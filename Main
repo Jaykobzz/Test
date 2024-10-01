@@ -1,1 +1,147 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const TaskAnalyzer = () => {
+  const [tasks, setTasks] = useState([]);
+  const [currentTask, setCurrentTask] = useState('');
+  const [currentFunScore, setCurrentFunScore] = useState('');
+  const [currentValueScore, setCurrentValueScore] = useState('');
+  const [analyzedTasks, setAnalyzedTasks] = useState([]);
+
+  const addTask = () => {
+    if (currentTask && currentFunScore && currentValueScore) {
+      setTasks([...tasks, {
+        name: currentTask,
+        funScore: parseInt(currentFunScore),
+        valueScore: parseInt(currentValueScore)
+      }]);
+      setCurrentTask('');
+      setCurrentFunScore('');
+      setCurrentValueScore('');
+    }
+  };
+
+  const analyzeTask = (task) => {
+    const funThreshold = 5;
+    const valueThreshold = 5;
+
+    if (task.funScore > funThreshold && task.valueScore > valueThreshold) return 'A';
+    if (task.funScore <= funThreshold && task.valueScore > valueThreshold) return 'B';
+    if (task.funScore > funThreshold && task.valueScore <= valueThreshold) return 'C';
+    return 'D';
+  };
+
+  const analyzeTasks = () => {
+    const analyzed = tasks.map(task => ({
+      ...task,
+      classification: analyzeTask(task)
+    }));
+    setAnalyzedTasks(analyzed);
+  };
+
+  const classColors = {
+    A: '#4CAF50', // Green
+    B: '#2196F3', // Blue
+    C: '#FFC107', // Yellow
+    D: '#F44336'  // Red
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-8 font-sans">
+      <h1 className="text-3xl font-semibold mb-6">Workshop Task Analyzer</h1>
+      
+      <div className="space-y-4">
+        <Input
+          type="text"
+          placeholder="Arbetsuppgift"
+          value={currentTask}
+          onChange={(e) => setCurrentTask(e.target.value)}
+          className="w-full"
+        />
+        <div className="flex space-x-4">
+          <Input
+            type="number"
+            placeholder="Kul-score (1-10)"
+            value={currentFunScore}
+            onChange={(e) => setCurrentFunScore(e.target.value)}
+            min="1"
+            max="10"
+            className="w-1/2"
+          />
+          <Input
+            type="number"
+            placeholder="Värde-score (1-10)"
+            value={currentValueScore}
+            onChange={(e) => setCurrentValueScore(e.target.value)}
+            min="1"
+            max="10"
+            className="w-1/2"
+          />
+        </div>
+        <Button onClick={addTask} className="w-full bg-blue-500 hover:bg-blue-600 text-white">Lägg till arbetsuppgift</Button>
+      </div>
+
+      {tasks.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Tillagda arbetsuppgifter</h2>
+          <ul className="list-disc pl-5">
+            {tasks.map((task, index) => (
+              <li key={index}>{task.name} (Kul: {task.funScore}, Värde: {task.valueScore})</li>
+            ))}
+          </ul>
+          <Button onClick={analyzeTasks} className="w-full bg-green-500 hover:bg-green-600 text-white">Analysera</Button>
+        </div>
+      )}
+
+      {analyzedTasks.length > 0 && (
+        <div className="space-y-8">
+          <h2 className="text-2xl font-semibold">Analysresultat</h2>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Arbetsuppgift</th>
+                  <th className="px-4 py-2 text-left">Kul-score</th>
+                  <th className="px-4 py-2 text-left">Värde-score</th>
+                  <th className="px-4 py-2 text-left">Klassificering</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analyzedTasks.map((task, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td className="px-4 py-2">{task.name}</td>
+                    <td className="px-4 py-2">{task.funScore}</td>
+                    <td className="px-4 py-2">{task.valueScore}</td>
+                    <td className="px-4 py-2" style={{ color: classColors[task.classification] }}>{task.classification}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="h-96 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <XAxis type="number" dataKey="funScore" name="Kul-score" unit="" domain={[0, 10]} />
+                <YAxis type="number" dataKey="valueScore" name="Värde-score" unit="" domain={[0, 10]} />
+                <ZAxis type="category" dataKey="classification" name="Klassificering" />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                <Legend />
+                <Scatter name="Arbetsuppgifter" data={analyzedTasks} fill="#8884d8">
+                  {analyzedTasks.map((entry, index) => (
+                    <circle key={`circle-${index}`} fill={classColors[entry.classification]} r={8} />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TaskAnalyzer;
