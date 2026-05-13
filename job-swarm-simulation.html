@@ -2,296 +2,585 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8" />
-<title>Arbetssvärmen 2025–2050</title>
+<title>SWARM — Jobbmarknaden 2025–2050</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #07090d;
-    --panel: rgba(16, 22, 30, 0.85);
-    --text: #e6edf3;
-    --muted: #8b949e;
+    --bg-0: #04060a;
+    --bg-1: #0a0e16;
+    --panel: rgba(10, 14, 22, 0.55);
+    --panel-strong: rgba(10, 14, 22, 0.82);
+    --border: rgba(255, 255, 255, 0.06);
+    --border-bright: rgba(255, 255, 255, 0.12);
+    --text: #eef2f7;
+    --muted: #6b7585;
     --accent: #58a6ff;
-    --border: #1f2730;
+    --accent-2: #bc8cff;
+    --danger: #ff4757;
+    --good: #2ed573;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--bg);
+    background: var(--bg-0);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
     overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+    height: 100vh; width: 100vw;
+    letter-spacing: -0.005em;
   }
-  canvas {
-    display: block;
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-  }
-  #ui {
-    position: absolute;
-    top: 16px; left: 16px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 360px;
-  }
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(8px);
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-  h1 {
-    margin: 0 0 4px;
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .sub { color: var(--muted); font-size: 12px; line-height: 1.4; }
-  .row {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 10px;
-  }
-  button {
-    background: #1f2933;
-    color: var(--text);
-    border: 1px solid #2d3540;
-    border-radius: 5px;
-    padding: 7px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.1s;
-  }
-  button:hover { background: #2a3540; }
-  button.primary { background: #1f6feb; border-color: #1f6feb; }
-  button.primary:hover { background: #388bfd; }
-  button.danger { background: #8b0000; border-color: #b00000; }
-  button.danger:hover { background: #b00000; }
-  select, input[type="range"] {
-    background: #0f1419;
-    color: var(--text);
-    border: 1px solid #2d3540;
-    border-radius: 4px;
-    padding: 5px 8px;
-    font-size: 13px;
-  }
-  input[type="range"] { padding: 0; flex: 1; }
-  label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
-  #stats {
-    position: absolute;
-    top: 16px; right: 16px;
-    z-index: 10;
-    min-width: 260px;
+  /* ---- Background atmosphere ---- */
+  .bg-grad {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(88, 166, 255, 0.08), transparent 70%),
+      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(188, 140, 255, 0.06), transparent 70%),
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(20, 30, 50, 0.4), transparent 70%);
   }
-  .big-stat {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 6px 0;
-    border-bottom: 1px solid #1a2028;
+  .bg-grid {
+    position: absolute; inset: 0; z-index: 1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
   }
-  .big-stat:last-child { border-bottom: none; }
-  .big-stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .big-stat .num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .year-display {
-    font-size: 56px;
+  .vignette {
+    position: absolute; inset: 0; z-index: 8;
+    pointer-events: none;
+    background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 50%, rgba(0,0,0,0.7) 100%);
+  }
+  .noise {
+    position: absolute; inset: 0; z-index: 9;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>");
+  }
+
+  /* ---- Canvases ---- */
+  canvas {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+  }
+  #glow-canvas { z-index: 2; filter: blur(14px) saturate(1.5); opacity: 0.95; mix-blend-mode: screen; }
+  #main-canvas { z-index: 3; }
+  #fx-canvas { z-index: 4; pointer-events: none; }
+
+  /* ---- HUD ---- */
+  #hud { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+  #hud > * { pointer-events: auto; }
+
+  .brand {
+    position: absolute; top: 22px; left: 28px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .brand-logo {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    background: conic-gradient(from 45deg, #58a6ff, #bc8cff, #ff4757, #ffb74d, #58a6ff);
+    filter: blur(0.5px);
+    box-shadow: 0 0 24px rgba(88,166,255,0.5), inset 0 0 8px rgba(0,0,0,0.3);
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .brand-text .name {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
+  }
+  .brand-text .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; color: var(--muted); letter-spacing: 0.15em; margin-top: 2px;
+  }
+
+  .year-block {
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    text-align: center;
+  }
+  .year-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; color: var(--muted); letter-spacing: 0.5em;
+    text-transform: uppercase;
+  }
+  .year-number {
+    font-size: 86px;
     font-weight: 800;
+    letter-spacing: -0.04em;
     line-height: 1;
-    letter-spacing: -0.03em;
-    background: linear-gradient(90deg, #58a6ff, #bc8cff);
+    background: linear-gradient(180deg, #ffffff 0%, #a8b3c7 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 40px rgba(88,166,255,0.3);
+    margin-top: -8px;
+  }
+  .year-bar {
+    height: 3px;
+    width: 260px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    margin: 4px auto 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .year-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 12px var(--accent);
+    width: 0%;
+    transition: width 0.3s;
   }
 
-  #legend {
-    position: absolute;
-    bottom: 16px; left: 16px;
-    z-index: 10;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-width: 50vw;
+  /* ---- Stat cards ---- */
+  .stats {
+    position: absolute; top: 22px; right: 28px;
+    display: flex; flex-direction: column; gap: 10px;
+    min-width: 240px;
   }
-  .sector-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  .stat-card {
     background: var(--panel);
     border: 1px solid var(--border);
-    padding: 5px 9px;
-    border-radius: 999px;
-    font-size: 12px;
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 14px;
+    padding: 12px 16px;
+    position: relative;
+    overflow: hidden;
   }
-  .sector-chip .dot {
-    width: 8px; height: 8px; border-radius: 50%;
+  .stat-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 60%);
+    pointer-events: none;
   }
-  .sector-chip .count {
-    color: var(--muted);
+  .stat-card .label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9.5px; color: var(--muted);
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .stat-card .num {
+    font-size: 32px; font-weight: 700;
     font-variant-numeric: tabular-nums;
-    font-size: 11px;
+    line-height: 1.1; margin-top: 2px;
+    letter-spacing: -0.025em;
   }
-  #event-log {
-    position: absolute;
-    bottom: 16px; right: 16px;
-    z-index: 10;
-    max-width: 320px;
-    max-height: 200px;
+  .stat-card .delta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; color: var(--muted);
+    margin-top: 2px;
+  }
+  .stat-card.danger .num { color: var(--danger); text-shadow: 0 0 18px rgba(255,71,87,0.4); }
+  .stat-card.good .num { color: var(--good); text-shadow: 0 0 18px rgba(46,213,115,0.3); }
+  .stat-card.warn .num { color: #ffb74d; text-shadow: 0 0 18px rgba(255,183,77,0.3); }
+
+  /* ---- Bottom dock (controls) ---- */
+  .dock {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    background: var(--panel-strong);
+    border: 1px solid var(--border-bright);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
+  }
+  .dock .group { display: flex; align-items: center; gap: 8px; }
+  .dock .sep {
+    width: 1px; height: 28px; background: var(--border);
+  }
+  button.btn {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border: 1px solid var(--border-bright);
+    border-radius: 9px;
+    padding: 8px 14px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  button.btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+  button.btn.primary {
+    background: linear-gradient(135deg, #1f6feb, #388bfd);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 14px rgba(31,111,235,0.4);
+  }
+  button.btn.primary:hover { box-shadow: 0 6px 20px rgba(31,111,235,0.6); }
+  button.btn.danger {
+    background: linear-gradient(135deg, #c41e3a, #ff4757);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 14px rgba(255,71,87,0.4);
+  }
+  button.btn.danger:hover { box-shadow: 0 6px 24px rgba(255,71,87,0.7); }
+  select.btn {
+    appearance: none;
+    padding-right: 28px;
+    background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.6) 50%),
+                      linear-gradient(135deg, rgba(255,255,255,0.6) 50%, transparent 50%);
+    background-position: calc(100% - 14px) 50%, calc(100% - 10px) 50%;
+    background-size: 4px 4px;
+    background-repeat: no-repeat;
+  }
+  .slider-wrap {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 6px;
+  }
+  .slider-wrap label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 130px; height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 10px var(--accent), 0 0 0 3px rgba(88,166,255,0.3);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border: none; border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 10px var(--accent), 0 0 0 3px rgba(88,166,255,0.3);
+    cursor: pointer;
+  }
+  .speed-val {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; font-weight: 500;
+    min-width: 38px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Sector spectrum (top bottom?) ---- */
+  .spectrum {
+    position: absolute; bottom: 96px; left: 28px; right: 28px;
+    height: 8px;
+    display: flex;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  }
+  .spectrum .seg {
+    height: 100%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .spectrum .seg::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent 60%);
+  }
+
+  /* ---- Legend ---- */
+  .legend {
+    position: absolute; bottom: 116px; left: 28px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+    max-width: 60vw;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .chip .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .chip .count {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--muted);
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Event log ---- */
+  .log {
+    position: absolute; bottom: 116px; right: 28px;
+    width: 320px;
+    max-height: 260px;
     overflow: hidden;
     pointer-events: none;
+    display: flex; flex-direction: column-reverse;
+    gap: 6px;
   }
   .event {
     background: var(--panel);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
+    backdrop-filter: blur(14px);
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 12px;
-    margin-bottom: 6px;
-    animation: fade 8s forwards;
+    animation: slideIn 0.4s ease-out forwards, fadeOut 8s forwards;
+    transform-origin: right;
   }
-  .event.bad { border-left-color: #e53935; }
-  .event.good { border-left-color: #4caf50; }
-  @keyframes fade {
-    0% { opacity: 0; transform: translateX(20px); }
-    8% { opacity: 1; transform: translateX(0); }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+  .event.bad { border-left-color: var(--danger); }
+  .event.good { border-left-color: var(--good); }
+  .event.shock { border-left-color: #ff4757; background: linear-gradient(90deg, rgba(255,71,87,0.18), var(--panel)); }
+  .event .ts {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9.5px; color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
   }
-  .flash {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, rgba(229,57,53,0.18), transparent 70%);
-    pointer-events: none;
-    z-index: 5;
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeOut {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(40px); }
+  }
+
+  /* ---- Shock flash ---- */
+  .shock-flash {
+    position: absolute; inset: 0; z-index: 6;
+    background: radial-gradient(circle at 50% 50%, rgba(255,71,87,0.35), transparent 60%);
     opacity: 0;
-    transition: opacity 0.3s;
+    pointer-events: none;
+    transition: opacity 0.4s;
   }
-  .flash.active { opacity: 1; }
+  .shock-flash.active { opacity: 1; }
+  .scanline {
+    position: absolute; left: 0; right: 0; height: 80px; z-index: 6;
+    background: linear-gradient(180deg, transparent, rgba(255,71,87,0.25), transparent);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* ---- Title card ---- */
+  .title-card {
+    position: absolute; bottom: 26px; left: 28px;
+    max-width: 280px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    padding: 14px 16px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.3s forwards;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .title-card h1 {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .title-card p {
+    font-size: 11.5px; color: var(--muted);
+    margin: 0; line-height: 1.45;
+  }
 </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
-<div class="flash" id="flash"></div>
+<div class="bg-grad"></div>
+<div class="bg-grid"></div>
+<canvas id="glow-canvas"></canvas>
+<canvas id="main-canvas"></canvas>
+<canvas id="fx-canvas"></canvas>
+<div class="shock-flash" id="shock-flash"></div>
+<div class="vignette"></div>
+<div class="noise"></div>
 
-<div id="ui">
-  <div class="panel">
-    <h1>Arbetssvärmen 2025–2050</h1>
-    <div class="sub">10 000 arbetare. Varje prick är en människa. Färgen är deras sektor. När AI träffar blir de grå – och måste hitta nytt jobb.</div>
+<div id="hud">
+  <div class="brand">
+    <div class="brand-logo"></div>
+    <div class="brand-text">
+      <div class="name">SWARM ⁄ 2050</div>
+      <div class="tag">AGENT-BASED LABOR SIMULATION</div>
+    </div>
   </div>
-  <div class="panel">
-    <div class="row">
-      <button id="play" class="primary">⏸ Pausa</button>
-      <button id="reset">↻ Återställ</button>
+
+  <div class="year-block">
+    <div class="year-label">SIMULATION YEAR</div>
+    <div class="year-number" id="year">2025</div>
+    <div class="year-bar"><div class="year-bar-fill" id="year-fill"></div></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card danger">
+      <div class="label">DISPLACED</div>
+      <div class="num" id="unemployed">0</div>
+      <div class="delta" id="unemployed-pct">0.0% av styrkan</div>
     </div>
-    <div class="row">
-      <label style="min-width:60px">Hastighet</label>
+    <div class="stat-card good">
+      <div class="label">RESKILLED</div>
+      <div class="num" id="retrained">0</div>
+      <div class="delta" id="retrained-rate">— per år</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="label">AI STRIKES / YR</div>
+      <div class="num" id="hit-rate">0</div>
+      <div class="delta" id="strike-trend">tryck stigande</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">EMERGENT FIELDS</div>
+      <div class="num" id="new-sectors">0</div>
+      <div class="delta">nya yrken sedan 2025</div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <div class="spectrum" id="spectrum"></div>
+  <div class="log" id="event-log"></div>
+
+  <div class="title-card">
+    <h1>10 000 människor. 25 år.</h1>
+    <p>Varje prick är en arbetare. Färgen visar sektor. När AI träffar bleknar de — och måste hitta nya jobb i framtidens ekonomi.</p>
+  </div>
+
+  <div class="dock">
+    <div class="group">
+      <button id="play" class="btn primary">⏸ Pause</button>
+      <button id="reset" class="btn">↻ Reset</button>
+    </div>
+    <div class="sep"></div>
+    <div class="group slider-wrap">
+      <label>Speed</label>
       <input type="range" id="speed" min="0.2" max="6" step="0.1" value="1.5" />
-      <span id="speed-label" style="font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted)">1.5×</span>
+      <span class="speed-val" id="speed-label">1.5×</span>
     </div>
-    <div class="row">
-      <label style="min-width:60px">Scenario</label>
-      <select id="scenario">
-        <option value="slow">Långsam adoption</option>
-        <option value="moderate" selected>Måttlig (basscenario)</option>
-        <option value="fast">Snabb AI-revolution</option>
+    <div class="sep"></div>
+    <div class="group">
+      <select id="scenario" class="btn">
+        <option value="slow">⊙ Slow adoption</option>
+        <option value="moderate" selected>⊙ Moderate baseline</option>
+        <option value="fast">⊙ Fast AI revolution</option>
       </select>
     </div>
-    <div class="row">
-      <button id="shock" class="danger">⚡ Trigga AGI-genombrott</button>
+    <div class="sep"></div>
+    <div class="group">
+      <button id="shock" class="btn danger">⚡ Trigger AGI breakthrough</button>
     </div>
   </div>
 </div>
 
-<div id="stats" class="panel">
-  <div class="year-display" id="year">2025</div>
-  <div class="big-stat">
-    <span class="label">Arbetslösa</span>
-    <span class="num" id="unemployed" style="color:#e53935">0</span>
-  </div>
-  <div class="big-stat">
-    <span class="label">Omskolade</span>
-    <span class="num" id="retrained" style="color:#4caf50">0</span>
-  </div>
-  <div class="big-stat">
-    <span class="label">AI-träffar / år</span>
-    <span class="num" id="hit-rate" style="color:#ffb74d">0</span>
-  </div>
-  <div class="big-stat">
-    <span class="label">Nya yrkesfält</span>
-    <span class="num" id="new-sectors">0</span>
-  </div>
-</div>
-
-<div id="legend"></div>
-<div id="event-log"></div>
-
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+// ====================================================================
+//  CANVASES
+// ====================================================================
+const mainCanvas = document.getElementById("main-canvas");
+const glowCanvas = document.getElementById("glow-canvas");
+const fxCanvas = document.getElementById("fx-canvas");
+const mctx = mainCanvas.getContext("2d");
+const gctx = glowCanvas.getContext("2d");
+const fctx = fxCanvas.getContext("2d");
 let W = 0, H = 0, dpr = 1;
 
 function resize() {
   dpr = Math.min(window.devicePixelRatio || 1, 2);
   W = window.innerWidth;
   H = window.innerHeight;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width = W + "px";
-  canvas.style.height = H + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  for (const c of [mainCanvas, glowCanvas, fxCanvas]) {
+    c.width = W * dpr; c.height = H * dpr;
+    c.style.width = W + "px"; c.style.height = H + "px";
+  }
+  // Glow renders at lower resolution for performance
+  glowCanvas.width = Math.floor(W * 0.5);
+  glowCanvas.height = Math.floor(H * 0.5);
+  mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  gctx.setTransform(0.5, 0, 0, 0.5, 0, 0);
 }
 window.addEventListener("resize", resize);
 resize();
 
-// --- Sektorer ---
-// risk = sannolikhet per "år" att en arbetare i sektorn träffas av AI
-// (skalas med scenario-multiplier och tidsacceleration)
+// ====================================================================
+//  SECTORS
+// ====================================================================
 const SECTORS = [
-  { id: "manuf",   name: "Industri & tillverkning", color: "#ff7043", risk: 0.85, anchor: [0.20, 0.30] },
-  { id: "transp",  name: "Transport & logistik",    color: "#ffb74d", risk: 0.80, anchor: [0.35, 0.25] },
-  { id: "retail",  name: "Handel & kassa",          color: "#ffd54f", risk: 0.75, anchor: [0.50, 0.30] },
-  { id: "admin",   name: "Administration",          color: "#fff176", risk: 0.70, anchor: [0.65, 0.25] },
-  { id: "finance", name: "Finans & bokföring",      color: "#aed581", risk: 0.60, anchor: [0.80, 0.30] },
-  { id: "media",   name: "Media & kreativ",         color: "#4fc3f7", risk: 0.55, anchor: [0.20, 0.55] },
-  { id: "tech",    name: "IT & utveckling",         color: "#7986cb", risk: 0.45, anchor: [0.35, 0.60] },
-  { id: "edu",     name: "Utbildning",              color: "#9575cd", risk: 0.35, anchor: [0.50, 0.55] },
-  { id: "health",  name: "Vård & omsorg",           color: "#f06292", risk: 0.20, anchor: [0.65, 0.60] },
-  { id: "craft",   name: "Hantverk & service",      color: "#ba68c8", risk: 0.25, anchor: [0.80, 0.55] },
-  { id: "ai_eng",  name: "AI-ingenjör",             color: "#00e5ff", risk: 0.05, anchor: [0.30, 0.82], emerging: true, emergesYear: 2026 },
-  { id: "robo_op", name: "Robotunderhåll",          color: "#1de9b6", risk: 0.10, anchor: [0.50, 0.82], emerging: true, emergesYear: 2028 },
-  { id: "ai_ethic",name: "AI-etiker",               color: "#ffea00", risk: 0.05, anchor: [0.70, 0.82], emerging: true, emergesYear: 2031 },
+  { id: "manuf",   name: "Manufacturing",   color: "#ff6b9d", rgb: [255,107,157], risk: 0.85 },
+  { id: "transp",  name: "Transport",       color: "#ff8c42", rgb: [255,140, 66], risk: 0.80 },
+  { id: "retail",  name: "Retail",          color: "#ffd166", rgb: [255,209,102], risk: 0.75 },
+  { id: "admin",   name: "Administration",  color: "#fff37c", rgb: [255,243,124], risk: 0.70 },
+  { id: "finance", name: "Finance",         color: "#a8e6a3", rgb: [168,230,163], risk: 0.60 },
+  { id: "media",   name: "Creative & Media",color: "#4cc9f0", rgb: [ 76,201,240], risk: 0.55 },
+  { id: "tech",    name: "Software",        color: "#7b9cff", rgb: [123,156,255], risk: 0.45 },
+  { id: "edu",     name: "Education",       color: "#b08aff", rgb: [176,138,255], risk: 0.35 },
+  { id: "health",  name: "Healthcare",      color: "#ff85a2", rgb: [255,133,162], risk: 0.20 },
+  { id: "craft",   name: "Craft & Service", color: "#d29bff", rgb: [210,155,255], risk: 0.25 },
+  { id: "ai_eng",  name: "AI Engineer",     color: "#00f5d4", rgb: [  0,245,212], risk: 0.05, emerging: true, emergesYear: 2026 },
+  { id: "robo_op", name: "Robotics Ops",    color: "#06ffa5", rgb: [  6,255,165], risk: 0.10, emerging: true, emergesYear: 2028 },
+  { id: "ai_ethic",name: "AI Ethicist",     color: "#fbff12", rgb: [251,255, 18], risk: 0.05, emerging: true, emergesYear: 2031 },
+  { id: "synth",   name: "Synthetic Bio",   color: "#ff61d8", rgb: [255, 97,216], risk: 0.05, emerging: true, emergesYear: 2034 },
 ];
 const SECTOR_BY_ID = Object.fromEntries(SECTORS.map(s => [s.id, s]));
-const UNEMPLOYED_COLOR = "#4a5560";
+const UNEMPLOYED_RGB = [110, 122, 140];
 
-const SCENARIOS = {
-  slow:     { mult: 0.55, retrainBoost: 1.3, label: "Långsam adoption" },
-  moderate: { mult: 1.00, retrainBoost: 1.0, label: "Måttlig (basscenario)" },
-  fast:     { mult: 1.70, retrainBoost: 0.8, label: "Snabb AI-revolution" },
-};
+// Compute hex anchor points around the screen — circular layout
+function computeAnchors() {
+  const cx = W * 0.5, cy = H * 0.5;
+  const rx = Math.min(W * 0.34, 520);
+  const ry = Math.min(H * 0.30, 360);
+  const active = SECTORS.filter(s => activeSectorIds.has(s.id));
+  active.forEach((s, i) => {
+    const ang = (i / active.length) * Math.PI * 2 - Math.PI / 2;
+    s.anchor = [cx + Math.cos(ang) * rx, cy + Math.sin(ang) * ry];
+  });
+  // Inactive (not yet emerged) get placeholder anchors at center bottom (unused)
+  SECTORS.forEach(s => { if (!s.anchor) s.anchor = [cx, cy + H * 0.4]; });
+}
 
+// ====================================================================
+//  STATE
+// ====================================================================
 const AGENT_COUNT = 10000;
 const agents = [];
+const particles = [];
+const shockwaves = [];
 
-function initialSectorDistribution() {
-  // Ungefärlig global sysselsättningsfördelning per startsektor.
+let activeSectorIds = new Set(SECTORS.filter(s => !s.emerging).map(s => s.id));
+let year = 2025;
+let yearFrac = 0;
+let playing = true;
+let speed = 1.5;
+let scenarioKey = "moderate";
+let shockActive = false;
+let shockDecay = 0;
+let totalHitsThisYear = 0;
+let lastYearHits = 0;
+let totalRetrained = 0;
+let lastYearRetrained = 0;
+let prevTotalRetrained = 0;
+
+const SCENARIOS = {
+  slow:     { mult: 0.55, retrainBoost: 1.3, label: "Slow adoption" },
+  moderate: { mult: 1.00, retrainBoost: 1.0, label: "Moderate baseline" },
+  fast:     { mult: 1.75, retrainBoost: 0.85, label: "Fast AI revolution" },
+};
+
+function initialDistribution() {
   const dist = [
-    ["manuf",   0.18],
-    ["transp",  0.07],
-    ["retail",  0.14],
-    ["admin",   0.10],
-    ["finance", 0.05],
-    ["media",   0.04],
-    ["tech",    0.05],
-    ["edu",     0.07],
-    ["health",  0.13],
-    ["craft",   0.17],
+    ["manuf",   0.18], ["transp",  0.07], ["retail",  0.14], ["admin",   0.10],
+    ["finance", 0.05], ["media",   0.04], ["tech",    0.05], ["edu",     0.07],
+    ["health",  0.13], ["craft",   0.17],
   ];
   const arr = [];
   for (const [id, p] of dist) {
@@ -304,105 +593,156 @@ function initialSectorDistribution() {
 
 function spawnAgents() {
   agents.length = 0;
-  const dist = initialSectorDistribution();
+  particles.length = 0;
+  shockwaves.length = 0;
+  const dist = initialDistribution();
   for (let i = 0; i < AGENT_COUNT; i++) {
     const sid = dist[i];
-    const s = SECTOR_BY_ID[sid];
     agents.push({
       sector: sid,
-      x: s.anchor[0] * W + (Math.random() - 0.5) * 80,
-      y: s.anchor[1] * H + (Math.random() - 0.5) * 80,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      state: "employed", // employed | unemployed | retraining
+      x: W * 0.5 + (Math.random() - 0.5) * W * 0.6,
+      y: H * 0.5 + (Math.random() - 0.5) * H * 0.6,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      state: "employed",
       retrainProgress: 0,
       targetSector: null,
-      age: 25 + Math.random() * 40,
+      phase: Math.random() * Math.PI * 2,
     });
   }
 }
+computeAnchors();
 spawnAgents();
 
-// --- Tillstånd ---
-let year = 2025;
-let yearFrac = 0;
-let playing = true;
-let speed = 1.5;
-let scenarioKey = "moderate";
-let shockActive = false;
-let shockDecay = 0;
-let totalHitsThisYear = 0;
-let lastYearHits = 0;
-let totalRetrained = 0;
-let activeSectorIds = new Set(SECTORS.filter(s => !s.emerging).map(s => s.id));
+// ====================================================================
+//  UI bindings
+// ====================================================================
+const $ = id => document.getElementById(id);
+const playBtn = $("play"), resetBtn = $("reset"), speedInput = $("speed"),
+      speedLabel = $("speed-label"), scenarioSelect = $("scenario"),
+      shockBtn = $("shock"), yearEl = $("year"), yearFill = $("year-fill"),
+      unemployedEl = $("unemployed"), unemployedPctEl = $("unemployed-pct"),
+      retrainedEl = $("retrained"), retrainedRateEl = $("retrained-rate"),
+      hitRateEl = $("hit-rate"), strikeTrendEl = $("strike-trend"),
+      newSectorsEl = $("new-sectors"),
+      legendEl = $("legend"), spectrumEl = $("spectrum"),
+      logEl = $("event-log"), shockFlash = $("shock-flash");
 
-// --- UI ---
-const playBtn = document.getElementById("play");
-const resetBtn = document.getElementById("reset");
-const speedInput = document.getElementById("speed");
-const speedLabel = document.getElementById("speed-label");
-const scenarioSelect = document.getElementById("scenario");
-const shockBtn = document.getElementById("shock");
-const yearEl = document.getElementById("year");
-const unemployedEl = document.getElementById("unemployed");
-const retrainedEl = document.getElementById("retrained");
-const hitRateEl = document.getElementById("hit-rate");
-const newSectorsEl = document.getElementById("new-sectors");
-const legendEl = document.getElementById("legend");
-const eventLog = document.getElementById("event-log");
-const flash = document.getElementById("flash");
-
-playBtn.addEventListener("click", () => {
+playBtn.onclick = () => {
   playing = !playing;
-  playBtn.textContent = playing ? "⏸ Pausa" : "▶ Spela";
-});
-resetBtn.addEventListener("click", () => {
+  playBtn.innerHTML = playing ? "⏸ Pause" : "▶ Play";
+};
+resetBtn.onclick = () => {
   year = 2025; yearFrac = 0;
-  totalHitsThisYear = 0; lastYearHits = 0; totalRetrained = 0;
+  totalHitsThisYear = 0; lastYearHits = 0;
+  totalRetrained = 0; prevTotalRetrained = 0; lastYearRetrained = 0;
   activeSectorIds = new Set(SECTORS.filter(s => !s.emerging).map(s => s.id));
+  computeAnchors();
   spawnAgents();
-  buildLegend();
-  logEvent("Simuleringen återställd", "good");
-});
-speedInput.addEventListener("input", e => {
+  buildLegend(); buildSpectrum();
+  logEvent("Simulation reset", "good");
+};
+speedInput.oninput = e => {
   speed = +e.target.value;
   speedLabel.textContent = speed.toFixed(1) + "×";
-});
-scenarioSelect.addEventListener("change", e => {
+};
+scenarioSelect.onchange = e => {
   scenarioKey = e.target.value;
-  logEvent(`Scenario: ${SCENARIOS[scenarioKey].label}`);
-});
-shockBtn.addEventListener("click", () => {
+  logEvent(`Scenario → ${SCENARIOS[scenarioKey].label}`);
+};
+shockBtn.onclick = triggerShock;
+
+function triggerShock() {
   shockActive = true;
-  shockDecay = 3.0; // år
-  flash.classList.add("active");
-  logEvent("⚡ AGI-GENOMBROTT! Massiv automatiseringsvåg.", "bad");
-  setTimeout(() => flash.classList.remove("active"), 600);
-});
+  shockDecay = 3.0;
+  shockFlash.classList.add("active");
+  setTimeout(() => shockFlash.classList.remove("active"), 700);
+  // Spawn dramatic shockwave
+  shockwaves.push({ x: W/2, y: H/2, r: 0, life: 1.4, max: Math.max(W,H) });
+  logEvent("⚡ AGI BREAKTHROUGH — global automation surge", "shock");
+}
 
 function buildLegend() {
   legendEl.innerHTML = "";
   SECTORS.forEach(s => {
     if (!activeSectorIds.has(s.id)) return;
-    const chip = document.createElement("div");
-    chip.className = "sector-chip";
-    chip.innerHTML = `<div class="dot" style="background:${s.color}"></div><span>${s.name}</span><span class="count" id="count-${s.id}">0</span>`;
-    legendEl.appendChild(chip);
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.innerHTML = `<span class="dot" style="background:${s.color};color:${s.color}"></span><span>${s.name}</span><span class="count" id="count-${s.id}">0</span>`;
+    legendEl.appendChild(c);
   });
 }
-buildLegend();
+
+function buildSpectrum() {
+  spectrumEl.innerHTML = "";
+  SECTORS.forEach(s => {
+    if (!activeSectorIds.has(s.id)) return;
+    const seg = document.createElement("div");
+    seg.className = "seg";
+    seg.id = "spec-" + s.id;
+    seg.style.background = s.color;
+    seg.style.width = "0%";
+    spectrumEl.appendChild(seg);
+  });
+  // Unemployed segment
+  const u = document.createElement("div");
+  u.className = "seg";
+  u.id = "spec-unemployed";
+  u.style.background = "rgba(110,122,140,0.6)";
+  u.style.width = "0%";
+  spectrumEl.appendChild(u);
+}
+buildLegend(); buildSpectrum();
 
 function logEvent(msg, kind = "") {
   const e = document.createElement("div");
   e.className = "event " + kind;
-  e.textContent = msg;
-  eventLog.prepend(e);
-  setTimeout(() => e.remove(), 8200);
+  const ts = `Y${year}`;
+  e.innerHTML = `<div class="ts">${ts}</div>${msg}`;
+  logEl.prepend(e);
+  setTimeout(() => e.remove(), 8500);
 }
 
-// --- Simuleringssteg ---
+// ====================================================================
+//  Particle FX
+// ====================================================================
+function emitStrike(x, y, rgb) {
+  // Red sparks + small fade-out of original color
+  const n = 6;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const sp = 1 + Math.random() * 2.2;
+    particles.push({
+      x, y,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+      life: 0.7 + Math.random() * 0.5,
+      maxLife: 1.2,
+      rgb: [255, 80 + Math.random()*60, 80 + Math.random()*40],
+      size: 1.2 + Math.random() * 1.2,
+    });
+  }
+}
+
+function emitBirth(x, y, rgb) {
+  // green/cyan sparkles when retraining completes
+  for (let i = 0; i < 4; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const sp = 0.5 + Math.random() * 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.6,
+      life: 0.9 + Math.random() * 0.5,
+      maxLife: 1.4,
+      rgb,
+      size: 1.4 + Math.random() * 1.2,
+    });
+  }
+}
+
+// ====================================================================
+//  Simulation
+// ====================================================================
 function pickRetrainTarget() {
-  // Lågriskssektorer + nya yrkesfält viktade efter låg risk.
   const candidates = SECTORS.filter(s => activeSectorIds.has(s.id) && s.risk < 0.5);
   if (!candidates.length) return null;
   const weights = candidates.map(s => 1 / (s.risk + 0.05));
@@ -416,141 +756,211 @@ function pickRetrainTarget() {
 }
 
 function step(dt) {
-  // dt = år (delår)
   const scen = SCENARIOS[scenarioKey];
   const shockMult = shockActive ? 4.0 : 1.0;
 
-  // Lansera nya sektorer när året passeras
+  // New sectors emerging
   SECTORS.forEach(s => {
     if (s.emerging && !activeSectorIds.has(s.id) && year >= s.emergesYear) {
       activeSectorIds.add(s.id);
-      buildLegend();
-      logEvent(`Nytt yrkesfält: ${s.name}`, "good");
+      computeAnchors();
+      buildLegend(); buildSpectrum();
+      logEvent(`Emerging field — ${s.name}`, "good");
     }
   });
 
-  // Decay för shock
   if (shockActive) {
     shockDecay -= dt;
-    if (shockDecay <= 0) {
-      shockActive = false;
-      logEvent("Chockvågen klingar av");
-    }
+    if (shockDecay <= 0) { shockActive = false; logEvent("Shockwave subsiding"); }
   }
 
-  let hitsThisStep = 0;
+  let hits = 0;
+  const swayT = performance.now() * 0.0005;
 
   for (let i = 0; i < agents.length; i++) {
     const a = agents[i];
 
-    // Rörelse mot sektorns ankarpunkt med lite brus
     let anchor;
     if (a.state === "unemployed") {
-      anchor = [0.5, 0.9];
+      anchor = [W * 0.5, H * 0.5 + 80];
     } else if (a.state === "retraining") {
       const tgt = SECTOR_BY_ID[a.targetSector];
-      anchor = tgt ? tgt.anchor : [0.5, 0.9];
+      anchor = tgt && tgt.anchor ? tgt.anchor : [W * 0.5, H * 0.5];
     } else {
       const s = SECTOR_BY_ID[a.sector];
       anchor = s.anchor;
     }
-    const tx = anchor[0] * W;
-    const ty = anchor[1] * H;
-    const dx = tx - a.x;
-    const dy = ty - a.y;
-    a.vx += dx * 0.00015 + (Math.random() - 0.5) * 0.04;
-    a.vy += dy * 0.00015 + (Math.random() - 0.5) * 0.04;
-    a.vx *= 0.94;
-    a.vy *= 0.94;
-    a.x += a.vx * speed;
-    a.y += a.vy * speed;
+    // Subtle orbital motion around anchor
+    const orbitR = a.state === "employed" ? 36 : 60;
+    const ox = anchor[0] + Math.cos(a.phase + swayT) * orbitR;
+    const oy = anchor[1] + Math.sin(a.phase + swayT * 0.8) * orbitR;
+    const dx = ox - a.x;
+    const dy = oy - a.y;
+    a.vx += dx * 0.0018 + (Math.random() - 0.5) * 0.05;
+    a.vy += dy * 0.0018 + (Math.random() - 0.5) * 0.05;
+    a.vx *= 0.90;
+    a.vy *= 0.90;
+    a.x += a.vx * (0.8 + speed * 0.2);
+    a.y += a.vy * (0.8 + speed * 0.2);
 
-    // AI-träff
     if (a.state === "employed") {
       const s = SECTOR_BY_ID[a.sector];
-      const annualHitProb = s.risk * scen.mult * 0.025 * shockMult;
-      const stepProb = annualHitProb * dt;
-      if (Math.random() < stepProb) {
+      const annualHit = s.risk * scen.mult * 0.028 * shockMult;
+      if (Math.random() < annualHit * dt) {
         a.state = "unemployed";
         a.retrainProgress = 0;
-        hitsThisStep++;
+        hits++;
+        emitStrike(a.x, a.y, s.rgb);
       }
     } else if (a.state === "unemployed") {
-      // Försök börja omskolning
-      if (Math.random() < 0.4 * dt) {
+      if (Math.random() < 0.45 * dt) {
         const t = pickRetrainTarget();
-        if (t) {
-          a.state = "retraining";
-          a.targetSector = t;
-          a.retrainProgress = 0;
-        }
+        if (t) { a.state = "retraining"; a.targetSector = t; a.retrainProgress = 0; }
       }
     } else if (a.state === "retraining") {
-      const retrainSpeed = 0.6 * scen.retrainBoost;
-      a.retrainProgress += retrainSpeed * dt;
+      a.retrainProgress += 0.55 * scen.retrainBoost * dt;
       if (a.retrainProgress >= 1) {
+        const tgt = SECTOR_BY_ID[a.targetSector];
         a.sector = a.targetSector;
         a.targetSector = null;
         a.state = "employed";
         totalRetrained++;
+        if (Math.random() < 0.2) emitBirth(a.x, a.y, tgt.rgb);
       }
     }
   }
 
-  totalHitsThisYear += hitsThisStep;
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.03;
+    p.life -= dt * 1.8;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+  // Shockwaves
+  for (let i = shockwaves.length - 1; i >= 0; i--) {
+    const s = shockwaves[i];
+    s.r += s.max / (s.life * 60);
+    s.life -= dt * 1.5;
+    if (s.life <= 0) shockwaves.splice(i, 1);
+  }
+
+  totalHitsThisYear += hits;
   yearFrac += dt;
   if (yearFrac >= 1) {
     lastYearHits = totalHitsThisYear;
+    lastYearRetrained = totalRetrained - prevTotalRetrained;
+    prevTotalRetrained = totalRetrained;
     totalHitsThisYear = 0;
     yearFrac -= 1;
     year++;
     if (year > 2050) {
       playing = false;
-      playBtn.textContent = "▶ Spela";
-      logEvent("Simulering klar – år 2050", "good");
+      playBtn.innerHTML = "▶ Play";
+      logEvent("Simulation horizon reached — 2050", "good");
     }
   }
 }
 
-// --- Rendering ---
-function render() {
-  // Trail-effekt
-  ctx.fillStyle = "rgba(7, 9, 13, 0.35)";
-  ctx.fillRect(0, 0, W, H);
+// ====================================================================
+//  Rendering
+// ====================================================================
+function render(renderDt) {
+  // ----- Trails: fade main canvas -----
+  mctx.globalCompositeOperation = "source-over";
+  mctx.fillStyle = "rgba(4, 6, 10, 0.22)";
+  mctx.fillRect(0, 0, W, H);
 
-  // Rita arbetare
+  // ----- Sector auras (radial gradients behind clusters) -----
+  mctx.globalCompositeOperation = "lighter";
+  SECTORS.forEach(s => {
+    if (!activeSectorIds.has(s.id)) return;
+    const [ax, ay] = s.anchor;
+    const grd = mctx.createRadialGradient(ax, ay, 0, ax, ay, 140);
+    const [r,g,b] = s.rgb;
+    grd.addColorStop(0, `rgba(${r},${g},${b},0.12)`);
+    grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
+    mctx.fillStyle = grd;
+    mctx.fillRect(ax - 160, ay - 160, 320, 320);
+  });
+
+  // ----- Glow pass (low-res) -----
+  gctx.globalCompositeOperation = "source-over";
+  gctx.fillStyle = "rgba(0,0,0,0.55)";
+  gctx.fillRect(0, 0, W, H);
+  gctx.globalCompositeOperation = "lighter";
+
+  // ----- Agents -----
+  mctx.globalCompositeOperation = "lighter";
   for (let i = 0; i < agents.length; i++) {
     const a = agents[i];
-    let color;
+    let r, g, b, alpha = 0.95;
     if (a.state === "unemployed") {
-      color = UNEMPLOYED_COLOR;
+      [r,g,b] = UNEMPLOYED_RGB; alpha = 0.5;
     } else if (a.state === "retraining") {
       const tgt = SECTOR_BY_ID[a.targetSector];
       const t = a.retrainProgress;
-      color = tgt ? blend(UNEMPLOYED_COLOR, tgt.color, t) : UNEMPLOYED_COLOR;
+      r = UNEMPLOYED_RGB[0] + (tgt.rgb[0] - UNEMPLOYED_RGB[0]) * t;
+      g = UNEMPLOYED_RGB[1] + (tgt.rgb[1] - UNEMPLOYED_RGB[1]) * t;
+      b = UNEMPLOYED_RGB[2] + (tgt.rgb[2] - UNEMPLOYED_RGB[2]) * t;
+      alpha = 0.7 + t * 0.3;
     } else {
-      color = SECTOR_BY_ID[a.sector].color;
+      [r,g,b] = SECTOR_BY_ID[a.sector].rgb;
     }
-    ctx.fillStyle = color;
-    ctx.fillRect(a.x, a.y, 2, 2);
+    // Main sharp pixel
+    mctx.fillStyle = `rgba(${r|0},${g|0},${b|0},${alpha})`;
+    mctx.fillRect(a.x, a.y, 1.6, 1.6);
+    // Glow pass
+    gctx.fillStyle = `rgba(${r|0},${g|0},${b|0},${alpha * 0.9})`;
+    gctx.fillRect(a.x, a.y, 4, 4);
+  }
+
+  // ----- Particles (sparks) -----
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    const t = Math.max(0, p.life / p.maxLife);
+    const a = t;
+    mctx.fillStyle = `rgba(${p.rgb[0]|0},${p.rgb[1]|0},${p.rgb[2]|0},${a})`;
+    mctx.beginPath();
+    mctx.arc(p.x, p.y, p.size * (0.4 + t), 0, Math.PI * 2);
+    mctx.fill();
+    gctx.fillStyle = `rgba(${p.rgb[0]|0},${p.rgb[1]|0},${p.rgb[2]|0},${a * 0.9})`;
+    gctx.beginPath();
+    gctx.arc(p.x, p.y, p.size * 2.5 * (0.4 + t), 0, Math.PI * 2);
+    gctx.fill();
+  }
+
+  // ----- Shockwaves (on fx canvas) -----
+  fctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < shockwaves.length; i++) {
+    const s = shockwaves[i];
+    const t = Math.max(0, s.life / 1.4);
+    fctx.strokeStyle = `rgba(255, 71, 87, ${t * 0.5})`;
+    fctx.lineWidth = 3 * t + 1;
+    fctx.beginPath();
+    fctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    fctx.stroke();
+    // inner second ring
+    fctx.strokeStyle = `rgba(255, 200, 200, ${t * 0.3})`;
+    fctx.lineWidth = 1.5;
+    fctx.beginPath();
+    fctx.arc(s.x, s.y, s.r * 0.85, 0, Math.PI * 2);
+    fctx.stroke();
   }
 }
 
-function blend(c1, c2, t) {
-  const a = hex2rgb(c1), b = hex2rgb(c2);
-  const r = Math.round(a[0] + (b[0] - a[0]) * t);
-  const g = Math.round(a[1] + (b[1] - a[1]) * t);
-  const bl = Math.round(a[2] + (b[2] - a[2]) * t);
-  return `rgb(${r},${g},${bl})`;
-}
-function hex2rgb(h) {
-  const m = h.replace("#", "");
-  return [parseInt(m.substr(0,2),16), parseInt(m.substr(2,2),16), parseInt(m.substr(4,2),16)];
-}
+// ====================================================================
+//  HUD updates (animated counters)
+// ====================================================================
+const display = { unemployed: 0, retrained: 0, hitRate: 0, newSectors: 0 };
+function lerp(a, b, t) { return a + (b - a) * t; }
 
-// --- HUD ---
 function updateHUD() {
   yearEl.textContent = year;
+  const yearProg = Math.min(1, (year - 2025 + yearFrac) / 25);
+  yearFill.style.width = (yearProg * 100) + "%";
+
   let unemployed = 0;
   const counts = {};
   for (const s of SECTORS) counts[s.id] = 0;
@@ -559,42 +969,55 @@ function updateHUD() {
     if (a.state === "unemployed" || a.state === "retraining") unemployed++;
     else counts[a.sector]++;
   }
-  unemployedEl.textContent = unemployed.toLocaleString("sv-SE");
-  retrainedEl.textContent = totalRetrained.toLocaleString("sv-SE");
-  hitRateEl.textContent = lastYearHits.toLocaleString("sv-SE");
-  newSectorsEl.textContent = SECTORS.filter(s => s.emerging && activeSectorIds.has(s.id)).length;
+
+  display.unemployed = lerp(display.unemployed, unemployed, 0.18);
+  display.retrained = lerp(display.retrained, totalRetrained, 0.18);
+  display.hitRate = lerp(display.hitRate, lastYearHits, 0.18);
+  display.newSectors = SECTORS.filter(s => s.emerging && activeSectorIds.has(s.id)).length;
+
+  unemployedEl.textContent = Math.round(display.unemployed).toLocaleString("sv-SE");
+  unemployedPctEl.textContent = ((unemployed / AGENT_COUNT) * 100).toFixed(1) + "% av styrkan";
+  retrainedEl.textContent = Math.round(display.retrained).toLocaleString("sv-SE");
+  retrainedRateEl.textContent = lastYearRetrained.toLocaleString("sv-SE") + " / år";
+  hitRateEl.textContent = Math.round(display.hitRate).toLocaleString("sv-SE");
+  const pressure = SCENARIOS[scenarioKey].mult * (shockActive ? 4 : 1);
+  strikeTrendEl.textContent = pressure > 1.5 ? "extremt högt tryck" : pressure > 0.9 ? "tryck stigande" : "lågt tryck";
+  newSectorsEl.textContent = display.newSectors;
+
   for (const s of SECTORS) {
     const el = document.getElementById("count-" + s.id);
     if (el) el.textContent = counts[s.id].toLocaleString("sv-SE");
+    const seg = document.getElementById("spec-" + s.id);
+    if (seg) seg.style.width = ((counts[s.id] / AGENT_COUNT) * 100) + "%";
   }
+  const uSeg = document.getElementById("spec-unemployed");
+  if (uSeg) uSeg.style.width = ((unemployed / AGENT_COUNT) * 100) + "%";
 }
 
-// --- Loop ---
+// ====================================================================
+//  Main loop
+// ====================================================================
 let lastT = performance.now();
 let hudAccum = 0;
 function loop(now) {
   const realDt = Math.min(0.05, (now - lastT) / 1000);
   lastT = now;
   if (playing && year <= 2050) {
-    // 1 verklig sekund = ~0.5 simuleringsår vid 1× hastighet
     const simDt = realDt * 0.5 * speed;
     step(simDt);
   }
-  render();
+  render(realDt);
   hudAccum += realDt;
-  if (hudAccum > 0.1) {
-    updateHUD();
-    hudAccum = 0;
-  }
+  if (hudAccum > 0.06) { updateHUD(); hudAccum = 0; }
   requestAnimationFrame(loop);
 }
-ctx.fillStyle = "#07090d";
-ctx.fillRect(0, 0, W, H);
+mctx.fillStyle = "#04060a";
+mctx.fillRect(0, 0, W, H);
 updateHUD();
 requestAnimationFrame(loop);
 
-// Inledande events för dramaturgi
-setTimeout(() => logEvent("Simulering startad. AI-press börjar byggas upp."), 300);
+setTimeout(() => logEvent("Initializing labor swarm — 10 000 agents"), 200);
+setTimeout(() => logEvent("AI automation pressure rising"), 1400);
 </script>
 </body>
 </html>
