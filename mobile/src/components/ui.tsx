@@ -20,7 +20,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { Image } from "expo-image";
-import { SafeAreaView, type Edge } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
 
 import { Icon, type IconName } from "@/components/icons/Icon";
 import { Tappable } from "@/components/Tappable";
@@ -76,13 +76,24 @@ export function Screen({
   scroll = false,
   edges = ["top"],
   padded = true,
+  footer,
 }: {
   children: ReactNode;
   scroll?: boolean;
   edges?: Edge[];
   padded?: boolean;
+  /**
+   * Huvudhandlingen, fäst i underkant utanför scrollytan.
+   *
+   * En knapp som ligger sist i en lång scroll är svår att nå och hamnar
+   * dessutom i iPhones gestzon längst ned, där systemet tar trycket före
+   * appen. Den känns då död utan att vara det. Ligger den här är den
+   * alltid synlig och alltid tryckbar.
+   */
+  footer?: ReactNode;
 }) {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const padding = padded ? { paddingHorizontal: space.lg } : undefined;
 
   return (
@@ -108,6 +119,25 @@ export function Screen({
         </ScrollView>
       ) : (
         <View style={[{ flex: 1 }, padding]}>{children}</View>
+      )}
+
+      {footer && (
+        <View
+          style={[
+            padding,
+            {
+              paddingTop: space.md,
+              // Gestzonen längst ned är systemets. Lägger vi knappen där tar
+              // iOS trycket och appen ser trasig ut.
+              paddingBottom: Math.max(insets.bottom, space.md),
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderTopColor: theme.color.border,
+              backgroundColor: theme.color.bg,
+            },
+          ]}
+        >
+          {footer}
+        </View>
       )}
     </SafeAreaView>
   );

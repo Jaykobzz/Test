@@ -130,7 +130,30 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <Screen scroll>
+    <Screen
+      scroll
+      footer={
+        <>
+          {missing && (
+            <>
+              <Txt
+                variant="small"
+                tone={triedToSave ? "danger" : "faint"}
+                align="center"
+              >
+                {missing}
+              </Txt>
+              <Gap size="sm" />
+            </>
+          )}
+          <Button
+            label={saving ? "Sparar …" : "Kom igång"}
+            onPress={save}
+            loading={saving}
+          />
+        </>
+      }
+    >
       <Gap size="xl" />
       <Txt variant="display">Välkommen!</Txt>
       <Gap size="xs" />
@@ -265,24 +288,6 @@ export default function OnboardingScreen() {
 
       <Gap size="xl" />
 
-      {missing && (
-        <>
-          <Txt
-            variant="small"
-            tone={triedToSave ? "danger" : "faint"}
-            align="center"
-          >
-            {missing}
-          </Txt>
-          <Gap size="sm" />
-        </>
-      )}
-
-      <Button
-        label={saving ? "Sparar …" : "Kom igång"}
-        onPress={save}
-        loading={saving}
-      />
     </Screen>
   );
 }
