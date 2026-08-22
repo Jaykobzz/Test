@@ -1,12 +1,16 @@
 # FRIEND
 
-Hitta folk i närheten som vill göra samma sak som du.
+Få med dig folk på det du ändå ska göra.
 
-Du lägger upp något du ändå ska göra — *Fiska i Drevviken 13–15* — och folk i
-området ansöker om att haka på. Du väljer vilka du säger ja till. De du
-accepterar hamnar direkt i en chattgrupp med dig, där ni kan skicka bilder,
-kartnålar och listor inför det ni ska göra. Efteråt finns chatten kvar, ni kan
-göra om samma sak, och den ni gillade kan ni göra till BFF.
+Du lägger upp *Fiska i Drevviken 13–15* och folk i området ansöker om att haka
+på. Du väljer vilka du säger ja till. De du accepterar hamnar direkt i en
+chattgrupp med dig, där ni kan skicka bilder, kartnålar och listor inför det ni
+ska göra.
+
+Efteråt får ni frågan om ni vill göra om det. Vill båda det hörs ni av — vill
+bara den ena det händer ingenting alls, och ingen får veta. Gör ni om det
+tillräckligt många gånger har ni blivit vänner. Det är ordningen: **aktiviteten
+är produkten, vänskapen är vad som växer ur den.**
 
 Alla är verifierade med BankID. Inga anonyma konton, inga profiler utan bild.
 Och ingen betygsätter någon — se nedan.
@@ -80,7 +84,9 @@ Kräver ett Expo-konto och `eas.json`. Bundle-id och paketnamn står i
 Startar en tillfällig Postgres, lägger på en attrapp av det Supabase
 tillhandahåller (`auth.uid()`, `storage.foldername()`, rollerna), kör alla
 migrationer och går sedan igenom hela flödet som tre riktiga användare med
-RLS påslagen — ansöka, acceptera, chatta, anmäla, blockera.
+RLS påslagen — ansöka, acceptera, chatta, svara på "göra om det?", anmäla,
+blockera. Flera av testerna finns enbart för att bevisa att ett nej är omöjligt
+att upptäcka.
 
 Kräver `postgresql-16` och `postgresql-16-postgis-3`.
 
@@ -89,16 +95,18 @@ Kräver `postgresql-16` och `postgresql-16-postgis-3`.
 ## Hur det hänger ihop
 
 ```
-Ansökan  ──accepteras av värden──▶  Chattgrupp  ──aktiviteten är slut──┐
-                                        │                              │
-                                        └── finns kvar efteråt ◀───────┘
-                                            (gör om, boka nytt)
-                                                    │
-                                                    ▼
-                                              BFF-förfrågan
-                                                    │
-                                                    ▼
-                                    Aktiviteter bara för BFFs
+Ansökan ──accepteras av värden──▶ Chattgrupp ──slut──▶ "Göra om det?"
+                                       │                      │
+                                       │              båda ja │ (annars ingenting,
+                                       │                      │  och ingen får veta)
+                                       │                      ▼
+                                       └──────────────▶  Boka in nästa
+                                          chatten kvar        │
+                                                              ▼
+                                                        BFF-förfrågan
+                                                              │
+                                                              ▼
+                                              Aktiviteter bara för BFFs
 ```
 
 Att acceptera någon är den enda handling som skapar en chatt. Det är med
@@ -128,6 +136,14 @@ som behöver den mest. Profilen visar i stället fakta: BankID-verifierad, antal
 genomförda aktiviteter, medlem sedan. Trygghet hanteras som anmälan — privat,
 granskad av människa, aldrig synlig på någons profil.
 
+**Ett nej gör ingenting.** Efter en aktivitet får var och en frågan om de vill
+göra om det med de andra. Svaret är privat. Ett ja mot ett nej ger ingenting,
+och den som sagt nej får aldrig veta att någon sagt ja om hen. Eftersom en
+matchning bara uppstår när båda svarat går det heller aldrig att avgöra om
+tystnaden betyder nej eller bara att svaret dröjer — därför säger appen aldrig
+"ingen matchning" eller "väntar på svar". Den tvetydigheten är skyddet som gör
+att man vågar svara ärligt.
+
 **Reglerna bor i databasen.** Vem som får acceptera en ansökan, vem som får
 läsa en tråd, vem som får öppna en chatt — allt är RLS-policies och RPC:er.
 Appen kan inte kringgå dem ens om klientkoden ändras, och mock-backendet
@@ -151,9 +167,8 @@ via en svensk bank och en juridisk person — samma gränssnitt håller ändå.
   det finns ingen karta inuti FRIEND.
 - **Moderationsverktyg.** `reports` fylls på korrekt, men det finns ingen vy
   att beta av kön i.
-- **Ömsesidig "vi klickade"-signal.** Föreslagen ersättare för stunden efter
-  aktiviteten: båda svarar privat på om de vill göra om det, och bara ett
-  dubbelt ja syns — som ett BFF-förslag. Inte byggd än.
+- **Bjuda in någon direkt till en ny aktivitet.** Efter en matchning öppnas en
+  chatt där man får komma överens själv; appen kan inte skicka en inbjudan.
 - **Listor på Android.** `Alert.prompt` finns bara på iOS; Android behöver ett
   eget litet formulär.
 

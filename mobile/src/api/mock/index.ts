@@ -27,6 +27,8 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
+  Rematch,
+  RematchPrompt,
   SendMessageInput,
   ThreadSummary,
   Uuid,
@@ -44,6 +46,8 @@ import {
 } from "./store";
 
 const SIGNING_DURATION_MS = 3_000;
+/** Hur länge efter en aktivitet man kan svara på om man vill göra om det. */
+const WINDOW_MS = 14 * 86_400_000;
 const FIRST_NAMES = ["Anna", "Erik", "Maria", "Johan", "Sara", "Karl", "Elin", "Anders"];
 
 /** Trådlyssnare, så att chatten uppdateras när man skickar något. */
@@ -836,6 +840,153 @@ export class MockBackend implements Backend {
       listeners!.delete(onMessage);
       if (listeners!.size === 0) threadListeners.delete(threadId);
     };
+  }
+
+  /* Göra om det? ---------------------------------------------------------- */
+
+  async rematchPrompts(): Promise<RematchPrompt[]> {
+    const db = await loadDb();
+    completeDueActivities(db);
+    const me = meOrThrow(db);
+    const now = Date.now();
+
+    const prompts: RematchPrompt[] = [];
+
+    for (const activity of db.activities) {
+      if (activity.status !== "completed") continue;
+
+      const ended = new Date(activity.endsAt).getTime();
+      if (ended > now || now - ended > WINDOW_MS) continue;
+
+      const iWasThere =
+        activity.hostId === me ||
+        db.participants.some(
+          (p) => p.activityId === activity.id && p.userId === me && p.status === "accepted",
+        );
+      if (!iWasThere) continue;
+
+      const attendees = new Set<Uuid>([activity.hostId]);
+      for (const p of db.participants) {
+        if (p.activityId === activity.id && p.status === "accepted") attendees.add(p.userId);
+      }
+      attendees.delete(me);
+
+      for (const userId of attendees) {
+        if (isBlocked(db, me, userId)) continue;
+
+        const answered = db.rematches.some(
+          (r) => r.activityId === activity.id && r.fromUser === me && r.toUser === userId,
+        );
+        if (answered) continue;
+
+        const person = profileOrThrow(db, userId);
+        prompts.push({
+          activityId: activity.id,
+          activityTitle: activity.title,
+          endsAt: activity.endsAt,
+          userId: person.id,
+          displayName: person.displayName,
+          avatarUrl: person.avatarUrl,
+        });
+      }
+    }
+
+    return prompts.sort((a, b) => b.endsAt.localeCompare(a.endsAt));
+  }
+
+  async submitRematch(activityId: Uuid, userId: Uuid, wantsAgain: boolean): Promise<void> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+    if (me === userId) throw new Error("Du kan inte svara om dig själv");
+
+    const activity = activityOrThrow(db, activityId);
+    if (new Date(activity.endsAt).getTime() > Date.now()) {
+      throw new Error("Aktiviteten är inte slut än");
+    }
+
+    const wasThere = (candidate: Uuid) =>
+      activity.hostId === candidate ||
+      db.participants.some(
+        (p) => p.activityId === activity.id && p.userId === candidate && p.status === "accepted",
+      );
+
+    if (!wasThere(me) || !wasThere(userId)) {
+      throw new Error("Ni var inte båda med på aktiviteten");
+    }
+
+    const existing = db.rematches.find(
+      (r) => r.activityId === activityId && r.fromUser === me && r.toUser === userId,
+    );
+
+    if (existing) {
+      existing.wantsAgain = wantsAgain;
+      existing.acknowledgedAt = null;
+      existing.createdAt = nowIso();
+    } else {
+      db.rematches.push({
+        activityId,
+        fromUser: me,
+        toUser: userId,
+        wantsAgain,
+        acknowledgedAt: null,
+        createdAt: nowIso(),
+      });
+    }
+
+    await persist();
+  }
+
+  async rematches(): Promise<Rematch[]> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+
+    // Bara dubbla ja lämnar den här funktionen. Ett ensidigt ja — åt något
+    // håll — ger ingenting, och den som svarat nej syns aldrig här.
+    return db.rematches
+      .filter((mine) => {
+        if (mine.fromUser !== me || !mine.wantsAgain || mine.acknowledgedAt) return false;
+        if (isBlocked(db, me, mine.toUser)) return false;
+        return db.rematches.some(
+          (theirs) =>
+            theirs.activityId === mine.activityId &&
+            theirs.fromUser === mine.toUser &&
+            theirs.toUser === me &&
+            theirs.wantsAgain,
+        );
+      })
+      .map((mine) => {
+        const person = profileOrThrow(db, mine.toUser);
+        const activity = activityOrThrow(db, mine.activityId);
+        const theirs = db.rematches.find(
+          (r) =>
+            r.activityId === mine.activityId &&
+            r.fromUser === mine.toUser &&
+            r.toUser === me,
+        );
+        return {
+          userId: person.id,
+          displayName: person.displayName,
+          avatarUrl: person.avatarUrl,
+          homeAreaLabel: person.homeAreaLabel,
+          activityId: activity.id,
+          activityTitle: activity.title,
+          matchedAt:
+            theirs && theirs.createdAt > mine.createdAt ? theirs.createdAt : mine.createdAt,
+        };
+      })
+      .sort((a, b) => b.matchedAt.localeCompare(a.matchedAt));
+  }
+
+  async acknowledgeRematch(activityId: Uuid, userId: Uuid): Promise<void> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+    const row = db.rematches.find(
+      (r) => r.activityId === activityId && r.fromUser === me && r.toUser === userId,
+    );
+    if (row) {
+      row.acknowledgedAt = nowIso();
+      await persist();
+    }
   }
 
   /* BFF ------------------------------------------------------------------- */

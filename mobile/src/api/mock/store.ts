@@ -90,6 +90,15 @@ export interface MockMessage {
   createdAt: string;
 }
 
+export interface MockRematch {
+  activityId: Uuid;
+  fromUser: Uuid;
+  toUser: Uuid;
+  wantsAgain: boolean;
+  acknowledgedAt: string | null;
+  createdAt: string;
+}
+
 export interface MockFriendship {
   id: Uuid;
   requesterId: Uuid;
@@ -108,6 +117,7 @@ export interface MockDb {
   threadMembers: MockThreadMember[];
   messages: MockMessage[];
   friendships: MockFriendship[];
+  rematches: MockRematch[];
   blocks: { blockerId: Uuid; blockedId: Uuid }[];
   reports: { id: Uuid; reporterId: Uuid; reportedUserId: Uuid; reason: string;
              details: string | null; createdAt: string }[];
@@ -200,6 +210,7 @@ function buildSeed(): MockDb {
     threadMembers: [],
     messages: [],
     friendships,
+    rematches: [],
     blocks: [],
     reports: [],
     identities: {},

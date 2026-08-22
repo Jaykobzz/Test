@@ -20,6 +20,8 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
+  Rematch,
+  RematchPrompt,
   SendMessageInput,
   ThreadSummary,
   Uuid,
@@ -62,6 +64,15 @@ export interface Backend {
   ensureDirectThread(userId: Uuid): Promise<Uuid>;
   /** Returnerar en avregistreringsfunktion. */
   subscribeToThread(threadId: Uuid, onMessage: (message: Message) => void): () => void;
+
+  /* Göra om det? ---------------------------------------------------------- */
+  /** Personer du ännu inte svarat om efter en genomförd aktivitet. */
+  rematchPrompts(): Promise<RematchPrompt[]>;
+  /** Svaret är privat. Ett `false` får aldrig någon konsekvens någonstans. */
+  submitRematch(activityId: Uuid, userId: Uuid, wantsAgain: boolean): Promise<void>;
+  /** Bara dubbla ja. Returnerar aldrig något om ensidiga svar. */
+  rematches(): Promise<Rematch[]>;
+  acknowledgeRematch(activityId: Uuid, userId: Uuid): Promise<void>;
 
   /* BFF ------------------------------------------------------------------- */
   listBffs(): Promise<PublicProfile[]>;

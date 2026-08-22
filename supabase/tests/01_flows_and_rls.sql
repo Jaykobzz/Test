@@ -385,6 +385,123 @@ select assert_true(
       and status = 'open') = 1,
   'anmälan hamnade i moderationskön');
 
+/* "Skulle du göra om det?" ----------------------------------------------
+   Kärnan i testerna nedan är att ett NEJ ska vara omöjligt att upptäcka.
+   Att ett dubbelt ja syns är den lätta halvan.                            */
+
+-- Micke (värd) och Sara var båda på fisketuren, som nu är genomförd.
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
+
+select assert_true(
+  (select count(*) from rematch_prompts()
+    where activity_id = 'bbbbbbbb-0000-4000-8000-000000000001') = 2,
+  'efter aktiviteten finns de andra deltagarna att svara om');
+
+select submit_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+                      'aaaaaaaa-0000-4000-8000-000000000001', true);
+
+select assert_true(
+  (select count(*) from rematch_prompts()
+    where activity_id = 'bbbbbbbb-0000-4000-8000-000000000001'
+      and user_id = 'aaaaaaaa-0000-4000-8000-000000000001') = 0,
+  'den man svarat om försvinner ur frågelistan');
+
+-- Micke har inte svarat än. Inget får synas — och framför allt inget som
+-- avslöjar ATT han inte svarat.
+select assert_true(
+  (select count(*) from rematches()) = 0,
+  'ett ensidigt ja ger ingen matchning');
+commit;
+
+-- Sara svarar nej om Johan. Det ska inte gå att upptäcka någonstans.
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
+select submit_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+                      'aaaaaaaa-0000-4000-8000-000000000003', false);
+commit;
+
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000003';
+
+select assert_true(
+  (select count(*) from rematch_signals) = 0,
+  'Johan kan inte läsa ett enda svar som handlar om honom');
+
+select assert_true(
+  (select count(*) from rematch_prompts()
+    where user_id = 'aaaaaaaa-0000-4000-8000-000000000002') = 1,
+  'Saras nej hindrar inte Johan från att få frågan om henne');
+
+-- Johan säger ja om Sara. Hon sa nej — men han får inget veta.
+select submit_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+                      'aaaaaaaa-0000-4000-8000-000000000002', true);
+
+select assert_true(
+  (select count(*) from rematches()) = 0,
+  'ett ja mot ett nej ger ingen matchning, och ingen antydan om varför');
+commit;
+
+-- Micke svarar ja om Sara. Nu finns ett dubbelt ja.
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000001';
+select submit_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+                      'aaaaaaaa-0000-4000-8000-000000000002', true);
+
+select assert_true(
+  (select count(*) from rematches()
+    where user_id = 'aaaaaaaa-0000-4000-8000-000000000002') = 1,
+  'två ja ger en matchning hos den som svarade sist');
+commit;
+
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
+
+select assert_true(
+  (select count(*) from rematches()
+    where user_id = 'aaaaaaaa-0000-4000-8000-000000000001') = 1,
+  'och samma matchning hos den som svarade först');
+
+select assert_true(
+  (select count(*) from rematches()
+    where user_id = 'aaaaaaaa-0000-4000-8000-000000000003') = 0,
+  'den hon sa nej om dyker aldrig upp, trots att han sa ja');
+
+select acknowledge_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+                           'aaaaaaaa-0000-4000-8000-000000000001');
+select assert_true(
+  (select count(*) from rematches()) = 0,
+  'en kvitterad matchning slutar visas');
+commit;
+
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000001';
+select assert_true(
+  (select count(*) from rematches()) = 1,
+  'men den ligger kvar hos den andra tills hen kvitterat sin');
+commit;
+
+-- En utomstående kan varken svara eller läsa.
+begin;
+set local role authenticated;
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000004';
+
+select assert_denied(
+  $$ select submit_rematch('bbbbbbbb-0000-4000-8000-000000000001',
+       'aaaaaaaa-0000-4000-8000-000000000002', true) $$,
+  'den som inte var med kan inte svara om någon');
+
+select assert_true(
+  (select count(*) from rematch_signals) = 0,
+  'och ser inga svar alls');
+commit;
+
 /* Blockering ----------------------------------------------------------- */
 begin;
 set local role authenticated;

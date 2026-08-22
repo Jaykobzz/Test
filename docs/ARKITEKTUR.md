@@ -41,6 +41,7 @@ profiles ──┬──< activities ──< activity_participants
            │                  │
            │                  └──< messages
            │
+           ├──< rematch_signals  ("göra om det?", privat)
            ├──< friendships   (BFF, ett par = en rad)
            ├──< blocks
            └──< reports
@@ -153,12 +154,57 @@ en siffra någonsin bär.
 regressionsvakt som failar om en kolumn med `rating`, `stars`, `score` eller
 `felt_safe` dyker upp någonstans i schemat.
 
-### Vad som saknas
+## "Skulle du göra om det?"
 
-Stunden efter aktiviteten är tom nu. Den föreslagna ersättaren är en ömsesidig
-och helt privat fråga — *"Skulle du göra om det med Sara?"* — där ett nej inte
-gör någonting alls, och bara ett dubbelt ja syns, som ett BFF-förslag. Då blir
-det en matchning i stället för en bedömning. Inte byggd än.
+Det som fyller stunden efter aktiviteten i stället för ett betyg. Samma
+tillfälle, motsatt riktning: i stället för att lämna en dom över någon svarar
+du på vad **du** vill göra härnäst, och svaret får konsekvenser bara om den
+andra vill samma sak.
+
+Frågan är formulerad kring aktiviteten, inte kring personen — *"skulle du göra
+om det med Sara?"*, inte *"vill du bli kompis med Sara?"*. Det är en mycket
+lättare fråga att svara ärligt på, och den speglar vad appen är till för.
+Vänskap är det som växer ur upprepningen, inte det man ansöker om.
+
+### Tre egenskaper, och vad som skyddar dem
+
+**Ett nej gör ingenting.** Det räknas inte, syns inte, och påverkar varken
+profil, flöde eller möjligheten att ansöka någonstans. Utifrån sett finns det
+inte. Skyddet är att `rematch_signals` bara har en select-policy —
+`from_user = auth.uid()` — så ingen kan läsa en rad som handlar om en själv.
+
+**Bara dubbla ja lämnar tabellen.** `rematches()` är den enda vägen ut för
+uppgifter om någon annan, och den joinar signalen mot motpartens signal och
+kräver att båda är `true`. Ett ensidigt ja passerar aldrig.
+
+**Tystnad är tvetydig med flit.** Ett svar kan dröja, så en utebliven matchning
+kan lika gärna betyda "hen har inte svarat än" som "hen sa nej". Det är därför
+klienten **aldrig** får visa "ingen matchning" eller "väntar på svar" — gjorde
+den det skulle ett uteblivet ja gå att räkna ut, och hela poängen falla. Det är
+en regel i gränssnittet som databasen inte kan upprätthålla åt en; den står
+kommenterad både i migrationen och i skärmen.
+
+### Livscykel
+
+```
+aktiviteten slut
+      │
+      ▼
+rematch_prompts()      alla som var där och du inte svarat om än
+      │                 (fönster: 14 dagar)
+      ▼
+submit_rematch()       privat ja eller nej
+      │
+      ▼
+rematches()            dyker upp först när motparten också sagt ja
+      │
+      ▼
+acknowledge_rematch()  kvitterar din egen rad; deras ligger kvar tills de
+                       kvitterat sin
+```
+
+Fönstret är fjorton dagar, samma som betygsfönstret var. Matchningar däremot
+har ingen bortre gräns — de ligger kvar tills man gjort något med dem.
 
 ## Att lägga till något
 
@@ -172,3 +218,7 @@ motsvarande filtrering i `MockBackend.discover`, och en chip-rad i
 
 **Ett nytt intresse** — båda ställena: `supabase/migrations/*_seed_interests.sql`
 och `mobile/src/api/interests.ts`.
+
+**Något som rör "göra om det?"** — läs regeln om tvetydighet ovan först. Varje
+tillägg som gör det möjligt att sluta sig till någon annans svar tar bort
+anledningen att svara ärligt, och därmed hela funktionens värde.

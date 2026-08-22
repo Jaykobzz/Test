@@ -26,6 +26,8 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
+  Rematch,
+  RematchPrompt,
   SendMessageInput,
   ThreadSummary,
   Uuid,
@@ -707,6 +709,63 @@ export class SupabaseBackend implements Backend {
       .subscribe();
 
     return () => { void supabase().removeChannel(channel); };
+  }
+
+  /* Göra om det? ---------------------------------------------------------- */
+
+  async rematchPrompts(): Promise<RematchPrompt[]> {
+    const { data, error } = await supabase().rpc("rematch_prompts");
+    fail(error);
+
+    return (data ?? []).map((row: {
+      activity_id: string; activity_title: string; ends_at: string;
+      user_id: string; display_name: string; avatar_url: string;
+    }) => ({
+      activityId: row.activity_id,
+      activityTitle: row.activity_title,
+      endsAt: row.ends_at,
+      userId: row.user_id,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url,
+    }));
+  }
+
+  async submitRematch(activityId: Uuid, userId: Uuid, wantsAgain: boolean): Promise<void> {
+    const { error } = await supabase().rpc("submit_rematch", {
+      p_activity_id: activityId,
+      p_to_user: userId,
+      p_wants_again: wantsAgain,
+    });
+    fail(error);
+  }
+
+  async rematches(): Promise<Rematch[]> {
+    // rematches() i databasen släpper bara igenom dubbla ja. Klienten får
+    // därför aldrig se ett ensidigt svar och kan inte råka avslöja ett nej.
+    const { data, error } = await supabase().rpc("rematches");
+    fail(error);
+
+    return (data ?? []).map((row: {
+      user_id: string; display_name: string; avatar_url: string;
+      home_area_label: string | null; activity_id: string;
+      activity_title: string; matched_at: string;
+    }) => ({
+      userId: row.user_id,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url,
+      homeAreaLabel: row.home_area_label,
+      activityId: row.activity_id,
+      activityTitle: row.activity_title,
+      matchedAt: row.matched_at,
+    }));
+  }
+
+  async acknowledgeRematch(activityId: Uuid, userId: Uuid): Promise<void> {
+    const { error } = await supabase().rpc("acknowledge_rematch", {
+      p_activity_id: activityId,
+      p_other: userId,
+    });
+    fail(error);
   }
 
   /* BFF ------------------------------------------------------------------- */

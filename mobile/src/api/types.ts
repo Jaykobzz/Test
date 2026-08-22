@@ -160,6 +160,33 @@ export interface ThreadSummary {
   unreadCount: number;
 }
 
+/**
+ * En person du ännu inte svarat om efter en genomförd aktivitet.
+ */
+export interface RematchPrompt {
+  activityId: Uuid;
+  activityTitle: string;
+  endsAt: IsoDate;
+  userId: Uuid;
+  displayName: string;
+  avatarUrl: string;
+}
+
+/**
+ * Ett dubbelt ja. Uppstår bara när båda sagt att de vill göra om det —
+ * ett ensidigt ja blir aldrig något alls, och den som sagt nej får aldrig
+ * veta att någon sagt ja om hen.
+ */
+export interface Rematch {
+  userId: Uuid;
+  displayName: string;
+  avatarUrl: string;
+  homeAreaLabel: string | null;
+  activityId: Uuid;
+  activityTitle: string;
+  matchedAt: IsoDate;
+}
+
 export interface BffRequest {
   friendshipId: Uuid;
   profile: PublicProfile;
