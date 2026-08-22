@@ -10,6 +10,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type {
+  ExperienceLevel,
   ActivityStatus,
   ActivityVisibility,
   FriendshipStatus,
@@ -60,6 +61,7 @@ export interface MockParticipant {
   userId: Uuid;
   status: JoinStatus;
   introMessage: string | null;
+  experience: ExperienceLevel | null;
   createdAt: string;
 }
 
@@ -174,19 +176,32 @@ function buildSeed(): MockDb {
   // Seedprofilerna har hakat på varandras aktiviteter, så att deltagarlistor
   // och kapacitet inte är tomma innan du själv gjort något.
   const participants: MockParticipant[] = [
-    { activityId: activities[0]!.id, userId: profiles[1]!.id, status: "accepted" },
-    { activityId: activities[0]!.id, userId: profiles[6]!.id, status: "pending" },
-    { activityId: activities[1]!.id, userId: profiles[6]!.id, status: "accepted" },
-    { activityId: activities[2]!.id, userId: profiles[4]!.id, status: "accepted" },
-    { activityId: activities[4]!.id, userId: profiles[2]!.id, status: "accepted" },
-    { activityId: activities[4]!.id, userId: profiles[3]!.id, status: "accepted" },
-    { activityId: activities[5]!.id, userId: profiles[7]!.id, status: "accepted" },
+    { activityId: activities[0]!.id, userId: profiles[1]!.id, status: "accepted",
+      introMessage: "Bor precis vid vattnet, tar med termos.", experience: "some" },
+    { activityId: activities[0]!.id, userId: profiles[6]!.id, status: "pending",
+      introMessage: "Har aldrig fiskat men velat testa i flera år.",
+      experience: "first_time" },
+    { activityId: activities[1]!.id, userId: profiles[6]!.id, status: "accepted",
+      introMessage: "Springer den rundan varje vecka, gärna sällskap.",
+      experience: "often" },
+    { activityId: activities[2]!.id, userId: profiles[4]!.id, status: "accepted",
+      introMessage: "Spelat en del förr, rostig men sugen.", experience: "some" },
+    { activityId: activities[4]!.id, userId: profiles[2]!.id, status: "accepted",
+      introMessage: "Kan ta med ett spel om ni vill testa något nytt.",
+      experience: "often" },
+    { activityId: activities[4]!.id, userId: profiles[3]!.id, status: "accepted",
+      introMessage: "Nyinflyttad i området, vill träffa folk.",
+      experience: "first_time" },
+    { activityId: activities[5]!.id, userId: profiles[7]!.id, status: "accepted",
+      introMessage: "Har hund som gärna följer med om det går bra.",
+      experience: "some" },
   ].map((p, i) => ({
     id: `33333333-3333-4333-8333-3333333333${String(i).padStart(2, "0")}`,
     activityId: p.activityId,
     userId: p.userId,
     status: p.status as JoinStatus,
-    introMessage: null,
+    introMessage: p.introMessage,
+    experience: p.experience as ExperienceLevel,
     createdAt: new Date(now - 2 * 86_400_000).toISOString(),
   }));
 

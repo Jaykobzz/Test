@@ -90,11 +90,18 @@ export interface ActivityCard {
   isMine: boolean;
 }
 
+/**
+ * Sökandens vana vid just den här sortens aktivitet. Beskriver aktiviteten,
+ * inte personen: "första gången" är en upplysning, inte en brist.
+ */
+export type ExperienceLevel = "first_time" | "some" | "often";
+
 export interface Applicant {
   participantId: Uuid;
   profile: PublicProfile;
   status: JoinStatus;
   introMessage: string | null;
+  experience: ExperienceLevel | null;
   createdAt: IsoDate;
 }
 

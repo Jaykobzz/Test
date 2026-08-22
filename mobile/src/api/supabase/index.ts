@@ -16,6 +16,7 @@ import type {
   Applicant,
   BankIdCollect,
   BankIdStart,
+  ExperienceLevel,
   FriendRequest,
   CreateActivityInput,
   DiscoverParams,
@@ -346,7 +347,7 @@ export class SupabaseBackend implements Backend {
 
     const { data: participants } = await supabase()
       .from("activity_participants")
-      .select("id, user_id, status, intro_message, created_at")
+      .select("id, user_id, status, intro_message, experience, created_at")
       .eq("activity_id", activityId);
 
     const rows = participants ?? [];
@@ -366,6 +367,7 @@ export class SupabaseBackend implements Backend {
         profile: toPublicProfile(profile, undefined, me),
         status: row.status,
         introMessage: row.intro_message,
+        experience: row.experience,
         createdAt: row.created_at,
       };
     };
@@ -483,10 +485,15 @@ export class SupabaseBackend implements Backend {
 
   /* Ansökningar ----------------------------------------------------------- */
 
-  async applyToActivity(activityId: Uuid, message?: string): Promise<void> {
+  async applyToActivity(
+    activityId: Uuid,
+    message: string,
+    experience?: ExperienceLevel,
+  ): Promise<void> {
     const { error } = await supabase().rpc("apply_to_activity", {
       p_activity_id: activityId,
-      p_message: message ?? null,
+      p_message: message,
+      p_experience: experience ?? null,
     });
     fail(error);
   }
@@ -497,7 +504,8 @@ export class SupabaseBackend implements Backend {
     const { data, error } = await supabase()
       .rpc("decide_application", { p_participant_id: participantId, p_accept: accept })
       .single<{ id: string; user_id: string; status: Applicant["status"];
-                intro_message: string | null; created_at: string }>();
+                intro_message: string | null; experience: ExperienceLevel | null;
+                created_at: string }>();
     fail(error);
 
     const { data: profile } = await supabase()
@@ -511,6 +519,7 @@ export class SupabaseBackend implements Backend {
       profile: toPublicProfile(profile!, undefined, me),
       status: data!.status,
       introMessage: data!.intro_message,
+      experience: data!.experience,
       createdAt: data!.created_at,
     };
   }

@@ -8,7 +8,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 
 import { getBackend } from "@/api";
@@ -34,10 +34,24 @@ export default function OnboardingScreen() {
   const [home, setHome] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const [locating, setLocating] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [triedToSave, setTriedToSave] = useState(false);
 
+  /*
+    Namnet från BankID fylls i en enda gång.
+
+    Tidigare låg displayName både i villkoret och i beroendelistan, vilket
+    gjorde att effekten kördes om i samma stund som fältet blev tomt och
+    genast skrev tillbaka namnet. Det gick alltså inte att sudda, bara att
+    skriva om utan att någonsin passera tomt. Vakten nedan gör att den fyller
+    i vid första profilen och sedan aldrig mer.
+  */
+  const prefilled = useRef(false);
   useEffect(() => {
-    if (profile && !displayName) setDisplayName(profile.displayName);
-  }, [profile, displayName]);
+    if (profile && !prefilled.current) {
+      prefilled.current = true;
+      setDisplayName(profile.displayName);
+    }
+  }, [profile]);
 
   useEffect(() => {
     let active = true;
@@ -56,10 +70,17 @@ export default function OnboardingScreen() {
 
   if (!profile) return <Loading />;
 
-  const canSave =
-    avatarUri !== null &&
-    displayName.trim().length >= 2 &&
-    interests.length >= MIN_INTERESTS;
+  /** Vad som fattas, eller null när allt är klart. En rad, inte en lista. */
+  const missing =
+    avatarUri === null
+      ? "Välj en bild på dig först."
+      : displayName.trim().length < 2
+        ? "Skriv vad du vill kallas."
+        : interests.length < MIN_INTERESTS
+          ? `Välj ${MIN_INTERESTS - interests.length} intressen till.`
+          : null;
+
+  const canSave = missing === null;
 
   async function choosePhoto() {
     try {
@@ -79,7 +100,12 @@ export default function OnboardingScreen() {
   }
 
   async function save() {
-    if (!canSave || !avatarUri) return;
+    if (!canSave || !avatarUri) {
+      // Utan det här gör ett tryck ingenting alls, och det är omöjligt att
+      // gissa varför. Hellre ett tydligt besked än en död knapp.
+      setTriedToSave(true);
+      return;
+    }
     setSaving(true);
     try {
       const avatarUrl = await getBackend().uploadImage("avatars", avatarUri);
@@ -104,7 +130,7 @@ export default function OnboardingScreen() {
   return (
     <Screen scroll>
       <Gap size="xl" />
-      <Txt variant="display">Hej{profile.displayName ? ` ${profile.displayName}` : ""}!</Txt>
+      <Txt variant="display">Välkommen!</Txt>
       <Gap size="xs" />
       <Txt variant="body" tone="muted">
         Tre snabba saker, sen är du igång.
@@ -233,25 +259,24 @@ export default function OnboardingScreen() {
 
       <Gap size="xl" />
 
+      {missing && (
+        <>
+          <Txt
+            variant="small"
+            tone={triedToSave ? "danger" : "faint"}
+            align="center"
+          >
+            {missing}
+          </Txt>
+          <Gap size="sm" />
+        </>
+      )}
+
       <Button
         label={saving ? "Sparar …" : "Kom igång"}
         onPress={save}
-        disabled={!canSave}
         loading={saving}
       />
-
-      {!canSave && (
-        <>
-          <Gap size="sm" />
-          <Txt variant="small" tone="faint" align="center">
-            {!avatarUri
-              ? "Välj en bild för att fortsätta."
-              : displayName.trim().length < 2
-                ? "Skriv vad du vill kallas."
-                : `Välj ${MIN_INTERESTS - interests.length} intressen till.`}
-          </Txt>
-        </>
-      )}
     </Screen>
   );
 }

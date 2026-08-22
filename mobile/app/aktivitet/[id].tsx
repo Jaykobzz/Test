@@ -15,10 +15,12 @@ import { Alert, Linking, Pressable, RefreshControl, ScrollView, View } from "rea
 import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
+import { ApplySheet } from "@/components/ApplySheet";
 import { interestLabel } from "@/api/interests";
-import type { ActivityDetail, Applicant } from "@/api/types";
+import type { ActivityDetail, Applicant, ExperienceLevel } from "@/api/types";
 import {
-  Avatar, Badge, Button, Card, Credentials, Divider, Gap, IconButton, Loading, Row, Screen, Txt,
+  Avatar, Badge, Button, Card, Chip, Credentials, Divider, Gap, IconButton, Loading, Row, Screen,
+  Txt,
 } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance, mapsUrl } from "@/lib/geo";
@@ -35,6 +37,7 @@ export default function ActivityScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [working, setWorking] = useState(false);
+  const [applying, setApplying] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -70,14 +73,15 @@ export default function ActivityScreen() {
   const full = activity.spotsLeft === 0;
   const past = new Date(activity.endsAt).getTime() < Date.now();
 
-  async function apply() {
+  async function apply(message: string, experience: ExperienceLevel | undefined) {
     if (!activity) return;
     setWorking(true);
     try {
-      await getBackend().applyToActivity(activity.id);
+      await getBackend().applyToActivity(activity.id, message, experience);
+      setApplying(false);
       await load();
     } catch (error) {
-      Alert.alert("Kunde inte ansöka", describe(error));
+      Alert.alert("Kunde inte haka på", describe(error));
     } finally {
       setWorking(false);
     }
@@ -270,7 +274,7 @@ export default function ActivityScreen() {
           <ActionArea
             activity={activity}
             working={working}
-            onApply={apply}
+            onApply={() => setApplying(true)}
             onWithdraw={withdraw}
             onCancel={cancelActivity}
             onOpenChat={() =>
@@ -285,6 +289,14 @@ export default function ActivityScreen() {
           />
         </View>
       </ScrollView>
+
+      <ApplySheet
+        visible={applying}
+        activityTitle={activity.title}
+        working={working}
+        onCancel={() => setApplying(false)}
+        onSubmit={apply}
+      />
     </Screen>
   );
 }
@@ -336,6 +348,13 @@ function PersonRow({
   );
 }
 
+/** Nivån i klartext. Beskriver aktiviteten, aldrig personen. */
+const EXPERIENCE_LABEL: Record<ExperienceLevel, string> = {
+  first_time: "Första gången",
+  some: "Gjort det förr",
+  often: "Gör det ofta",
+};
+
 function ApplicantCard({
   applicant,
   disabled,
@@ -375,7 +394,16 @@ function ApplicantCard({
         {applicant.introMessage && (
           <>
             <Gap size="md" />
-            <Txt variant="body" tone="muted">”{applicant.introMessage}”</Txt>
+            <Txt variant="body">”{applicant.introMessage}”</Txt>
+          </>
+        )}
+
+        {applicant.experience && (
+          <>
+            <Gap size="sm" />
+            <Row gap="sm">
+              <Chip label={EXPERIENCE_LABEL[applicant.experience]} tone="accent" />
+            </Row>
           </>
         )}
 

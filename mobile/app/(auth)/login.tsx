@@ -81,12 +81,15 @@ export default function LoginScreen() {
 
         <Gap size="xl" />
 
-        <Row gap="sm" justify="center">
-          <Ionicons name="lock-closed" size={13} color={theme.color.textFaint} />
-          <Txt variant="small" tone="faint" align="center" style={{ flexShrink: 1 }}>
-            Alla här är verifierade med BankID. Ditt personnummer lagras aldrig.
-          </Txt>
-        </Row>
+        {/*
+          Hänglåset låg tidigare bredvid texten. Texten bryts på två rader,
+          och en ikon som mittjusteras mot ett tvåradigt block hamnar mellan
+          raderna och ser lös ut. Knappen ovanför bär redan en sköld, så en
+          andra låsikon tillförde ingenting utom problemet.
+        */}
+        <Txt variant="small" tone="faint" align="center">
+          Alla här är verifierade med BankID. Ditt personnummer lagras aldrig.
+        </Txt>
       </KeyboardAvoidingView>
     </Screen>
   );

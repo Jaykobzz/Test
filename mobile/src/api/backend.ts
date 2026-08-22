@@ -7,6 +7,7 @@
  */
 
 import type {
+  ExperienceLevel,
   ActivityCard,
   ActivityDetail,
   Applicant,
@@ -51,7 +52,11 @@ export interface Backend {
   myActivities(): Promise<{ hosting: ActivityCard[]; joined: ActivityCard[] }>;
 
   /* Ansökningar ----------------------------------------------------------- */
-  applyToActivity(activityId: Uuid, message?: string): Promise<void>;
+  applyToActivity(
+    activityId: Uuid,
+    message: string,
+    experience?: ExperienceLevel,
+  ): Promise<void>;
   decideApplication(participantId: Uuid, accept: boolean): Promise<Applicant>;
   withdrawApplication(participantId: Uuid): Promise<void>;
 

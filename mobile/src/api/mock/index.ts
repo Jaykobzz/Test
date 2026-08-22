@@ -15,6 +15,7 @@ import type {
   ActivityCard,
   ActivityDetail,
   Applicant,
+  ExperienceLevel,
   BankIdCollect,
   BankIdStart,
   FriendRequest,
@@ -209,6 +210,7 @@ function toApplicant(db: MockDb, participant: MockParticipant): Applicant {
     profile: toPublicProfile(db, participant.userId),
     status: participant.status,
     introMessage: participant.introMessage,
+    experience: participant.experience,
     createdAt: participant.createdAt,
   };
 }
@@ -283,6 +285,63 @@ function completeDueActivities(db: MockDb): void {
   }
 }
 
+/**
+ * Ger en ny testanvändare en egen aktivitet med flera sökande.
+ *
+ * Utan det här går värdvyn inte att se när man provar appen: seedens
+ * aktiviteter har andra värdar, och en aktivitet man skapar själv får
+ * naturligt noll ansökningar. Just den skärmen, där man ska välja mellan
+ * flera som vill haka på, är den som behöver kunna granskas.
+ *
+ * Bara mock. Skarp drift har riktiga ansökningar.
+ */
+function handOverAnActivity(db: MockDb, userId: Uuid): void {
+  // Den aktivitet som ligger längst fram i tiden, så den hinner sökas till.
+  const activity = [...db.activities]
+    .filter((a) => a.status === "open")
+    .sort((a, b) => Date.parse(b.startsAt) - Date.parse(a.startsAt))[0];
+  if (!activity) return;
+
+  const previousHost = activity.hostId;
+  activity.hostId = userId;
+
+  // Den tidigare värden söker nu själv, tillsammans med några till. Fem
+  // sökande till en aktivitet med plats för färre är hela poängen: det är
+  // först då man måste välja.
+  const candidates = [previousHost, ...db.profiles.map((p) => p.id)]
+    .filter((id) => id !== userId)
+    .filter((id, i, all) => all.indexOf(id) === i)
+    .filter((id) => !db.participants.some(
+      (p) => p.activityId === activity.id && p.userId === id,
+    ))
+    .slice(0, 5);
+
+  const pitches: { introMessage: string; experience: ExperienceLevel }[] = [
+    { introMessage: "Bor tre kvarter bort och har inget för mig den dagen.",
+      experience: "some" },
+    { introMessage: "Har aldrig gjort det här men har velat testa länge.",
+      experience: "first_time" },
+    { introMessage: "Gör det varje vecka. Kan visa om någon är ny.",
+      experience: "often" },
+    { introMessage: "Ny i stan, försöker träffa folk utan att det blir konstigt.",
+      experience: "first_time" },
+    { introMessage: "Var med förra gången och hade riktigt kul.",
+      experience: "some" },
+  ];
+
+  candidates.forEach((id, i) => {
+    db.participants.push({
+      id: newId(),
+      activityId: activity.id,
+      userId: id,
+      status: "pending",
+      introMessage: pitches[i]!.introMessage,
+      experience: pitches[i]!.experience,
+      createdAt: new Date(Date.now() - (i + 1) * 3_600_000).toISOString(),
+    });
+  });
+}
+
 export class MockBackend implements Backend {
   readonly name = "mock";
 
@@ -341,6 +400,7 @@ export class MockBackend implements Backend {
         birthYear: Number(order.pnr.slice(0, 4)),
         createdAt: nowIso(),
       });
+      handOverAnActivity(db, userId);
       needsOnboarding = true;
     } else {
       const profile = profileOrThrow(db, userId);
@@ -557,10 +617,20 @@ export class MockBackend implements Backend {
 
   /* Ansökningar ----------------------------------------------------------- */
 
-  async applyToActivity(activityId: Uuid, message?: string): Promise<void> {
+  async applyToActivity(
+    activityId: Uuid,
+    message: string,
+    experience?: ExperienceLevel,
+  ): Promise<void> {
     const db = await loadDb();
     const me = meOrThrow(db);
     const activity = activityOrThrow(db, activityId);
+
+    // Samma krav som i apply_to_activity(), så mocken inte är snällare
+    // än servern och släpper igenom något som skulle avvisas skarpt.
+    if (message.trim().length < 5) {
+      throw new Error("Skriv en rad om varför du vill haka på");
+    }
 
     if (activity.hostId === me) throw new Error("Du är värd för aktiviteten");
     if (activity.status !== "open") throw new Error("Aktiviteten tar inte emot fler ansökningar");
@@ -578,7 +648,8 @@ export class MockBackend implements Backend {
     if (existing) {
       if (existing.status === "pending" || existing.status === "accepted") return;
       existing.status = "pending";
-      existing.introMessage = message ?? existing.introMessage;
+      existing.introMessage = message.trim();
+      existing.experience = experience ?? null;
       existing.createdAt = nowIso();
     } else {
       db.participants.push({
@@ -586,7 +657,8 @@ export class MockBackend implements Backend {
         activityId,
         userId: me,
         status: "pending",
-        introMessage: message ?? null,
+        introMessage: message.trim(),
+        experience: experience ?? null,
         createdAt: nowIso(),
       });
     }
