@@ -17,6 +17,7 @@ import { useFocusEffect } from "expo-router";
 import { getBackend } from "@/api";
 import { ApplySheet } from "@/components/ApplySheet";
 import { Cover } from "@/components/Cover";
+import { formatPrice } from "@/lib/pris";
 import { interestLabel } from "@/api/interests";
 import type { ActivityDetail, Applicant, ExperienceLevel } from "@/api/types";
 import {
@@ -202,6 +203,13 @@ export default function ActivityScreen() {
               ? `${activity.acceptedCount} med · ingen gräns`
               : `${activity.acceptedCount} av ${activity.capacity} platser tagna`}
           />
+          <Gap size="sm" />
+          {/* Priset står här och inte bara i beskrivningen, så att ingen
+              dyker upp utan att veta vad det kostar. */}
+          <InfoRow
+            icon="wallet-outline"
+            text={formatPrice(activity.priceSek)}
+          />
 
           {activity.description && (
             <>
@@ -295,6 +303,7 @@ export default function ActivityScreen() {
       <ApplySheet
         visible={applying}
         activityTitle={activity.title}
+        priceSek={activity.priceSek}
         working={working}
         onCancel={() => setApplying(false)}
         onSubmit={apply}

@@ -102,13 +102,14 @@ export default function DiscoverScreen() {
   return (
     <Screen padded={false}>
       <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm }}>
-        <Row justify="space-between">
-          <View>
+        <Row justify="space-between" gap="md">
+          {/* Knappen till höger behåller sin bredd, platsraden får krympa. */}
+          <View style={{ flex: 1, minWidth: 0 }}>
             <Txt variant="title">Upptäck</Txt>
             {place && (
               <Row gap="xs">
                 <Ionicons name="location" size={13} color={theme.color.textFaint} />
-                <Txt variant="small" tone="faint">
+                <Txt variant="small" tone="faint" numberOfLines={1} style={{ flex: 1 }}>
                   {place.label} · {RADII.find((r) => r.value === radiusM)?.label}
                 </Txt>
               </Row>
@@ -127,6 +128,7 @@ export default function DiscoverScreen() {
               flexDirection: "row",
               alignItems: "center",
               gap: 6,
+              flexShrink: 0,
             }}
           >
             <Ionicons name="add" size={17} color={theme.color.onPrimary} />

@@ -33,12 +33,13 @@ import { DEFAULT_LOCATION, SEED_ACTIVITIES, SEED_PROFILES } from "./seed";
  *
  * v2: aktiviteter fick kind, deltagare fick experience och en obligatorisk
  *     introMessage, och appen bytte namn från FRIEND till Haka på.
+ * v3: aktiviteter fick priceSek.
  */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 const STORAGE_KEY = `hakapa.mock.db.v${SCHEMA_VERSION}`;
 
 /** Nycklar från tidigare former. Städas bort så de inte ligger och tar plats. */
-const OLD_KEYS = ["friend.mock.db.v1"];
+const OLD_KEYS = ["friend.mock.db.v1", "hakapa.mock.db.v2"];
 
 export interface MockProfile {
   id: Uuid;
@@ -61,6 +62,7 @@ export interface MockActivity {
   description: string | null;
   category: string | null;
   coverUrl: string | null;
+  priceSek: number | null;
   locationName: string;
   lat: number;
   lng: number;
@@ -176,6 +178,7 @@ function buildSeed(): MockDb {
       hostId: a.hostId,
       title: a.title,
       kind: "planned",
+      priceSek: a.priceSek ?? null,
       description: a.description,
       category: a.category,
       coverUrl: a.coverUrl,

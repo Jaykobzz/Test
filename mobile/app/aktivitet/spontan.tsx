@@ -18,6 +18,7 @@ import { Alert, View } from "react-native";
 import { getBackend } from "@/api";
 import { INTERESTS } from "@/api/interests";
 import type { ActivityVisibility } from "@/api/types";
+import { PriceField } from "@/components/PriceField";
 import { Button, Chip, Divider, Field, Gap, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { getCurrentPlace } from "@/lib/location";
@@ -68,6 +69,7 @@ export default function SpontaneousScreen() {
   const [minutes, setMinutes] = useState<number>(30);
   const [hours, setHours] = useState<number>(2);
   const [capacity, setCapacity] = useState<number | null>(3);
+  const [priceSek, setPriceSek] = useState<number | null>(null);
   const [visibility, setVisibility] = useState<ActivityVisibility>("public");
   const [locationName, setLocationName] = useState("");
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
@@ -112,6 +114,7 @@ export default function SpontaneousScreen() {
         endsAt: addHours(startsAt, hours).toISOString(),
         visibility,
         capacity,
+        priceSek,
         minAge: null,
       });
       router.replace(`/aktivitet/${created.id}`);
@@ -231,6 +234,9 @@ export default function SpontaneousScreen() {
           onPress={() => setCapacity(null)}
         />
       </Row>
+
+      <Gap size="md" />
+      <PriceField value={priceSek} onChange={setPriceSek} />
 
       <Gap size="md" />
       <Txt variant="smallStrong" tone="muted">Vem får se?</Txt>

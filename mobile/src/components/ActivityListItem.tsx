@@ -14,6 +14,7 @@ import { interestIcon, interestLabel } from "@/api/interests";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar, Badge, Card, Credentials, Gap, Row, Txt } from "@/components/ui";
 import { Cover } from "@/components/Cover";
+import { formatPriceShort } from "@/lib/pris";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance } from "@/lib/geo";
 import { formatActivityWhen } from "@/lib/time";
@@ -40,6 +41,9 @@ export function ActivityListItem({
 
         <Row gap="xs" wrap style={{ position: "absolute", top: space.md, left: space.md }}>
           {activity.kind === "now" && <Badge label="Spontant" icon="flash" tone="accent" />}
+          {formatPriceShort(activity.priceSek) && (
+            <Badge label={formatPriceShort(activity.priceSek)!} tone="dark" />
+          )}
           {activity.visibility === "friends" && <Badge label="Bara kompisar" icon="heart" tone="accent" />}
           {activity.myStatus === "pending" && <Badge label="Ansökt" tone="dark" />}
           {activity.myStatus === "accepted" && <Badge label="Du är med" tone="primary" />}
@@ -90,16 +94,26 @@ export function ActivityListItem({
 
         <Gap size="md" />
 
-        <Row justify="space-between">
-          <Row gap="sm">
+        {/*
+          Etiketten till höger får aldrig krympas.
+
+          Utan flexShrink: 0 tar värdens namn den plats den behöver och
+          "4 platser kvar" kapas mitt i. minWidth: 0 på vänstersidan behövs
+          för att en flexbox annars vägrar krympa sitt innehåll under dess
+          naturliga bredd, oavsett flex: 1.
+        */}
+        <Row justify="space-between" gap="sm">
+          <Row gap="sm" style={{ flex: 1, minWidth: 0 }}>
             <Avatar uri={activity.hostAvatar} name={activity.hostName} size={30} />
-            <View>
-              <Txt variant="smallStrong">{activity.hostName}</Txt>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Txt variant="smallStrong" numberOfLines={1}>{activity.hostName}</Txt>
               <Credentials verified activityCount={activity.hostActivityCount} size="micro" />
             </View>
           </Row>
 
-          <SpotsLabel activity={activity} />
+          <View style={{ flexShrink: 0 }}>
+            <SpotsLabel activity={activity} />
+          </View>
         </Row>
       </View>
     </Card>

@@ -61,6 +61,7 @@ interface ActivityRow {
   description: string | null;
   category: string | null;
   cover_url: string | null;
+  price_sek: number | null;
   location_name: string;
   lat: number;
   lng: number;
@@ -316,6 +317,7 @@ export class SupabaseBackend implements Backend {
       hostName: row.host_name,
       hostAvatar: row.host_avatar,
       kind: row.kind,
+      priceSek: row.price_sek,
       hostActivityCount: row.host_activity_count,
       title: row.title,
       description: row.description,
@@ -399,6 +401,7 @@ export class SupabaseBackend implements Backend {
       hostName: activity.host.display_name,
       hostAvatar: activity.host.avatar_url,
       kind: activity.kind,
+      priceSek: activity.price_sek,
       hostActivityCount: hostProfile?.activities_hosted ?? 0,
       title: activity.title,
       description: activity.description,
@@ -437,7 +440,9 @@ export class SupabaseBackend implements Backend {
         title: input.title,
         description: input.description ?? null,
         category: input.category ?? null,
-        cover_url: input.coverUrl,
+        kind: input.kind ?? "planned",
+        cover_url: input.coverUrl ?? null,
+        price_sek: input.priceSek ?? null,
         location_name: input.locationName,
         lat: input.lat,
         lng: input.lng,

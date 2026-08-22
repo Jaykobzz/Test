@@ -84,6 +84,8 @@ export interface ActivityCard {
   category: string | null;
   /** Null bara för spontana; klienten ritar då ett omslag ur kategorin. */
   coverUrl: string | null;
+  /** Kostnad per person i hela kronor. null = gratis. */
+  priceSek: number | null;
   locationName: string;
   lat: number;
   lng: number;
@@ -129,6 +131,7 @@ export interface CreateActivityInput {
   category?: string;
   /** Krav för planerade. Spontana får ett omslag ur kategorin i stället. */
   coverUrl?: string | null;
+  priceSek?: number | null;
   locationName: string;
   lat: number;
   lng: number;

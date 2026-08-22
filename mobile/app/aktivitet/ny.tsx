@@ -13,6 +13,7 @@ import { Alert, Platform, Pressable, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { getBackend } from "@/api";
+import { PriceField } from "@/components/PriceField";
 import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityVisibility } from "@/api/types";
 import {
@@ -49,6 +50,7 @@ export default function NewActivityScreen() {
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [visibility, setVisibility] = useState<ActivityVisibility>("public");
   const [capacity, setCapacity] = useState<number | null>(4);
+  const [priceSek, setPriceSek] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Förvalt: nästa hela timme imorgon, två timmar lång.
@@ -132,6 +134,7 @@ export default function NewActivityScreen() {
         endsAt: endsAt.toISOString(),
         visibility,
         capacity,
+        priceSek,
       });
       router.replace(`/aktivitet/${activity.id}`);
     } catch (error) {
@@ -337,6 +340,10 @@ export default function NewActivityScreen() {
       <Txt variant="smallStrong" tone="muted">Vem får se den?</Txt>
       <Gap size="sm" />
       <VisibilityChoice value={visibility} onChange={setVisibility} />
+
+      <Gap size="lg" />
+
+      <PriceField value={priceSek} onChange={setPriceSek} />
 
       <Gap size="lg" />
 

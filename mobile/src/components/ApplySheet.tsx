@@ -31,6 +31,7 @@ const LEVELS: { value: ExperienceLevel; label: string }[] = [
 interface Props {
   visible: boolean;
   activityTitle: string;
+  priceSek: number | null;
   working: boolean;
   onCancel(): void;
   onSubmit(message: string, experience: ExperienceLevel | undefined): void;
@@ -39,6 +40,7 @@ interface Props {
 export function ApplySheet({
   visible,
   activityTitle,
+  priceSek,
   working,
   onCancel,
   onSubmit,
@@ -85,6 +87,16 @@ export function ApplySheet({
                 Skriv en rad till värden. Det är den som gör att du syns bland
                 de andra som vill med.
               </Txt>
+
+              {priceSek !== null && priceSek > 0 && (
+                <>
+                  <Gap size="md" />
+                  {/* Sista chansen att se kostnaden innan man tackar ja. */}
+                  <Row gap="sm">
+                    <Chip label={`Kostar ${priceSek} kr per person`} tone="accent" />
+                  </Row>
+                </>
+              )}
 
               <Gap size="lg" />
 

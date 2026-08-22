@@ -37,6 +37,8 @@ export interface SeedActivity {
   durationHours: number;
   visibility: ActivityVisibility;
   capacity: number | null;
+  /** Kostnad per person i hela kronor. Utelämnad = gratis. */
+  priceSek?: number;
 }
 
 /**
@@ -280,6 +282,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
     description: "Sex grader i vattnet. Bastun är varm efteråt, jag lovar.",
     category: "bad",
     coverUrl: COVER.kallbad,
+    priceSek: 120,
     locationName: "Tyresö strandbad",
     lat: 59.2402,
     lng: 18.2295,

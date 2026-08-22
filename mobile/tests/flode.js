@@ -186,6 +186,21 @@ async function shouldThrow(label, fn) {
   check("planerade är fortfarande planerade",
         feedNow.filter((a) => a.id !== spontan.id).every((a) => a.kind === "planned"));
 
+  console.log("\nKostnad");
+  const gratis = (await api.discover({ radiusM: 25000 }))
+    .find((a) => a.priceSek === null);
+  check("gratis aktiviteter har null och inte noll", Boolean(gratis));
+  const kostar = await api.createActivity({
+    kind: "now", title: "Bastu och kallbad", category: "bad", coverUrl: null,
+    locationName: "Bryggan", lat: 59.2617, lng: 18.1204,
+    startsAt: new Date(Date.now() + 60 * 60000).toISOString(),
+    endsAt: new Date(Date.now() + 180 * 60000).toISOString(),
+    visibility: "public", capacity: 4, minAge: null, priceSek: 120,
+  });
+  check("priset sparas", kostar.priceSek === 120, String(kostar.priceSek));
+  const igen = await api.getActivity(kostar.id);
+  check("priset finns kvar vid omlasning", igen.priceSek === 120);
+
   console.log("\nKompisar");
   const people = (await api.discover({ radiusKm: 25 }))
     .map((a) => a.hostId).filter((id) => id !== me.id);
