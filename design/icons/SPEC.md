@@ -65,3 +65,17 @@ ett generiskt bibliotek syns tydligast. Gränssnittsikonerna uppträder en och e
 och tål att vänta. Ionicons streckvikt ligger nära 1,6 vid 24 px, så
 skillnaden är liten tills resten är ritad — men den finns, och setet är inte
 färdigt förrän den är borta.
+
+## Jämförelse med Claude Designs set
+
+`design-sheet-48.png` och `design-sheet-14.png` är renderingar av ikonsetet ur
+Claude Designs handoff-paket (`Mobile app design project.zip` på `main`,
+riktning "Bryggan"). De ligger här som beslutsunderlag, inte som något appen
+använder.
+
+Setet ritades oberoende av det här och landade i samma konstruktion — 24-rutnät,
+runda ändar, ingen fyllning — med 1,7 i streck mot våra 1,6. Deras är jämnare
+och har 31 ikoner mot våra 30, inklusive `handarbete`.
+
+**Beslut som väntar på Jakob:** byta till deras set och behålla vår `svamp`
+(deras är ett löv, vilket är fel för "Svamp & bär"). Se PR-tråden.
