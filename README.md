@@ -21,7 +21,7 @@ Och ingen betygsätter någon — se nedan.
 
 | Del | Var | Läge |
 |---|---|---|
-| Mobilapp (iOS + Android) | `mobile/` | Expo SDK 57, React Native 0.86, expo-router |
+| Mobilapp (iOS + Android) | `mobile/` | Expo SDK 56, React Native 0.85, expo-router |
 | Databas, RLS och RPC:er | `supabase/migrations/` | Postgres 17 + PostGIS |
 | BankID-inloggning | `supabase/functions/bankid-auth/` | Mock idag, broker inkopplingsbar |
 | Databastester | `supabase/tests/` | 46 påståenden, körs utan Supabase |
