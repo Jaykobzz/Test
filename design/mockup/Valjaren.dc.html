@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Hanken+Grotesk:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #B3541E; } a:hover { color: #8E4218; }
+    .scr { width: 390px; height: 844px; background: #F7F5EF; overflow: hidden; position: relative;
+           font-family: "Hanken Grotesk", system-ui, sans-serif; color: #14201B; }
+    .disp { font-family: "Unbounded", system-ui, sans-serif; font-weight: 600; }
+  </style>
+</helmet>
+
+<div class="scr">
+
+  <div style="position:absolute; inset:0; background:#F7F5EF"></div>
+  <div style="position:absolute; inset:0; background:rgba(12,14,18,.72)"></div>
+
+  <div style="position:absolute; left:0; right:0; bottom:0; background:#F7F5EF;
+              border-top-left-radius:22px; border-top-right-radius:22px;
+              padding:20px 20px 26px; display:flex; flex-direction:column; gap:12px">
+
+    <div class="disp" style="font-size:18px; line-height:24px">Vad vill du lägga upp?</div>
+
+    <div style="display:flex; gap:12px; align-items:flex-start; background:#D9EBE2;
+                border-radius:18px; padding:16px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#15604B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z"/></svg>
+      <div style="flex:1">
+        <div style="font-size:15px; line-height:22px; font-weight:600">Spontant nu</div>
+        <div style="font-size:13px; line-height:18px; color:#56635C; margin-top:4px">
+          Något du vill göra inom några timmar. Går ut till folk i närheten direkt.
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; align-items:flex-start; background:#FFFFFF;
+                border-radius:18px; padding:16px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#56635C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/></svg>
+      <div style="flex:1">
+        <div style="font-size:15px; line-height:22px; font-weight:600">Planera något</div>
+        <div style="font-size:13px; line-height:18px; color:#56635C; margin-top:4px">
+          En aktivitet längre fram, med bild och beskrivning.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

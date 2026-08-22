@@ -1,0 +1,22 @@
+{
+  "artboards": [
+    { "file": "Flodet.dc.html",   "x": 0,    "y": 0, "w": 390, "h": 844, "title": "Flödet" },
+    { "file": "Valjaren.dc.html", "x": 510,  "y": 0, "w": 390, "h": 844, "title": "Planerat eller spontant" },
+    { "file": "Spontan.dc.html",  "x": 1020, "y": 0, "w": 390, "h": 844, "title": "Spontant nu" },
+    { "file": "HakaPa.dc.html",   "x": 1530, "y": 0, "w": 390, "h": 844, "title": "Haka på" },
+    { "file": "Main.dc.html",     "x": 2040, "y": 0, "w": 390, "h": 844, "title": "Värden väljer" }
+  ],
+  "annotations": [
+    {
+      "id": "spontant",
+      "x": 0, "y": -150, "w": 900,
+      "text": "Spontant och planerat är två vägar, inte två lägen.\nDen spontana har inget foto, ingen beskrivning och ingen datumväljare: ett förslag fyller titel och kategori på ett tryck.\nOmslaget ritas ur kategorins ikon, så flödet ser fyllt ut utan att någon fotograferat en hall."
+    },
+    {
+      "id": "urval",
+      "x": 1530, "y": -150, "w": 900,
+      "text": "Raden är obligatorisk. Den är det enda som skiljer tjugo sökande åt, för alla som söker till en fisketur gillar redan att fiska.\nNivån beskriver aktiviteten, inte personen. Inga betyg finns kvar någonstans i appen."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

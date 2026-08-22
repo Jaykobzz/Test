@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Hanken+Grotesk:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #B3541E; } a:hover { color: #8E4218; }
+    .scr { width: 390px; height: 844px; background: #F7F5EF; overflow: hidden; position: relative;
+           font-family: "Hanken Grotesk", system-ui, sans-serif; color: #14201B; }
+    .disp { font-family: "Unbounded", system-ui, sans-serif; font-weight: 600; }
+    .chip { border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600;
+            background:#EEEAE0; color:#56635C; display:inline-block; }
+    .chip.on { background:#15604B; color:#FFFFFF; }
+  </style>
+</helmet>
+
+<div class="scr">
+
+  <!-- Skärmen bakom, nedtonad av överlägget -->
+  <div style="position:absolute; inset:0">
+    <div style="height:230px; background:linear-gradient(160deg,#5B6E63 0%,#2F3F38 55%,#1B2620 100%)"></div>
+    <div style="padding:16px 20px">
+      <div class="disp" style="font-size:24px; line-height:32px">Fiska i Drevviken</div>
+      <div style="font-size:13px; color:#56635C; margin-top:4px">Imorgon 13–15 · Drevviken, Skarpnäck</div>
+    </div>
+  </div>
+  <div style="position:absolute; inset:0; background:rgba(12,14,18,.72)"></div>
+
+  <!-- Arket -->
+  <div style="position:absolute; left:0; right:0; bottom:0; background:#F7F5EF;
+              border-top-left-radius:22px; border-top-right-radius:22px; padding:20px 20px 26px">
+
+    <div class="disp" style="font-size:18px; line-height:24px">Haka på Fiska i Drevviken</div>
+    <div style="font-size:15px; line-height:22px; color:#56635C; margin-top:4px">
+      Skriv en rad till värden. Det är den som gör att du syns bland de andra
+      som vill med.
+    </div>
+
+    <div style="height:16px"></div>
+
+    <div style="font-size:13px; font-weight:600; color:#56635C">Din rad</div>
+    <div style="background:#FFFFFF; border:1px solid #15604B; border-radius:14px;
+                padding:12px; margin-top:4px; min-height:96px; font-size:15px; line-height:22px">
+      Har aldrig fiskat men velat testa i flera år. Bor vid Drevviken så
+      det är nära för mig.<span style="display:inline-block; width:1.5px; height:17px; background:#15604B; vertical-align:-3px; margin-left:1px"></span>
+    </div>
+
+    <div style="height:16px"></div>
+
+    <div style="font-size:13px; font-weight:600; color:#56635C">Hur van är du?</div>
+    <div style="font-size:13px; line-height:18px; color:#83908A; margin-top:2px">
+      Frivilligt. Hjälper värden planera, och att vara ny är aldrig ett minus.
+    </div>
+    <div style="display:flex; gap:8px; margin-top:8px">
+      <span class="chip on">Första gången</span>
+      <span class="chip">Gjort det förr</span>
+      <span class="chip">Gör det ofta</span>
+    </div>
+
+    <div style="height:20px"></div>
+
+    <div style="background:#15604B; color:#fff; border-radius:999px; padding:15px;
+                text-align:center; font-size:15px; font-weight:700; display:flex;
+                align-items:center; justify-content:center; gap:8px">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-8-8-4L21 3Z"/></svg>
+      Skicka
+    </div>
+    <div style="text-align:center; padding-top:12px; font-size:15px; font-weight:700; color:#15604B">Avbryt</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
