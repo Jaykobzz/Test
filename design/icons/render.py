@@ -15,7 +15,7 @@ import cairosvg
 HERE = pathlib.Path(__file__).parent
 ICONS = json.load(open(HERE / "icons.json"))
 
-STROKE = 1.6
+STROKE = 1.7
 COLS = 6
 CELL = 96
 PAD = 14

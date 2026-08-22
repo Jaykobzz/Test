@@ -10,7 +10,7 @@ gränssnittet.
 |---|---|
 | Rutnät | 24 × 24 |
 | Levande yta | 20 × 20 (2 enheters marginal runt om) |
-| Streck | 1,6 |
+| Streck | 1,7 |
 | Ändar och hörn | Runda, alltid |
 | Fyllning | Ingen. Rent streck genom hela setet. |
 | Diagonaler | 45° där det går |
@@ -66,16 +66,25 @@ och tål att vänta. Ionicons streckvikt ligger nära 1,6 vid 24 px, så
 skillnaden är liten tills resten är ritad — men den finns, och setet är inte
 färdigt förrän den är borta.
 
-## Jämförelse med Claude Designs set
+## Ursprung
 
-`design-sheet-48.png` och `design-sheet-14.png` är renderingar av ikonsetet ur
-Claude Designs handoff-paket (`Mobile app design project.zip` på `main`,
-riktning "Bryggan"). De ligger här som beslutsunderlag, inte som något appen
-använder.
+Setet i `icons.json` kommer från Claude Designs handoff-paket
+(`Mobile app design project.zip` på `main`, riktning "Bryggan"), med två byten.
 
-Setet ritades oberoende av det här och landade i samma konstruktion — 24-rutnät,
-runda ändar, ingen fyllning — med 1,7 i streck mot våra 1,6. Deras är jämnare
-och har 31 ikoner mot våra 30, inklusive `handarbete`.
+De två seten ritades oberoende av varandra och landade i samma konstruktion —
+24-rutnät, runda ändar, ingen fyllning. Deras var jämnare i kurvorna och hade
+31 ikoner mot våra 30, inklusive `handarbete` (sy, sticka, brodera och virka
+samlat som en aktivitet). Därför blev deras grunden.
 
-**Beslut som väntar på Jakob:** byta till deras set och behålla vår `svamp`
-(deras är ett löv, vilket är fel för "Svamp & bär"). Se PR-tråden.
+Två ikoner behölls eller ritades om:
+
+| Ikon | Varför |
+|---|---|
+| `svamp` | Deras var ett löv. Kategorin heter "Svamp & bär" — vår svamp stannar. |
+| `vandring` | Deras skyltstolpe lästes som ett P. Omritad till en bergskam. |
+
+`design-sheet-48.png` och `design-sheet-14.png` är renderingar av deras
+ursprungliga set och ligger kvar som jämförelse.
+
+Streckvikten är nu **1,7**, deras värde. Vår Icon-komponent justerar den
+optiskt mot storleken — se `mobile/src/components/icons/Icon.tsx`.

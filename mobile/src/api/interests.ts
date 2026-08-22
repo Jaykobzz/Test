@@ -25,6 +25,7 @@ export const INTERESTS: Interest[] = [
   { slug: "skidor",     label: "Skidor & snö",      icon: "skidor" },
   { slug: "svamp",      label: "Svamp & bär",       icon: "svamp" },
   { slug: "tradgard",   label: "Trädgård & odling", icon: "tradgard" },
+  { slug: "handarbete", label: "Handarbete",        icon: "handarbete" },
   { slug: "matlagning", label: "Matlagning",        icon: "matlagning" },
   { slug: "fika",       label: "Fika",              icon: "fika" },
   { slug: "middag",     label: "Middag & krog",     icon: "middag" },
