@@ -22,7 +22,7 @@ jobs:
           cache-dependency-path: mobile/package-lock.json
 
       - name: Installera beroenden
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Typkontroll
         run: npx tsc --noEmit
