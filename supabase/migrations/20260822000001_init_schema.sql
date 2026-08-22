@@ -34,12 +34,13 @@ create type report_status       as enum ('open', 'reviewing', 'actioned', 'dismi
 create table interests (
   slug        text primary key,
   label       text not null,
-  emoji       text not null,
+  icon        text not null,
   sort_order  int  not null default 100
 );
 
 comment on table interests is
-  'Kanonisk lista över intressen. Profiler och aktiviteter refererar till slugs.';
+  'Kanonisk lista över intressen. Profiler och aktiviteter refererar till slugs. '
+  'icon är namnet på en linjeikon i klienten — aldrig ett emoji.';
 
 -- ---------------------------------------------------------------------------
 -- Profiler

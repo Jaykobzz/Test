@@ -9,7 +9,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +22,7 @@ import {
 import { Image } from "expo-image";
 import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
+import { Tappable } from "@/components/Tappable";
 import { useTheme } from "@/hooks/useTheme";
 import { font, radius, shadow, space } from "@/theme";
 
@@ -120,13 +120,12 @@ export function Card({
 
   if (!onPress) return <View style={[base, shadow, style]}>{children}</View>;
 
+  // Stora ytor sjunker in mindre — en full kortbredd som krymper 3 % ser ut
+  // att studsa, medan samma rörelse på en knapp känns precis.
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [base, shadow, { opacity: pressed ? 0.85 : 1 }, style]}
-    >
+    <Tappable onPress={onPress} scale={0.985} style={[base, shadow, style]}>
       {children}
-    </Pressable>
+    </Tappable>
   );
 }
 
@@ -222,13 +221,12 @@ export function Button({
   const palette = styles[kind];
 
   return (
-    <Pressable
+    <Tappable
       onPress={onPress}
       disabled={inactive}
-      accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled: inactive, busy: loading }}
-      style={({ pressed }) => ({
+      accessibilityState={{ disabled: inactive }}
+      style={{
         backgroundColor: palette.bg,
         borderColor: palette.border,
         borderWidth: kind === "secondary" ? StyleSheet.hairlineWidth : 0,
@@ -240,8 +238,8 @@ export function Button({
         justifyContent: "center",
         gap: space.sm,
         alignSelf: fullWidth ? "stretch" : "flex-start",
-        opacity: inactive ? 0.5 : pressed ? 0.88 : 1,
-      })}
+        opacity: inactive ? 0.45 : 1,
+      }}
     >
       {loading ? (
         <ActivityIndicator color={palette.fg} />
@@ -251,7 +249,7 @@ export function Button({
           <Text style={[font.bodyStrong as TextStyle, { color: palette.fg }]}>{label}</Text>
         </>
       )}
-    </Pressable>
+    </Tappable>
   );
 }
 
@@ -275,22 +273,21 @@ export function IconButton({
       : theme.color.text;
 
   return (
-    <Pressable
+    <Tappable
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityLabel={label}
       hitSlop={10}
-      style={({ pressed }) => ({
+      scale={0.9}
+      style={{
         width: 40,
         height: 40,
         borderRadius: radius.pill,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: pressed ? theme.color.surfaceAlt : "transparent",
-      })}
+      }}
     >
       <Ionicons name={icon} size={22} color={color} />
-    </Pressable>
+    </Tappable>
   );
 }
 
@@ -448,11 +445,13 @@ function formatMonthYear(iso: string): string {
 
 export function Chip({
   label,
+  icon,
   selected = false,
   onPress,
   tone = "neutral",
 }: {
   label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
   selected?: boolean;
   onPress?: () => void;
   tone?: "neutral" | "primary" | "accent" | "highlight";
@@ -472,12 +471,17 @@ export function Chip({
   const content = (
     <View
       style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
         backgroundColor: palette.bg,
         borderRadius: radius.pill,
         paddingVertical: 7,
-        paddingHorizontal: space.md,
+        paddingLeft: icon ? space.sm + 2 : space.md,
+        paddingRight: space.md,
       }}
     >
+      {icon && <Ionicons name={icon} size={14} color={palette.fg} />}
       <Text style={[font.smallStrong as TextStyle, { color: palette.fg }]}>{label}</Text>
     </View>
   );
@@ -485,14 +489,15 @@ export function Chip({
   if (!onPress) return content;
 
   return (
-    <Pressable
+    <Tappable
       onPress={onPress}
-      accessibilityRole="button"
+      feedback="select"
       accessibilityState={{ selected }}
-      style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+      accessibilityLabel={label}
+      scale={0.94}
     >
       {content}
-    </Pressable>
+    </Tappable>
   );
 }
 

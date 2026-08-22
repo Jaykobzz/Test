@@ -8,16 +8,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, LinearTransition } from "react-native-reanimated";
 
 import { getBackend } from "@/api";
-import { INTERESTS } from "@/api/interests";
+import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityCard } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { ActivityListItem } from "@/components/ActivityListItem";
-import { Chip, EmptyState, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
+import { ActivityCardSkeleton } from "@/components/Skeleton";
+import { Tappable } from "@/components/Tappable";
+import { Chip, EmptyState, Gap, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { getCurrentPlace } from "@/lib/location";
+import { spring, useMotion } from "@/lib/motion";
 import { radius, space } from "@/theme";
 
 /** Radier man kan välja mellan, i meter. */
@@ -32,6 +36,7 @@ export default function DiscoverScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { profile } = useAuth();
+  const motion = useMotion();
 
   const [place, setPlace] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const [radiusM, setRadiusM] = useState(15_000);
@@ -108,11 +113,11 @@ export default function DiscoverScreen() {
             )}
           </View>
 
-          <Pressable
+          <Tappable
             onPress={() => router.push("/aktivitet/ny")}
-            accessibilityRole="button"
             accessibilityLabel="Skapa aktivitet"
-            style={({ pressed }) => ({
+            scale={0.94}
+            style={{
               backgroundColor: theme.color.primary,
               borderRadius: radius.pill,
               paddingVertical: 10,
@@ -120,12 +125,11 @@ export default function DiscoverScreen() {
               flexDirection: "row",
               alignItems: "center",
               gap: 6,
-              opacity: pressed ? 0.88 : 1,
-            })}
+            }}
           >
             <Ionicons name="add" size={17} color={theme.color.onPrimary} />
             <Txt variant="smallStrong" tone="onPrimary">Skapa</Txt>
-          </Pressable>
+          </Tappable>
         </Row>
       </View>
 
@@ -157,7 +161,8 @@ export default function DiscoverScreen() {
             keyExtractor={(item) => item.slug}
             renderItem={({ item }) => (
               <Chip
-                label={`${item.emoji} ${item.label}`}
+                label={item.label}
+                icon={item.icon as IconName}
                 selected={filter.includes(item.slug)}
                 onPress={() => toggleFilter(item.slug)}
               />
@@ -169,9 +174,19 @@ export default function DiscoverScreen() {
       <Gap size="md" />
 
       {loading ? (
-        <Loading />
+        <View style={{ paddingHorizontal: space.lg, gap: space.md }}>
+          {[0, 1, 2].map((i) => (
+            <Animated.View key={i} entering={FadeIn.delay(i * 60)}>
+              <ActivityCardSkeleton />
+            </Animated.View>
+          ))}
+        </View>
       ) : (
-        <FlatList
+        <Animated.FlatList
+          itemLayoutAnimation={motion.reduced ? undefined : LinearTransition.springify()
+            .mass(spring.layout.mass)
+            .stiffness(spring.layout.stiffness)
+            .damping(spring.layout.damping)}
           data={activities}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
@@ -186,11 +201,23 @@ export default function DiscoverScreen() {
               tintColor={theme.color.primary}
             />
           }
-          renderItem={({ item }) => (
-            <ActivityListItem
-              activity={item}
-              onPress={() => router.push(`/aktivitet/${item.id}`)}
-            />
+          renderItem={({ item, index }) => (
+            <Animated.View
+              entering={
+                motion.reduced
+                  ? FadeIn
+                  : FadeInDown.delay(motion.stagger(index))
+                      .springify()
+                      .mass(spring.enter.mass)
+                      .stiffness(spring.enter.stiffness)
+                      .damping(spring.enter.damping)
+              }
+            >
+              <ActivityListItem
+                activity={item}
+                onPress={() => router.push(`/aktivitet/${item.id}`)}
+              />
+            </Animated.View>
           )}
           ListEmptyComponent={
             <EmptyState

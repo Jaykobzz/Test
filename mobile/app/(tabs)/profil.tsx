@@ -13,7 +13,7 @@ import { useCallback, useState } from "react";
 import { Alert, Pressable, ScrollView, View } from "react-native";
 
 import { USING_MOCK, getBackend, resetMockData } from "@/api";
-import { INTERESTS } from "@/api/interests";
+import { INTERESTS, type IconName } from "@/api/interests";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import {
@@ -206,7 +206,8 @@ export default function ProfileScreen() {
                 {INTERESTS.map((interest) => (
                   <Chip
                     key={interest.slug}
-                    label={`${interest.emoji} ${interest.label}`}
+                    label={interest.label}
+            icon={interest.icon as IconName}
                     selected={draftInterests.includes(interest.slug)}
                     onPress={() =>
                       setDraftInterests((current) =>
@@ -248,7 +249,8 @@ export default function ProfileScreen() {
                   return interest ? (
                     <Chip
                       key={slug}
-                      label={`${interest.emoji} ${interest.label}`}
+                      label={interest.label}
+            icon={interest.icon as IconName}
                       tone="primary"
                     />
                   ) : null;

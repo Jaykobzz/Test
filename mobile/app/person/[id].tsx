@@ -14,7 +14,7 @@ import { Alert, ScrollView, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
-import { INTERESTS } from "@/api/interests";
+import { INTERESTS, type IconName } from "@/api/interests";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import {
@@ -202,7 +202,8 @@ export default function PersonScreen() {
                 return interest ? (
                   <Chip
                     key={slug}
-                    label={`${interest.emoji} ${interest.label}`}
+                    label={interest.label}
+            icon={interest.icon as IconName}
                     tone={shared ? "primary" : "neutral"}
                   />
                 ) : null;

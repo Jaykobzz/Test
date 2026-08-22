@@ -1122,9 +1122,9 @@ function describeMessage(raw: MockDb["messages"][number], db: MockDb, me: Uuid):
 
   switch (raw.kind) {
     case "system": return raw.body ?? "";
-    case "image":  return `${who}: 📷 Bild`;
-    case "place":  return `${who}: 📍 ${raw.body ?? "Plats"}`;
-    case "list":   return `${who}: 📋 ${raw.body ?? "Lista"}`;
+    case "image":  return `${who}: Bild`;
+    case "place":  return `${who}: ${raw.body ?? "Plats"}`;
+    case "list":   return `${who}: ${raw.body ?? "Lista"}`;
     default:       return `${who}: ${raw.body ?? ""}`;
   }
 }

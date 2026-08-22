@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 
 import { getBackend } from "@/api";
-import { INTERESTS } from "@/api/interests";
+import { INTERESTS, type IconName } from "@/api/interests";
 import { useAuth } from "@/auth/AuthContext";
 import { Button, Chip, Divider, Field, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
@@ -223,7 +223,8 @@ export default function OnboardingScreen() {
         {INTERESTS.map((interest) => (
           <Chip
             key={interest.slug}
-            label={`${interest.emoji} ${interest.label}`}
+            label={interest.label}
+            icon={interest.icon as IconName}
             selected={interests.includes(interest.slug)}
             onPress={() => toggleInterest(interest.slug)}
           />

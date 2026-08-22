@@ -17,7 +17,8 @@ export type FriendshipStatus = "pending" | "accepted" | "declined";
 export interface Interest {
   slug: string;
   label: string;
-  emoji: string;
+  /** Namn på en Ionicons-linjeikon. Aldrig emoji — se api/interests.ts. */
+  icon: string;
 }
 
 /** Din egen profil — inkluderar det bara du får se. */

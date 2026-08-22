@@ -13,7 +13,7 @@ import { Alert, Platform, Pressable, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { getBackend } from "@/api";
-import { INTERESTS } from "@/api/interests";
+import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityVisibility } from "@/api/types";
 import {
   Button, Chip, Divider, Field, Gap, Row, Screen, Txt,
@@ -210,7 +210,8 @@ export default function NewActivityScreen() {
         {INTERESTS.map((interest) => (
           <Chip
             key={interest.slug}
-            label={`${interest.emoji} ${interest.label}`}
+            label={interest.label}
+            icon={interest.icon as IconName}
             selected={category === interest.slug}
             onPress={() => setCategory(category === interest.slug ? null : interest.slug)}
           />

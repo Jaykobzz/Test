@@ -277,7 +277,7 @@ export class SupabaseBackend implements Backend {
   async listInterests(): Promise<Interest[]> {
     const { data, error } = await supabase()
       .from("interests")
-      .select("slug, label, emoji")
+      .select("slug, label, icon")
       .order("sort_order");
     fail(error);
     return data ?? [];
@@ -902,9 +902,9 @@ export class SupabaseBackend implements Backend {
 
 function describeKind(kind: Message["kind"], body: string | null): string {
   switch (kind) {
-    case "image": return "📷 Bild";
-    case "place": return `📍 ${body ?? "Plats"}`;
-    case "list":  return `📋 ${body ?? "Lista"}`;
+    case "image": return "Bild";
+    case "place": return body ?? "Plats";
+    case "list":  return body ?? "Lista";
     default:      return body ?? "";
   }
 }
