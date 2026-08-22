@@ -16,6 +16,7 @@ import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
 import { ApplySheet } from "@/components/ApplySheet";
+import { Cover } from "@/components/Cover";
 import { interestLabel } from "@/api/interests";
 import type { ActivityDetail, Applicant, ExperienceLevel } from "@/api/types";
 import {
@@ -151,10 +152,11 @@ export default function ActivityScreen() {
           />
         }
       >
-        <Image
-          source={{ uri: activity.coverUrl }}
+        <Cover
+          uri={activity.coverUrl}
+          category={activity.category}
+          title={activity.title}
           style={{ width: "100%", height: 230, backgroundColor: theme.color.surfaceAlt }}
-          contentFit="cover"
         />
 
         <View style={{ padding: space.lg }}>

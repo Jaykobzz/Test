@@ -13,6 +13,7 @@ import type { ActivityCard } from "@/api/types";
 import { interestIcon, interestLabel } from "@/api/interests";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar, Badge, Card, Credentials, Gap, Row, Txt } from "@/components/ui";
+import { Cover } from "@/components/Cover";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance } from "@/lib/geo";
 import { formatActivityWhen } from "@/lib/time";
@@ -30,14 +31,15 @@ export function ActivityListItem({
   return (
     <Card onPress={onPress}>
       <View>
-        <Image
-          source={{ uri: activity.coverUrl }}
-          contentFit="cover"
-          transition={200}
+        <Cover
+          uri={activity.coverUrl}
+          category={activity.category}
+          title={activity.title}
           style={{ width: "100%", height: 172, backgroundColor: theme.color.surfaceAlt }}
         />
 
         <Row gap="xs" wrap style={{ position: "absolute", top: space.md, left: space.md }}>
+          {activity.kind === "now" && <Badge label="Spontant" icon="flash" tone="accent" />}
           {activity.visibility === "friends" && <Badge label="Bara kompisar" icon="heart" tone="accent" />}
           {activity.myStatus === "pending" && <Badge label="Ansökt" tone="dark" />}
           {activity.myStatus === "accepted" && <Badge label="Du är med" tone="primary" />}

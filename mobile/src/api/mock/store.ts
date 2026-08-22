@@ -10,6 +10,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type {
+  ActivityKind,
   ExperienceLevel,
   ActivityStatus,
   ActivityVisibility,
@@ -38,11 +39,12 @@ export interface MockProfile {
 
 export interface MockActivity {
   id: Uuid;
+  kind: ActivityKind;
   hostId: Uuid;
   title: string;
   description: string | null;
   category: string | null;
-  coverUrl: string;
+  coverUrl: string | null;
   locationName: string;
   lat: number;
   lng: number;
@@ -157,6 +159,7 @@ function buildSeed(): MockDb {
       id: a.id,
       hostId: a.hostId,
       title: a.title,
+      kind: "planned",
       description: a.description,
       category: a.category,
       coverUrl: a.coverUrl,

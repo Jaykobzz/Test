@@ -181,6 +181,7 @@ function toActivityCard(
     hostId: activity.hostId,
     hostName: host.displayName,
     hostAvatar: host.avatarUrl,
+    kind: activity.kind,
     hostActivityCount: completedActivityCount(db, activity.hostId),
     title: activity.title,
     description: activity.description,
@@ -550,13 +551,25 @@ export class MockBackend implements Backend {
     const db = await loadDb();
     const me = meOrThrow(db);
 
+    const kind = input.kind ?? "planned";
+
+    // Samma krav som i databasen: planerade behöver bild, spontana inte.
+    if (kind === "planned" && !input.coverUrl) {
+      throw new Error("En planerad aktivitet behöver en bild");
+    }
+    if (kind === "now"
+      && Date.parse(input.startsAt) > Date.now() + 6 * 3_600_000) {
+      throw new Error("En spontan aktivitet måste börja inom sex timmar");
+    }
+
     const activity: MockActivity = {
       id: newId(),
+      kind,
       hostId: me,
       title: input.title,
       description: input.description ?? null,
       category: input.category ?? null,
-      coverUrl: input.coverUrl,
+      coverUrl: input.coverUrl ?? null,
       locationName: input.locationName,
       lat: input.lat,
       lng: input.lng,

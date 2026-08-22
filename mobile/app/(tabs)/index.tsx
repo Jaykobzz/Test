@@ -16,6 +16,7 @@ import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityCard } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { ActivityListItem } from "@/components/ActivityListItem";
+import { CreateChooser } from "@/components/CreateChooser";
 import { ActivityCardSkeleton } from "@/components/Skeleton";
 import { Tappable } from "@/components/Tappable";
 import { Chip, EmptyState, Gap, Row, Screen, Txt } from "@/components/ui";
@@ -39,6 +40,7 @@ export default function DiscoverScreen() {
   const motion = useMotion();
 
   const [place, setPlace] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [choosing, setChoosing] = useState(false);
   const [radiusM, setRadiusM] = useState(15_000);
   const [filter, setFilter] = useState<string[]>([]);
   const [activities, setActivities] = useState<ActivityCard[]>([]);
@@ -114,7 +116,7 @@ export default function DiscoverScreen() {
           </View>
 
           <Tappable
-            onPress={() => router.push("/aktivitet/ny")}
+            onPress={() => setChoosing(true)}
             accessibilityLabel="Skapa aktivitet"
             scale={0.94}
             style={{
@@ -230,12 +232,19 @@ export default function DiscoverScreen() {
               }
               action={{
                 label: filter.length ? "Rensa filter" : "Skapa aktivitet",
-                onPress: () => (filter.length ? setFilter([]) : router.push("/aktivitet/ny")),
+                onPress: () => (filter.length ? setFilter([]) : setChoosing(true)),
               }}
             />
           }
         />
       )}
+
+      <CreateChooser
+        visible={choosing}
+        onClose={() => setChoosing(false)}
+        onPlanned={() => { setChoosing(false); router.push("/aktivitet/ny"); }}
+        onSpontaneous={() => { setChoosing(false); router.push("/aktivitet/spontan"); }}
+      />
     </Screen>
   );
 }

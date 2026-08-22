@@ -63,8 +63,17 @@ export interface PublicProfile {
   friendAwaitingMyAnswer: boolean;
 }
 
+/**
+ * Planerad eller spontan.
+ *
+ * Samma data, nästan inget annat gemensamt: den planerade bläddras fram i
+ * flödet, den spontana måste komma till folk och dö av sig själv.
+ */
+export type ActivityKind = "planned" | "now";
+
 export interface ActivityCard {
   id: Uuid;
+  kind: ActivityKind;
   hostId: Uuid;
   hostName: string;
   hostAvatar: string;
@@ -73,7 +82,8 @@ export interface ActivityCard {
   title: string;
   description: string | null;
   category: string | null;
-  coverUrl: string;
+  /** Null bara för spontana; klienten ritar då ett omslag ur kategorin. */
+  coverUrl: string | null;
   locationName: string;
   lat: number;
   lng: number;
@@ -113,10 +123,12 @@ export interface ActivityDetail extends ActivityCard {
 }
 
 export interface CreateActivityInput {
+  kind?: ActivityKind;
   title: string;
   description?: string;
   category?: string;
-  coverUrl: string;
+  /** Krav för planerade. Spontana får ett omslag ur kategorin i stället. */
+  coverUrl?: string | null;
   locationName: string;
   lat: number;
   lng: number;
@@ -201,6 +213,15 @@ export interface FriendRequest {
   createdAt: IsoDate;
   /** true = de frågade dig, false = du frågade dem. */
   incoming: boolean;
+}
+
+/** Vad någon får bli störd av, och när. */
+export interface NotificationPrefs {
+  spontaneous: boolean;
+  radiusKm: number;
+  quietFrom: number;
+  quietTo: number;
+  maxPerDay: number;
 }
 
 export interface DiscoverParams {

@@ -91,7 +91,11 @@ function RootNavigator() {
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="aktivitet/ny" options={{ title: "Ny aktivitet", presentation: "modal" }} />
+      <Stack.Screen name="aktivitet/ny" options={{ title: "Planera något", presentation: "modal" }} />
+      <Stack.Screen
+        name="aktivitet/spontan"
+        options={{ title: "Spontant nu", presentation: "modal" }}
+      />
       <Stack.Screen name="aktivitet/[id]" options={{ title: "" }} />
       <Stack.Screen name="chatt/[id]" options={{ title: "" }} />
       <Stack.Screen name="person/[id]" options={{ title: "" }} />

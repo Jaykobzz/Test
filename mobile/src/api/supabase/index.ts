@@ -13,6 +13,7 @@ import type { Backend } from "../backend";
 import type {
   ActivityCard,
   ActivityDetail,
+  ActivityKind,
   Applicant,
   BankIdCollect,
   BankIdStart,
@@ -54,11 +55,12 @@ interface ProfileRow {
 
 interface ActivityRow {
   id: string;
+  kind: ActivityKind;
   host_id: string;
   title: string;
   description: string | null;
   category: string | null;
-  cover_url: string;
+  cover_url: string | null;
   location_name: string;
   lat: number;
   lng: number;
@@ -313,6 +315,7 @@ export class SupabaseBackend implements Backend {
       hostId: row.host_id,
       hostName: row.host_name,
       hostAvatar: row.host_avatar,
+      kind: row.kind,
       hostActivityCount: row.host_activity_count,
       title: row.title,
       description: row.description,
@@ -395,6 +398,7 @@ export class SupabaseBackend implements Backend {
       hostId: activity.host_id,
       hostName: activity.host.display_name,
       hostAvatar: activity.host.avatar_url,
+      kind: activity.kind,
       hostActivityCount: hostProfile?.activities_hosted ?? 0,
       title: activity.title,
       description: activity.description,

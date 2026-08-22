@@ -152,6 +152,37 @@ async function shouldThrow(label, fn) {
   const mineNow = (await api.myActivities()).hosting;
   check("den syns bland mina", mineNow.some((a) => a.id === created.id));
 
+  console.log("\nSpontant");
+  await shouldThrow("planerad utan bild avvisas", () => api.createActivity({
+    kind: "planned", title: "Utan bild", coverUrl: null,
+    locationName: "Nånstans", lat: 59.26, lng: 18.12,
+    startsAt: new Date(Date.now() + 86400000).toISOString(),
+    endsAt: new Date(Date.now() + 90000000).toISOString(),
+    visibility: "public", capacity: 4, minAge: null,
+  }));
+  await shouldThrow("spontan långt fram avvisas", () => api.createActivity({
+    kind: "now", title: "För långt fram", coverUrl: null,
+    locationName: "Nånstans", lat: 59.26, lng: 18.12,
+    startsAt: new Date(Date.now() + 86400000).toISOString(),
+    endsAt: new Date(Date.now() + 90000000).toISOString(),
+    visibility: "public", capacity: 4, minAge: null,
+  }));
+
+  const spontan = await api.createActivity({
+    kind: "now", title: "Ta en fika", category: "fika", coverUrl: null,
+    locationName: "Skarpnäcks torg", lat: 59.2617, lng: 18.1204,
+    startsAt: new Date(Date.now() + 30 * 60000).toISOString(),
+    endsAt: new Date(Date.now() + 150 * 60000).toISOString(),
+    visibility: "public", capacity: 3, minAge: null,
+  });
+  check("spontan utan bild går att skapa", Boolean(spontan.id));
+  check("den är märkt som spontan", spontan.kind === "now", spontan.kind);
+  check("den saknar omslag, klienten ritar ett", spontan.coverUrl === null);
+  const feedNow = await api.discover({ radiusM: 25000 });
+  check("den syns i flödet", feedNow.some((a) => a.id === spontan.id));
+  check("planerade är fortfarande planerade",
+        feedNow.filter((a) => a.id !== spontan.id).every((a) => a.kind === "planned"));
+
   console.log("\nKompisar");
   const people = (await api.discover({ radiusKm: 25 }))
     .map((a) => a.hostId).filter((id) => id !== me.id);
