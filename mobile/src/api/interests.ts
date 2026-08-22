@@ -16,6 +16,7 @@ export const INTERESTS: Interest[] = [
   { slug: "vandring",   label: "Vandring",          icon: "vandring" },
   { slug: "lopning",    label: "Löpning",           icon: "lopning" },
   { slug: "cykling",    label: "Cykling",           icon: "cykling" },
+  { slug: "skateboard", label: "Skateboard",        icon: "skateboard" },
   { slug: "padel",      label: "Padel",             icon: "padel" },
   { slug: "fotboll",    label: "Fotboll",           icon: "fotboll" },
   { slug: "golf",       label: "Golf",              icon: "golf" },

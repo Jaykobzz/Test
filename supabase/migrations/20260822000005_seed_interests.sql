@@ -13,6 +13,7 @@ insert into interests (slug, label, icon, sort_order) values
   ('vandring',     'Vandring',              'vandring', 20),
   ('lopning',      'Löpning',               'lopning', 30),
   ('cykling',      'Cykling',               'cykling', 40),
+  ('skateboard',   'Skateboard',            'skateboard', 45),
   ('padel',        'Padel',                 'padel', 50),
   ('fotboll',      'Fotboll',               'fotboll', 60),
   ('golf',         'Golf',                  'golf', 70),
