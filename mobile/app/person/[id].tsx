@@ -1,0 +1,331 @@
+/**
+ * Någon annans profil.
+ *
+ * Här finns BFF-knappen, och här finns blockera och anmäl. De två sista ligger
+ * medvetet på samma skärm som allt trevligt — man ska inte behöva leta efter
+ * dem när man väl behöver dem.
+ */
+
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Alert, ScrollView, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+
+import { getBackend } from "@/api";
+import { INTERESTS } from "@/api/interests";
+import type { PublicProfile } from "@/api/types";
+import { useAuth } from "@/auth/AuthContext";
+import {
+  Button, Card, Chip, Divider, Gap, Loading, Row, Screen, Stars, Txt,
+} from "@/components/ui";
+import { useTheme } from "@/hooks/useTheme";
+import { radius, space } from "@/theme";
+
+export default function PersonScreen() {
+  const theme = useTheme();
+  const router = useRouter();
+  const { profile: me } = useAuth();
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  const [person, setPerson] = useState<PublicProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [working, setWorking] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!id) return;
+    try {
+      setPerson(await getBackend().getProfile(id));
+    } catch (error) {
+      Alert.alert("Kunde inte hämta profilen", describe(error));
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  if (loading || !person) return <Screen><Loading /></Screen>;
+
+  const isMe = person.id === me?.id;
+
+  async function requestBff() {
+    if (!person) return;
+    setWorking(true);
+    try {
+      await getBackend().requestBff(person.id);
+      await load();
+    } catch (error) {
+      Alert.alert("Gick inte", describe(error));
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function respondBff(accept: boolean) {
+    if (!person?.bffRequestId) return;
+    setWorking(true);
+    try {
+      await getBackend().respondBff(person.bffRequestId, accept);
+      await load();
+    } catch (error) {
+      Alert.alert("Gick inte", describe(error));
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function openChat() {
+    if (!person) return;
+    setWorking(true);
+    try {
+      const threadId = await getBackend().ensureDirectThread(person.id);
+      router.push(`/chatt/${threadId}`);
+    } catch (error) {
+      Alert.alert("Kan inte öppna chatt än", describe(error));
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  function confirmBlock() {
+    if (!person) return;
+    Alert.alert(
+      `Blockera ${person.displayName}?`,
+      "Ni ser inte längre varandras aktiviteter och kan inte kontakta varandra.",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Blockera",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await getBackend().blockUser(person.id);
+              router.back();
+            } catch (error) {
+              Alert.alert("Gick inte", describe(error));
+            }
+          },
+        },
+      ],
+    );
+  }
+
+  function report() {
+    if (!person) return;
+    Alert.alert(`Anmäl ${person.displayName}?`, "Vad handlar det om?", [
+      { text: "Avbryt", style: "cancel" },
+      { text: "Obehagligt beteende", onPress: () => submitReport("obehagligt_beteende") },
+      { text: "Falsk profil", onPress: () => submitReport("falsk_profil") },
+      { text: "Något annat", onPress: () => submitReport("annat") },
+    ]);
+  }
+
+  async function submitReport(reason: string) {
+    if (!person) return;
+    try {
+      await getBackend().reportUser(person.id, reason);
+      Alert.alert("Tack", "Vi tittar på det. Du kan även blockera personen.");
+    } catch (error) {
+      Alert.alert("Gick inte", describe(error));
+    }
+  }
+
+  return (
+    <Screen padded={false} edges={[]}>
+      <ScrollView contentContainerStyle={{ padding: space.lg, paddingBottom: space.xxxl }}>
+        <View style={{ alignItems: "center" }}>
+          {person.avatarUrl && person.avatarUrl !== "pending" ? (
+            <Image
+              source={{ uri: person.avatarUrl }}
+              style={{ width: 128, height: 128, borderRadius: 64 }}
+              contentFit="cover"
+            />
+          ) : (
+            <View
+              style={{
+                width: 128,
+                height: 128,
+                borderRadius: 64,
+                backgroundColor: theme.color.primarySoft,
+              }}
+            />
+          )}
+
+          <Gap size="md" />
+          <Txt variant="title">{person.displayName}, {person.approxAge}</Txt>
+
+          <Gap size="xs" />
+          <Row gap="md">
+            <Stars value={person.avgStars} count={person.ratingCount} />
+            {person.bankIdVerified && (
+              <Row gap="xs">
+                <Ionicons name="shield-checkmark" size={13} color={theme.color.accent} />
+                <Txt variant="small" tone="muted">BankID</Txt>
+              </Row>
+            )}
+          </Row>
+
+          {person.homeAreaLabel && (
+            <>
+              <Gap size="xs" />
+              <Txt variant="small" tone="faint">{person.homeAreaLabel}</Txt>
+            </>
+          )}
+        </View>
+
+        <Gap size="xl" />
+
+        <Row gap="sm" justify="space-around">
+          <Stat value={person.activitiesHosted} label="värd för" />
+          <Stat value={person.activitiesJoined} label="varit med på" />
+          <Stat value={person.bffCount} label="BFFs" />
+        </Row>
+
+        <Gap size="xl" />
+
+        {person.bio && (
+          <>
+            <Card>
+              <View style={{ padding: space.lg }}>
+                <Txt variant="body">{person.bio}</Txt>
+              </View>
+            </Card>
+            <Gap size="lg" />
+          </>
+        )}
+
+        {person.interests.length > 0 && (
+          <>
+            <Txt variant="smallStrong" tone="muted">Gillar</Txt>
+            <Gap size="sm" />
+            <Row gap="sm" wrap>
+              {person.interests.map((slug) => {
+                const interest = INTERESTS.find((i) => i.slug === slug);
+                const shared = me?.interests.includes(slug) ?? false;
+                return interest ? (
+                  <Chip
+                    key={slug}
+                    label={`${interest.emoji} ${interest.label}`}
+                    tone={shared ? "primary" : "neutral"}
+                  />
+                ) : null;
+              })}
+            </Row>
+            <Gap size="xl" />
+          </>
+        )}
+
+        {!isMe && (
+          <>
+            <BffAction
+              person={person}
+              working={working}
+              onRequest={requestBff}
+              onRespond={respondBff}
+            />
+
+            <Gap size="sm" />
+            <Button label="Skicka meddelande" icon="chatbubble" kind="secondary" onPress={openChat} />
+
+            <Gap size="xl" />
+            <Divider />
+
+            <Row gap="sm" justify="center">
+              <Button label="Anmäl" kind="ghost" onPress={report} fullWidth={false} />
+              <Button label="Blockera" kind="ghost" onPress={confirmBlock} fullWidth={false} />
+            </Row>
+          </>
+        )}
+      </ScrollView>
+    </Screen>
+  );
+}
+
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <View style={{ alignItems: "center" }}>
+      <Txt variant="title">{value}</Txt>
+      <Txt variant="small" tone="muted">{label}</Txt>
+    </View>
+  );
+}
+
+function BffAction({
+  person,
+  working,
+  onRequest,
+  onRespond,
+}: {
+  person: PublicProfile;
+  working: boolean;
+  onRequest: () => void;
+  onRespond: (accept: boolean) => void;
+}) {
+  const theme = useTheme();
+
+  if (person.bffStatus === "accepted") {
+    return (
+      <View
+        style={{
+          backgroundColor: theme.color.accentSoft,
+          borderRadius: radius.md,
+          padding: space.md,
+        }}
+      >
+        <Row gap="sm" justify="center">
+          <Ionicons name="heart" size={17} color={theme.color.accent} />
+          <Txt variant="bodyStrong">Ni är BFFs</Txt>
+        </Row>
+        <Gap size="xs" />
+        <Txt variant="small" tone="muted" align="center">
+          {person.displayName} ser aktiviteter du lägger upp bara för BFFs.
+        </Txt>
+      </View>
+    );
+  }
+
+  if (person.bffAwaitingMyAnswer) {
+    return (
+      <View style={{ gap: space.sm }}>
+        <Txt variant="small" tone="muted" align="center">
+          {person.displayName} vill bli BFF med dig.
+        </Txt>
+        <Row gap="sm">
+          <View style={{ flex: 1 }}>
+            <Button label="Ja gärna" icon="heart" onPress={() => onRespond(true)} disabled={working} />
+          </View>
+          <Button
+            label="Nej tack"
+            kind="secondary"
+            onPress={() => onRespond(false)}
+            disabled={working}
+            fullWidth={false}
+          />
+        </Row>
+      </View>
+    );
+  }
+
+  if (person.bffStatus === "pending") {
+    return (
+      <Txt variant="small" tone="faint" align="center">
+        Du har frågat om att bli BFF. Väntar på svar.
+      </Txt>
+    );
+  }
+
+  return (
+    <Button
+      label="Bli BFF"
+      icon="heart-outline"
+      onPress={onRequest}
+      loading={working}
+    />
+  );
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : "Något gick fel.";
+}

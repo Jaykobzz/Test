@@ -1,0 +1,623 @@
+/**
+ * Grundkomponenter.
+ *
+ * Allt som ritas i FRIEND går genom de här, så att avstånd, radier och färger
+ * kommer från temat i stället för att spridas ut som magiska tal i skärmarna.
+ */
+
+import { Ionicons } from "@expo/vector-icons";
+import { useState, type ReactNode } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type StyleProp,
+  type TextInputProps,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
+import { Image } from "expo-image";
+import { SafeAreaView, type Edge } from "react-native-safe-area-context";
+
+import { useTheme } from "@/hooks/useTheme";
+import { font, radius, shadow, space } from "@/theme";
+
+/* Text -------------------------------------------------------------------- */
+
+type TextTone = "default" | "muted" | "faint" | "primary" | "danger" | "onPrimary";
+type TextVariant = keyof typeof font;
+
+interface TxtProps {
+  children: ReactNode;
+  variant?: TextVariant;
+  tone?: TextTone;
+  align?: TextStyle["textAlign"];
+  numberOfLines?: number;
+  style?: StyleProp<TextStyle>;
+}
+
+export function Txt({
+  children,
+  variant = "body",
+  tone = "default",
+  align,
+  numberOfLines,
+  style,
+}: TxtProps) {
+  const theme = useTheme();
+  const colors: Record<TextTone, string> = {
+    default: theme.color.text,
+    muted: theme.color.textMuted,
+    faint: theme.color.textFaint,
+    primary: theme.color.primary,
+    danger: theme.color.danger,
+    onPrimary: theme.color.onPrimary,
+  };
+
+  return (
+    <Text
+      numberOfLines={numberOfLines}
+      style={[font[variant] as TextStyle, { color: colors[tone], textAlign: align }, style]}
+    >
+      {children}
+    </Text>
+  );
+}
+
+/* Layout ------------------------------------------------------------------ */
+
+export function Screen({
+  children,
+  scroll = false,
+  edges = ["top"],
+  padded = true,
+}: {
+  children: ReactNode;
+  scroll?: boolean;
+  edges?: Edge[];
+  padded?: boolean;
+}) {
+  const theme = useTheme();
+  const padding = padded ? { paddingHorizontal: space.lg } : undefined;
+
+  return (
+    <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.color.bg }}>
+      {scroll ? (
+        <ScrollView
+          contentContainerStyle={[padding, { paddingBottom: space.xxxl }]}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={[{ flex: 1 }, padding]}>{children}</View>
+      )}
+    </SafeAreaView>
+  );
+}
+
+export function Card({
+  children,
+  onPress,
+  style,
+}: {
+  children: ReactNode;
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useTheme();
+  const base: ViewStyle = {
+    backgroundColor: theme.color.surface,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.color.border,
+    overflow: "hidden",
+  };
+
+  if (!onPress) return <View style={[base, shadow, style]}>{children}</View>;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [base, shadow, { opacity: pressed ? 0.85 : 1 }, style]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+/** Lodrätt mellanrum. */
+export function Gap({ size = "md" }: { size?: keyof typeof space }) {
+  return <View style={{ height: space[size] }} />;
+}
+
+export function Row({
+  children,
+  gap = "sm",
+  align = "center",
+  justify = "flex-start",
+  wrap = false,
+  style,
+}: {
+  children: ReactNode;
+  gap?: keyof typeof space;
+  align?: ViewStyle["alignItems"];
+  justify?: ViewStyle["justifyContent"];
+  wrap?: boolean;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <View
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: align,
+          justifyContent: justify,
+          gap: space[gap],
+          flexWrap: wrap ? "wrap" : "nowrap",
+        },
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+}
+
+export function Divider() {
+  const theme = useTheme();
+  return (
+    <View
+      style={{
+        height: StyleSheet.hairlineWidth,
+        backgroundColor: theme.color.border,
+        marginVertical: space.md,
+      }}
+    />
+  );
+}
+
+/* Knappar ----------------------------------------------------------------- */
+
+type ButtonKind = "primary" | "secondary" | "ghost" | "danger";
+
+export function Button({
+  label,
+  onPress,
+  kind = "primary",
+  icon,
+  disabled = false,
+  loading = false,
+  fullWidth = true,
+}: {
+  label: string;
+  onPress: () => void;
+  kind?: ButtonKind;
+  icon?: keyof typeof Ionicons.glyphMap;
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+}) {
+  const theme = useTheme();
+  const inactive = disabled || loading;
+
+  const styles: Record<ButtonKind, { bg: string; fg: string; border: string }> = {
+    primary: {
+      bg: theme.color.primary,
+      fg: theme.color.onPrimary,
+      border: "transparent",
+    },
+    secondary: {
+      bg: theme.color.surface,
+      fg: theme.color.text,
+      border: theme.color.border,
+    },
+    ghost: { bg: "transparent", fg: theme.color.primary, border: "transparent" },
+    danger: { bg: theme.color.dangerSoft, fg: theme.color.danger, border: "transparent" },
+  };
+  const palette = styles[kind];
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={inactive}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: inactive, busy: loading }}
+      style={({ pressed }) => ({
+        backgroundColor: palette.bg,
+        borderColor: palette.border,
+        borderWidth: kind === "secondary" ? StyleSheet.hairlineWidth : 0,
+        borderRadius: radius.pill,
+        paddingVertical: 15,
+        paddingHorizontal: space.xl,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: space.sm,
+        alignSelf: fullWidth ? "stretch" : "flex-start",
+        opacity: inactive ? 0.5 : pressed ? 0.88 : 1,
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator color={palette.fg} />
+      ) : (
+        <>
+          {icon && <Ionicons name={icon} size={18} color={palette.fg} />}
+          <Text style={[font.bodyStrong as TextStyle, { color: palette.fg }]}>{label}</Text>
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+/** Rund ikonknapp, t.ex. tillbaka eller bifoga. */
+export function IconButton({
+  icon,
+  onPress,
+  label,
+  tone = "default",
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  onPress: () => void;
+  label: string;
+  tone?: "default" | "primary" | "danger";
+}) {
+  const theme = useTheme();
+  const color = tone === "primary"
+    ? theme.color.primary
+    : tone === "danger"
+      ? theme.color.danger
+      : theme.color.text;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={10}
+      style={({ pressed }) => ({
+        width: 40,
+        height: 40,
+        borderRadius: radius.pill,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: pressed ? theme.color.surfaceAlt : "transparent",
+      })}
+    >
+      <Ionicons name={icon} size={22} color={color} />
+    </Pressable>
+  );
+}
+
+/* Bilder ------------------------------------------------------------------ */
+
+/**
+ * Profilbild med initialer som reserv.
+ *
+ * Bildkravet betyder att alla ska HA en bild, men nätet kan vara borta och
+ * en URL kan ha ruttnat — då ska det ändå se helt ut.
+ */
+export function Avatar({
+  uri,
+  name,
+  size = 44,
+}: {
+  uri: string | null;
+  name: string;
+  size?: number;
+}) {
+  const theme = useTheme();
+  const [failed, setFailed] = useState(false);
+  const usable = uri && uri !== "pending" && !failed;
+
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+  if (usable) {
+    return (
+      <Image
+        source={{ uri }}
+        onError={() => setFailed(true)}
+        contentFit="cover"
+        transition={150}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: theme.color.surfaceAlt,
+        }}
+      />
+    );
+  }
+
+  return (
+    <View
+      accessibilityLabel={name}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: theme.color.primarySoft,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: size * 0.38,
+          fontWeight: "700",
+          color: theme.color.primary,
+        }}
+      >
+        {initials || "?"}
+      </Text>
+    </View>
+  );
+}
+
+/* Stjärnor ---------------------------------------------------------------- */
+
+/** Visar ett snittbetyg. Utan betyg står det "Ny här" i stället för noll stjärnor. */
+export function Stars({
+  value,
+  count,
+  size = 14,
+  showCount = true,
+}: {
+  value: number | null;
+  count?: number;
+  size?: number;
+  showCount?: boolean;
+}) {
+  const theme = useTheme();
+
+  if (value === null) {
+    return <Txt variant="small" tone="faint">Ny här</Txt>;
+  }
+
+  return (
+    <Row gap="xs">
+      <Ionicons name="star" size={size} color={theme.color.highlight} />
+      <Txt variant="smallStrong">{value.toFixed(1).replace(".", ",")}</Txt>
+      {showCount && count !== undefined && (
+        <Txt variant="small" tone="faint">({count})</Txt>
+      )}
+    </Row>
+  );
+}
+
+/** Interaktiv stjärnrad för betygsättning. */
+export function StarPicker({
+  value,
+  onChange,
+  label,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  label: string;
+}) {
+  const theme = useTheme();
+
+  return (
+    <View>
+      <Txt variant="smallStrong" tone="muted">{label}</Txt>
+      <Gap size="sm" />
+      <Row gap="sm">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Pressable
+            key={star}
+            onPress={() => onChange(star)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: value === star }}
+            accessibilityLabel={`${star} av 5`}
+            hitSlop={6}
+          >
+            <Ionicons
+              name={star <= value ? "star" : "star-outline"}
+              size={34}
+              color={star <= value ? theme.color.highlight : theme.color.textFaint}
+            />
+          </Pressable>
+        ))}
+      </Row>
+    </View>
+  );
+}
+
+/* Chips ------------------------------------------------------------------- */
+
+export function Chip({
+  label,
+  selected = false,
+  onPress,
+  tone = "neutral",
+}: {
+  label: string;
+  selected?: boolean;
+  onPress?: () => void;
+  tone?: "neutral" | "primary" | "accent" | "highlight";
+}) {
+  const theme = useTheme();
+
+  const tones = {
+    neutral: { bg: theme.color.surfaceAlt, fg: theme.color.textMuted },
+    primary: { bg: theme.color.primarySoft, fg: theme.color.primary },
+    accent: { bg: theme.color.accentSoft, fg: theme.color.accent },
+    highlight: { bg: theme.color.highlightSoft, fg: theme.color.text },
+  };
+  const palette = selected
+    ? { bg: theme.color.primary, fg: theme.color.onPrimary }
+    : tones[tone];
+
+  const content = (
+    <View
+      style={{
+        backgroundColor: palette.bg,
+        borderRadius: radius.pill,
+        paddingVertical: 7,
+        paddingHorizontal: space.md,
+      }}
+    >
+      <Text style={[font.smallStrong as TextStyle, { color: palette.fg }]}>{label}</Text>
+    </View>
+  );
+
+  if (!onPress) return content;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+    >
+      {content}
+    </Pressable>
+  );
+}
+
+/* Formulär ---------------------------------------------------------------- */
+
+export function Field({
+  label,
+  hint,
+  error,
+  ...inputProps
+}: TextInputProps & { label: string; hint?: string; error?: string }) {
+  const theme = useTheme();
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <View>
+      <Txt variant="smallStrong" tone="muted">{label}</Txt>
+      <Gap size="xs" />
+      <TextInput
+        placeholderTextColor={theme.color.textFaint}
+        {...inputProps}
+        onFocus={(e) => { setFocused(true); inputProps.onFocus?.(e); }}
+        onBlur={(e) => { setFocused(false); inputProps.onBlur?.(e); }}
+        style={[
+          font.body as TextStyle,
+          {
+            color: theme.color.text,
+            backgroundColor: theme.color.surface,
+            borderWidth: 1,
+            borderColor: error
+              ? theme.color.danger
+              : focused
+                ? theme.color.primary
+                : theme.color.border,
+            borderRadius: radius.md,
+            paddingHorizontal: space.md,
+            paddingVertical: space.md,
+            minHeight: inputProps.multiline ? 96 : undefined,
+            textAlignVertical: inputProps.multiline ? "top" : "center",
+          },
+        ]}
+      />
+      {(error || hint) && (
+        <>
+          <Gap size="xs" />
+          <Txt variant="small" tone={error ? "danger" : "faint"}>{error ?? hint}</Txt>
+        </>
+      )}
+    </View>
+  );
+}
+
+/* Tillstånd --------------------------------------------------------------- */
+
+export function Loading({ label }: { label?: string }) {
+  const theme = useTheme();
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: space.md }}>
+      <ActivityIndicator color={theme.color.primary} size="large" />
+      {label && <Txt variant="small" tone="muted">{label}</Txt>}
+    </View>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  body: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  const theme = useTheme();
+
+  return (
+    <View style={{ alignItems: "center", paddingVertical: space.xxxl, gap: space.sm }}>
+      <View
+        style={{
+          width: 68,
+          height: 68,
+          borderRadius: radius.pill,
+          backgroundColor: theme.color.primarySoft,
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: space.sm,
+        }}
+      >
+        <Ionicons name={icon} size={30} color={theme.color.primary} />
+      </View>
+      <Txt variant="heading" align="center">{title}</Txt>
+      <Txt variant="small" tone="muted" align="center" style={{ maxWidth: 300 }}>
+        {body}
+      </Txt>
+      {action && (
+        <>
+          <Gap size="md" />
+          <Button label={action.label} onPress={action.onPress} fullWidth={false} />
+        </>
+      )}
+    </View>
+  );
+}
+
+/** Liten etikett ovanpå bilder, t.ex. "3 platser kvar" eller "Bara BFFs". */
+export function Badge({
+  label,
+  icon,
+  tone = "dark",
+}: {
+  label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  tone?: "dark" | "primary" | "accent";
+}) {
+  const theme = useTheme();
+  const palette = {
+    dark: { bg: "rgba(12,14,18,0.72)", fg: "#FFFFFF" },
+    primary: { bg: theme.color.primary, fg: theme.color.onPrimary },
+    accent: { bg: theme.color.accent, fg: "#FFFFFF" },
+  }[tone];
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
+        backgroundColor: palette.bg,
+        borderRadius: radius.pill,
+        paddingVertical: 5,
+        paddingHorizontal: space.sm + 2,
+      }}
+    >
+      {icon && <Ionicons name={icon} size={12} color={palette.fg} />}
+      <Text style={[font.micro as TextStyle, { color: palette.fg }]}>{label}</Text>
+    </View>
+  );
+}

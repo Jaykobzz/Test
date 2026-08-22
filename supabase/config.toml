@@ -1,0 +1,44 @@
+project_id = "friend"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[studio]
+enabled = true
+port = 54323
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"
+
+[auth]
+enabled = true
+site_url = "friend://"
+additional_redirect_urls = ["friend://auth-callback", "exp://localhost:8081"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+# Inloggning sker uteslutande genom bankid-auth-funktionen. Ingen av de
+# inbyggda metoderna får vara öppen — annars finns en väg in i appen som
+# aldrig passerat identitetskontroll.
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+[auth.sms]
+enable_signup = false
+
+[edge_runtime]
+enabled = true
+
+[functions.bankid-auth]
+# Inloggning sker innan man har en session, så JWT kan inte krävas här.
+verify_jwt = false

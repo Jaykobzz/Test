@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "FRIEND",
+    "slug": "friend",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "friend",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F26B3A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "se.friend.app",
+      "config": { "usesNonExemptEncryption": false },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "FRIEND använder din position för att visa aktiviteter nära dig. Din exakta position delas aldrig med andra användare.",
+        "NSPhotoLibraryUsageDescription": "För att välja profilbild och bilder till dina aktiviteter.",
+        "NSCameraUsageDescription": "För att ta en profilbild eller en bild till din aktivitet."
+      }
+    },
+    "android": {
+      "package": "se.friend.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F26B3A"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ],
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "FRIEND använder din position för att visa aktiviteter nära dig."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "För att välja profilbild och bilder till dina aktiviteter.",
+          "cameraPermission": "För att ta en profilbild eller en bild till din aktivitet."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F26B3A",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180
+        }
+      ]
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}

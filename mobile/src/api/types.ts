@@ -1,0 +1,214 @@
+/**
+ * Domäntyper — appens gemensamma vokabulär.
+ *
+ * De här formerna är det enda både mock-backendet och Supabase-backendet lovar
+ * att leverera. Skärmarna vet inte vilket som är inkopplat.
+ */
+
+export type Uuid = string;
+export type IsoDate = string;
+
+export type ActivityVisibility = "public" | "bff";
+export type ActivityStatus = "draft" | "open" | "full" | "cancelled" | "completed";
+export type JoinStatus = "pending" | "accepted" | "declined" | "withdrawn" | "removed";
+export type MessageKind = "text" | "image" | "place" | "list" | "system";
+export type FriendshipStatus = "pending" | "accepted" | "declined";
+
+export interface Interest {
+  slug: string;
+  label: string;
+  emoji: string;
+}
+
+/** Din egen profil — inkluderar det bara du får se. */
+export interface MyProfile {
+  id: Uuid;
+  displayName: string;
+  bio: string | null;
+  avatarUrl: string;
+  interests: string[];
+  homeLat: number | null;
+  homeLng: number | null;
+  homeAreaLabel: string | null;
+  birthYear: number;
+  bankIdVerified: boolean;
+  avgStars: number | null;
+  ratingCount: number;
+  /** Sant tills namn och bild är på plats. Styr om onboarding visas. */
+  needsOnboarding: boolean;
+}
+
+/** Någon annans profil — beskuren. Inga koordinater, inget juridiskt namn. */
+export interface PublicProfile {
+  id: Uuid;
+  displayName: string;
+  bio: string | null;
+  avatarUrl: string;
+  interests: string[];
+  homeAreaLabel: string | null;
+  approxAge: number;
+  bankIdVerified: boolean;
+  avgStars: number | null;
+  ratingCount: number;
+  activitiesHosted: number;
+  activitiesJoined: number;
+  bffCount: number;
+  /** Relationen mellan dig och den här personen. */
+  bffStatus: FriendshipStatus | "none";
+  bffRequestId: Uuid | null;
+  /** Sant när förfrågan väntar på ditt svar (inte på deras). */
+  bffAwaitingMyAnswer: boolean;
+}
+
+export interface ActivityCard {
+  id: Uuid;
+  hostId: Uuid;
+  hostName: string;
+  hostAvatar: string;
+  hostStars: number | null;
+  title: string;
+  description: string | null;
+  category: string | null;
+  coverUrl: string;
+  locationName: string;
+  lat: number;
+  lng: number;
+  distanceM: number | null;
+  startsAt: IsoDate;
+  endsAt: IsoDate;
+  visibility: ActivityVisibility;
+  status: ActivityStatus;
+  capacity: number | null;
+  acceptedCount: number;
+  spotsLeft: number | null;
+  /** Din relation till aktiviteten, om någon. */
+  myStatus: JoinStatus | null;
+  isMine: boolean;
+}
+
+export interface Applicant {
+  participantId: Uuid;
+  profile: PublicProfile;
+  status: JoinStatus;
+  introMessage: string | null;
+  createdAt: IsoDate;
+}
+
+export interface ActivityDetail extends ActivityCard {
+  applicants: Applicant[];
+  accepted: Applicant[];
+  threadId: Uuid | null;
+  myParticipantId: Uuid | null;
+}
+
+export interface CreateActivityInput {
+  title: string;
+  description?: string;
+  category?: string;
+  coverUrl: string;
+  locationName: string;
+  lat: number;
+  lng: number;
+  startsAt: IsoDate;
+  endsAt: IsoDate;
+  visibility: ActivityVisibility;
+  capacity?: number | null;
+  minRating?: number | null;
+  minAge?: number | null;
+}
+
+export interface ListItem {
+  id: string;
+  text: string;
+  checkedBy: Uuid | null;
+}
+
+export interface Message {
+  id: Uuid;
+  threadId: Uuid;
+  senderId: Uuid | null;
+  senderName: string | null;
+  senderAvatar: string | null;
+  kind: MessageKind;
+  body: string | null;
+  imageUrl: string | null;
+  lat: number | null;
+  lng: number | null;
+  items: ListItem[] | null;
+  createdAt: IsoDate;
+}
+
+export type SendMessageInput =
+  | { kind: "text"; body: string }
+  | { kind: "image"; imageUrl: string; body?: string }
+  | { kind: "place"; lat: number; lng: number; body: string }
+  | { kind: "list"; body: string; items: string[] };
+
+export interface ThreadSummary {
+  id: Uuid;
+  kind: "activity" | "direct";
+  title: string;
+  /** Aktivitetens omslag, eller motpartens avatar i en direktchatt. */
+  imageUrl: string | null;
+  activityId: Uuid | null;
+  activityStatus: ActivityStatus | null;
+  memberCount: number;
+  lastMessage: string | null;
+  lastMessageAt: IsoDate;
+  unreadCount: number;
+}
+
+export interface RateablePerson {
+  userId: Uuid;
+  displayName: string;
+  avatarUrl: string;
+}
+
+export interface RateableActivity {
+  activityId: Uuid;
+  title: string;
+  endsAt: IsoDate;
+  people: RateablePerson[];
+}
+
+export interface SubmitRatingInput {
+  activityId: Uuid;
+  rateeId: Uuid;
+  fun: number;
+  friendliness: number;
+  feltSafe: boolean;
+  comment?: string;
+}
+
+export interface BffRequest {
+  friendshipId: Uuid;
+  profile: PublicProfile;
+  createdAt: IsoDate;
+  /** true = de frågade dig, false = du frågade dem. */
+  incoming: boolean;
+}
+
+export interface DiscoverParams {
+  lat: number;
+  lng: number;
+  radiusM: number;
+  interests?: string[];
+  from?: IsoDate;
+  to?: IsoDate;
+}
+
+export interface BankIdStart {
+  orderRef: string;
+  autoStartToken: string;
+  qrData?: string;
+}
+
+export interface BankIdCollect {
+  status: "pending" | "complete" | "failed";
+  hintCode?: string;
+  qrData?: string;
+  needsOnboarding?: boolean;
+  givenName?: string;
+}
+
+export type ImageBucket = "avatars" | "activity-covers" | "chat-images";

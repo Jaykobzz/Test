@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  app:
+    name: Mobilappen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Installera beroenden
+        run: npm ci --legacy-peer-deps
+
+      - name: Typkontroll
+        run: npx tsc --noEmit
+
+      - name: Bygg buntar för iOS och Android
+        run: |
+          npx expo export --platform ios     --output-dir /tmp/export-ios
+          npx expo export --platform android --output-dir /tmp/export-android
+
+  database:
+    name: Databas och RLS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installera Postgres med PostGIS
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-16 postgresql-16-postgis-3
+
+      - name: Kör migrationer och beteendetester
+        run: sudo ./supabase/tests/run.sh
