@@ -139,6 +139,15 @@ export class SupabaseBackend implements Backend {
 
   /** Anropar edge-funktionen bankid-auth utan session, vi har ingen än. */
   private async callBankId(action: string, body: object): Promise<Record<string, unknown>> {
+    // Utan bas-URL blir adressen relativ, och en relativ fetch i React Native
+    // varken lyckas eller misslyckas, den blir hängande. Säg ifrån direkt.
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error(
+        "Appen är inte kopplad till någon server. Sätt EXPO_PUBLIC_SUPABASE_URL "
+        + "och EXPO_PUBLIC_SUPABASE_ANON_KEY i .env, eller kör i testläge.",
+      );
+    }
+
     const response = await fetch(`${SUPABASE_URL}/functions/v1/bankid-auth/${action}`, {
       method: "POST",
       headers: {

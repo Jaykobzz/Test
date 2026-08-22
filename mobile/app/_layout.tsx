@@ -4,6 +4,16 @@
  * annars in i appen.
  */
 
+import {
+  HankenGrotesk_400Regular,
+  HankenGrotesk_600SemiBold,
+  HankenGrotesk_700Bold,
+} from "@expo-google-fonts/hanken-grotesk";
+import {
+  Unbounded_600SemiBold,
+  Unbounded_700Bold,
+} from "@expo-google-fonts/unbounded";
+import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -18,6 +28,18 @@ import { darkTheme, lightTheme } from "@/theme";
 export default function RootLayout() {
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? darkTheme : lightTheme;
+
+  // Utan detta finns typsnitten aldrig i appen och varje fontFamily i temat
+  // faller tyst tillbaka på systemfonten. Inget kraschar, det ser bara fel ut.
+  const [fontsLoaded] = useFonts({
+    Unbounded_600SemiBold,
+    Unbounded_700Bold,
+    HankenGrotesk_400Regular,
+    HankenGrotesk_600SemiBold,
+    HankenGrotesk_700Bold,
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

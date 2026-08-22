@@ -12,6 +12,7 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { USING_MOCK } from "@/api";
 import { useAuth, waitingMessage } from "@/auth/AuthContext";
+import { Logo } from "@/components/Logo";
 import { Button, Field, Gap, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { radius, space } from "@/theme";
@@ -32,22 +33,9 @@ export default function LoginScreen() {
         style={{ flex: 1, justifyContent: "center" }}
       >
         <View style={{ alignItems: "center" }}>
-          <View
-            style={{
-              width: 84,
-              height: 84,
-              borderRadius: radius.sheet,
-              backgroundColor: theme.color.primary,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons name="people" size={42} color={theme.color.onPrimary} />
-          </View>
+          <Logo size={104} />
 
           <Gap size="lg" />
-          <Txt variant="display">Haka på</Txt>
-          <Gap size="xs" />
           <Txt variant="body" tone="muted" align="center" style={{ maxWidth: 300 }}>
             Hitta folk i närheten som vill göra samma sak som du.
           </Txt>

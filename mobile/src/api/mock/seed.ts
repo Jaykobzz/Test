@@ -64,26 +64,23 @@ const COVER = {
 
 const PORTRAIT = {
   amir: asset(require("../../../assets/seed/avatar-amir.jpg")),
+  anders: asset(require("../../../assets/seed/avatar-anders.jpg")),
   elin: asset(require("../../../assets/seed/avatar-elin.jpg")),
   ida: asset(require("../../../assets/seed/avatar-ida.jpg")),
   johan: asset(require("../../../assets/seed/avatar-johan.jpg")),
   klara: asset(require("../../../assets/seed/avatar-klara.jpg")),
+  micke: asset(require("../../../assets/seed/avatar-micke.jpg")),
+  nils: asset(require("../../../assets/seed/avatar-nils.jpg")),
+  sara: asset(require("../../../assets/seed/avatar-sara.jpg")),
   thu: asset(require("../../../assets/seed/avatar-thu.jpg")),
 } as const;
-
-/**
- * Saknar personen porträtt visar Avatar initialerna i stället. Det ser
- * avsiktligt ut, fungerar utan nät, och gör det synligt vilka bilder som
- * fattas.
- */
-const MISSING = "pending";
 
 export const SEED_PROFILES: SeedProfile[] = [
   {
     id: "11111111-1111-4111-8111-111111111101",
     displayName: "Micke",
     bio: "Fiskar helst i gryningen. Har extra spö om du vill testa.",
-    avatarUrl: MISSING,
+    avatarUrl: PORTRAIT.micke,
     interests: ["fiske", "paddling", "svamp"],
     homeAreaLabel: "Skarpnäck",
     birthYear: 1984,
@@ -93,7 +90,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     id: "11111111-1111-4111-8111-111111111102",
     displayName: "Sara",
     bio: "Springer långsamt men pratar fort. Söker löparsällskap på vardagsmorgnar.",
-    avatarUrl: MISSING,
+    avatarUrl: PORTRAIT.sara,
     interests: ["lopning", "fika", "bocker"],
     homeAreaLabel: "Bagarmossen",
     birthYear: 1991,
@@ -123,7 +120,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     id: "11111111-1111-4111-8111-111111111105",
     displayName: "Anders",
     bio: "Brädspel varje torsdag. Har över hundra spel i källaren.",
-    avatarUrl: MISSING,
+    avatarUrl: PORTRAIT.anders,
     interests: ["bradspel", "film", "bygga"],
     homeAreaLabel: "Enskede",
     birthYear: 1979,
@@ -143,7 +140,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     id: "11111111-1111-4111-8111-111111111107",
     displayName: "Nils",
     bio: "Kallbadar året runt. Det är inte så farligt som det låter.",
-    avatarUrl: MISSING,
+    avatarUrl: PORTRAIT.nils,
     interests: ["bad", "lopning", "teknik"],
     homeAreaLabel: "Tyresö",
     birthYear: 1986,
