@@ -100,26 +100,6 @@ as $$
 $$;
 
 -- ---------------------------------------------------------------------------
--- Betyg: aggregat
--- ---------------------------------------------------------------------------
-
--- Snittstjärnor = medelvärdet av "kul" och "trevlig". Trygghet räknas inte in
--- i den publika siffran; den hanteras separat i safety_flags.
-create or replace function rating_summary(p_user uuid)
-returns table (avg_stars numeric, rating_count int)
-language sql
-stable
-security definer
-set search_path = public, extensions, pg_temp
-as $$
-  select
-    round(avg((fun + friendliness) / 2.0)::numeric, 2) as avg_stars,
-    count(*)::int                                      as rating_count
-  from ratings
-  where ratee_id = p_user;
-$$;
-
--- ---------------------------------------------------------------------------
 -- public_profiles — det ENDA sättet en användare ser någon annans profil
 --
 -- Utelämnar personnummerhash, juridiskt namn och exakta koordinater.
@@ -142,9 +122,7 @@ select
   p.birth_year,
   (extract(year from now())::int - p.birth_year) as approx_age,
   p.verified_at is not null                      as bankid_verified,
-  p.created_at,
-  r.avg_stars,
-  coalesce(r.rating_count, 0)                    as rating_count,
+  p.created_at                                   as member_since,
   (select count(*)::int from activities a
      where a.host_id = p.id and a.status = 'completed')      as activities_hosted,
   (select count(*)::int from activity_participants ap
@@ -153,14 +131,14 @@ select
      where f.status = 'accepted'
        and (f.requester_id = p.id or f.addressee_id = p.id)) as bff_count
 from profiles p
-cross join lateral rating_summary(p.id) r
 where p.is_suspended = false
   and auth.uid() is not null
   and not is_blocked_between(p.id, auth.uid());
 
 comment on view public_profiles is
   'Säker projektion av profiles. Innehåller varken personnummerhash, juridiskt '
-  'namn eller exakta hemkoordinater.';
+  'namn eller exakta hemkoordinater — och inget omdöme om personen. Siffrorna '
+  'här är fakta om vad någon gjort, inte vad andra tycker om hen.';
 
 -- ---------------------------------------------------------------------------
 -- Upptäck aktiviteter i närheten
@@ -181,7 +159,7 @@ returns table (
   host_id        uuid,
   host_name      text,
   host_avatar    text,
-  host_stars     numeric,
+  host_activity_count int,
   title          text,
   description    text,
   category       text,
@@ -209,7 +187,7 @@ as $$
     a.host_id,
     hp.display_name,
     hp.avatar_url,
-    hr.avg_stars,
+    hosted.n,
     a.title,
     a.description,
     a.category,
@@ -231,7 +209,12 @@ as $$
   from activities a
   cross join me
   join profiles hp on hp.id = a.host_id
-  cross join lateral rating_summary(a.host_id) hr
+  -- Vad värden faktiskt gjort, inte vad någon tycker om hen.
+  cross join lateral (
+    select count(*)::int as n
+    from activities done
+    where done.host_id = a.host_id and done.status = 'completed'
+  ) hosted
   cross join lateral (
     select count(*)::int as n
     from activity_participants ap
@@ -282,7 +265,6 @@ as $$
 declare
   v_me       uuid := auth.uid();
   v_activity activities;
-  v_stars    numeric;
   v_age      int;
   v_accepted int;
   v_row      activity_participants;
@@ -310,16 +292,6 @@ begin
 
   if v_activity.starts_at <= now() then
     raise exception 'Aktiviteten har redan börjat' using errcode = '22023';
-  end if;
-
-  -- Värdens frivilliga trösklar
-  if v_activity.min_rating is not null then
-    select avg_stars into v_stars from rating_summary(v_me);
-    -- Den som ännu inte har något betyg släpps igenom; annars kan man aldrig börja.
-    if v_stars is not null and v_stars < v_activity.min_rating then
-      raise exception 'Ditt betyg är lägre än vad värden har satt som krav'
-        using errcode = '42501';
-    end if;
   end if;
 
   if v_activity.min_age is not null then
@@ -528,111 +500,6 @@ begin
 
   return v_thread_id;
 end;
-$$;
-
--- ---------------------------------------------------------------------------
--- Efter aktiviteten: betygsätt
--- ---------------------------------------------------------------------------
-
-create or replace function submit_rating(
-  p_activity_id  uuid,
-  p_ratee_id     uuid,
-  p_fun          smallint,
-  p_friendliness smallint,
-  p_felt_safe    boolean,
-  p_comment      text default null
-)
-returns ratings
-language plpgsql
-security definer
-set search_path = public, extensions, pg_temp
-as $$
-declare
-  v_me       uuid := auth.uid();
-  v_activity activities;
-  v_row      ratings;
-begin
-  if v_me is null then
-    raise exception 'Inte inloggad' using errcode = '28000';
-  end if;
-
-  if v_me = p_ratee_id then
-    raise exception 'Du kan inte betygsätta dig själv' using errcode = '22023';
-  end if;
-
-  select * into v_activity from activities where id = p_activity_id;
-  if not found then
-    raise exception 'Aktiviteten finns inte' using errcode = 'P0002';
-  end if;
-
-  if v_activity.ends_at > now() then
-    raise exception 'Aktiviteten är inte slut än' using errcode = '22023';
-  end if;
-
-  -- Betygsfönster: två veckor efteråt. Sen är minnet för blekt för att vara rättvist.
-  if now() > v_activity.ends_at + interval '14 days' then
-    raise exception 'Betygsfönstret har stängt' using errcode = '22023';
-  end if;
-
-  -- Båda måste ha varit där på riktigt (värd eller accepterad deltagare).
-  if not (
-    (v_activity.host_id = v_me or is_accepted_participant(p_activity_id, v_me))
-    and
-    (v_activity.host_id = p_ratee_id or is_accepted_participant(p_activity_id, p_ratee_id))
-  ) then
-    raise exception 'Ni var inte båda med på aktiviteten' using errcode = '42501';
-  end if;
-
-  insert into ratings (activity_id, rater_id, ratee_id, fun, friendliness, felt_safe, comment)
-  values (p_activity_id, v_me, p_ratee_id, p_fun, p_friendliness, p_felt_safe, p_comment)
-  on conflict (activity_id, rater_id, ratee_id) do update
-    set fun          = excluded.fun,
-        friendliness = excluded.friendliness,
-        felt_safe    = excluded.felt_safe,
-        comment      = excluded.comment,
-        created_at   = now()
-  returning * into v_row;
-
-  -- "Kändes inte tryggt" går till moderation, inte till en publik siffra.
-  if not p_felt_safe then
-    insert into safety_flags (rating_id, flagged_user, raised_by, activity_id, note)
-    values (v_row.id, p_ratee_id, v_me, p_activity_id, p_comment)
-    on conflict (rating_id) do update
-      set note = excluded.note, status = 'open', created_at = now();
-  else
-    delete from safety_flags where rating_id = v_row.id;
-  end if;
-
-  return v_row;
-end;
-$$;
-
--- Vem är kvar att betygsätta efter en aktivitet?
-create or replace function pending_ratings(p_activity_id uuid)
-returns table (user_id uuid, display_name text, avatar_url text)
-language sql
-stable
-security definer
-set search_path = public, extensions, pg_temp
-as $$
-  with me as (select auth.uid() as uid),
-  attendees as (
-    select a.host_id as uid from activities a where a.id = p_activity_id
-    union
-    select ap.user_id from activity_participants ap
-    where ap.activity_id = p_activity_id and ap.status = 'accepted'
-  )
-  select p.id, p.display_name, p.avatar_url
-  from attendees at
-  join profiles p on p.id = at.uid
-  cross join me
-  where at.uid <> me.uid
-    and not exists (
-      select 1 from ratings r
-      where r.activity_id = p_activity_id
-        and r.rater_id = me.uid
-        and r.ratee_id = at.uid
-    );
 $$;
 
 -- ---------------------------------------------------------------------------

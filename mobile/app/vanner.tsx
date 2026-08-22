@@ -14,7 +14,7 @@ import { useFocusEffect } from "expo-router";
 import { getBackend } from "@/api";
 import type { BffRequest, PublicProfile } from "@/api/types";
 import {
-  Avatar, Button, Card, EmptyState, Gap, Loading, Row, Screen, Stars, Txt,
+  Avatar, Button, Card, Credentials, EmptyState, Gap, Loading, Row, Screen, Txt,
 } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { space } from "@/theme";
@@ -84,10 +84,10 @@ export default function FriendsScreen() {
                       />
                       <View style={{ flex: 1 }}>
                         <Txt variant="bodyStrong">{request.profile.displayName}</Txt>
-                        <Stars
-                          value={request.profile.avgStars}
-                          count={request.profile.ratingCount}
-                          size={12}
+                        <Credentials
+                          verified={request.profile.bankIdVerified}
+                          activityCount={request.profile.activitiesJoined}
+                          size="micro"
                         />
                       </View>
                     </Row>
@@ -134,7 +134,11 @@ export default function FriendsScreen() {
                         <View>
                           <Txt variant="bodyStrong">{person.displayName}</Txt>
                           <Row gap="sm">
-                            <Stars value={person.avgStars} count={person.ratingCount} size={12} />
+                            <Credentials
+                            verified={person.bankIdVerified}
+                            activityCount={person.activitiesJoined}
+                            size="micro"
+                          />
                             {person.homeAreaLabel && (
                               <Txt variant="small" tone="faint">· {person.homeAreaLabel}</Txt>
                             )}

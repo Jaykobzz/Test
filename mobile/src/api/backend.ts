@@ -20,9 +20,7 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
-  RateableActivity,
   SendMessageInput,
-  SubmitRatingInput,
   ThreadSummary,
   Uuid,
 } from "./types";
@@ -64,10 +62,6 @@ export interface Backend {
   ensureDirectThread(userId: Uuid): Promise<Uuid>;
   /** Returnerar en avregistreringsfunktion. */
   subscribeToThread(threadId: Uuid, onMessage: (message: Message) => void): () => void;
-
-  /* Betyg ----------------------------------------------------------------- */
-  activitiesAwaitingRating(): Promise<RateableActivity[]>;
-  submitRating(input: SubmitRatingInput): Promise<void>;
 
   /* BFF ------------------------------------------------------------------- */
   listBffs(): Promise<PublicProfile[]>;

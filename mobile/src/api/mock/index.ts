@@ -27,9 +27,7 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
-  RateableActivity,
   SendMessageInput,
-  SubmitRatingInput,
   ThreadSummary,
   Uuid,
 } from "../types";
@@ -39,7 +37,6 @@ import {
   loadDb,
   newId,
   persist,
-  requireDb,
   resetDb,
   type MockActivity,
   type MockDb,
@@ -107,18 +104,16 @@ function acceptedCount(db: MockDb, activityId: Uuid): number {
   ).length;
 }
 
-/** Snittstjärnor: egna betyg först, annars seedvärdet för demoprofilerna. */
-function ratingSummary(db: MockDb, userId: Uuid): { avg: number | null; count: number } {
-  const own = db.ratings.filter((r) => r.rateeId === userId);
-  const seeded = db.seededRatings[userId];
-
-  const seedSum = seeded ? seeded.avg * seeded.count : 0;
-  const seedCount = seeded ? seeded.count : 0;
-  const ownSum = own.reduce((sum, r) => sum + (r.fun + r.friendliness) / 2, 0);
-  const count = seedCount + own.length;
-
-  if (count === 0) return { avg: null, count: 0 };
-  return { avg: Math.round(((seedSum + ownSum) / count) * 100) / 100, count };
+/** Genomförda aktiviteter personen varit med på — värd eller deltagare. */
+function completedActivityCount(db: MockDb, userId: Uuid): number {
+  return db.activities.filter(
+    (a) =>
+      a.status === "completed" &&
+      (a.hostId === userId ||
+        db.participants.some(
+          (p) => p.activityId === a.id && p.userId === userId && p.status === "accepted",
+        )),
+  ).length;
 }
 
 function friendshipBetween(db: MockDb, a: Uuid, b: Uuid) {
@@ -132,7 +127,6 @@ function friendshipBetween(db: MockDb, a: Uuid, b: Uuid) {
 function toPublicProfile(db: MockDb, userId: Uuid): PublicProfile {
   const p = profileOrThrow(db, userId);
   const me = db.currentUserId;
-  const rating = ratingSummary(db, userId);
   const friendship = me ? friendshipBetween(db, me, userId) : undefined;
 
   let bffStatus: FriendshipStatus | "none" = "none";
@@ -147,8 +141,7 @@ function toPublicProfile(db: MockDb, userId: Uuid): PublicProfile {
     homeAreaLabel: p.homeAreaLabel,
     approxAge: new Date().getFullYear() - p.birthYear,
     bankIdVerified: true,
-    avgStars: rating.avg,
-    ratingCount: rating.count,
+    memberSince: p.createdAt,
     activitiesHosted: db.activities.filter(
       (a) => a.hostId === userId && a.status === "completed",
     ).length,
@@ -173,7 +166,6 @@ function toActivityCard(
 ): ActivityCard {
   const me = db.currentUserId;
   const host = profileOrThrow(db, activity.hostId);
-  const hostRating = ratingSummary(db, activity.hostId);
   const accepted = acceptedCount(db, activity.id);
   const mine = me
     ? db.participants.find((p) => p.activityId === activity.id && p.userId === me)
@@ -184,7 +176,7 @@ function toActivityCard(
     hostId: activity.hostId,
     hostName: host.displayName,
     hostAvatar: host.avatarUrl,
-    hostStars: hostRating.avg,
+    hostActivityCount: completedActivityCount(db, activity.hostId),
     title: activity.title,
     description: activity.description,
     category: activity.category,
@@ -381,7 +373,6 @@ export class MockBackend implements Backend {
     if (!db.currentUserId) return null;
 
     const p = profileOrThrow(db, db.currentUserId);
-    const rating = ratingSummary(db, p.id);
 
     return {
       id: p.id,
@@ -394,8 +385,6 @@ export class MockBackend implements Backend {
       homeAreaLabel: p.homeAreaLabel,
       birthYear: p.birthYear,
       bankIdVerified: true,
-      avgStars: rating.avg,
-      ratingCount: rating.count,
       needsOnboarding: p.avatarUrl === "pending" || p.interests.length === 0,
     };
   }
@@ -511,7 +500,6 @@ export class MockBackend implements Backend {
       endsAt: input.endsAt,
       visibility: input.visibility,
       capacity: input.capacity ?? null,
-      minRating: input.minRating ?? null,
       minAge: input.minAge ?? null,
       status: "open",
       createdAt: nowIso(),
@@ -850,103 +838,6 @@ export class MockBackend implements Backend {
     };
   }
 
-  /* Betyg ----------------------------------------------------------------- */
-
-  async activitiesAwaitingRating(): Promise<RateableActivity[]> {
-    const db = await loadDb();
-    completeDueActivities(db);
-    const me = meOrThrow(db);
-    const now = Date.now();
-    const windowMs = 14 * 86_400_000;
-
-    const attended = db.activities.filter((a) => {
-      if (a.status !== "completed") return false;
-      const ended = new Date(a.endsAt).getTime();
-      if (now - ended > windowMs) return false;
-      return (
-        a.hostId === me ||
-        db.participants.some(
-          (p) => p.activityId === a.id && p.userId === me && p.status === "accepted",
-        )
-      );
-    });
-
-    return attended
-      .map((activity) => {
-        const attendeeIds = new Set<Uuid>([activity.hostId]);
-        for (const p of db.participants) {
-          if (p.activityId === activity.id && p.status === "accepted") {
-            attendeeIds.add(p.userId);
-          }
-        }
-        attendeeIds.delete(me);
-
-        const people = [...attendeeIds]
-          .filter(
-            (id) =>
-              !db.ratings.some(
-                (r) => r.activityId === activity.id && r.raterId === me && r.rateeId === id,
-              ),
-          )
-          .map((id) => {
-            const p = profileOrThrow(db, id);
-            return { userId: p.id, displayName: p.displayName, avatarUrl: p.avatarUrl };
-          });
-
-        return { activityId: activity.id, title: activity.title, endsAt: activity.endsAt, people };
-      })
-      .filter((a) => a.people.length > 0);
-  }
-
-  async submitRating(input: SubmitRatingInput): Promise<void> {
-    const db = await loadDb();
-    const me = meOrThrow(db);
-    if (me === input.rateeId) throw new Error("Du kan inte betygsätta dig själv");
-
-    const activity = activityOrThrow(db, input.activityId);
-    if (new Date(activity.endsAt).getTime() > Date.now()) {
-      throw new Error("Aktiviteten är inte slut än");
-    }
-
-    const wasThere = (userId: Uuid) =>
-      activity.hostId === userId ||
-      db.participants.some(
-        (p) => p.activityId === activity.id && p.userId === userId && p.status === "accepted",
-      );
-
-    if (!wasThere(me) || !wasThere(input.rateeId)) {
-      throw new Error("Ni var inte båda med på aktiviteten");
-    }
-
-    const existing = db.ratings.find(
-      (r) =>
-        r.activityId === input.activityId &&
-        r.raterId === me &&
-        r.rateeId === input.rateeId,
-    );
-
-    if (existing) {
-      existing.fun = input.fun;
-      existing.friendliness = input.friendliness;
-      existing.feltSafe = input.feltSafe;
-      existing.comment = input.comment ?? null;
-    } else {
-      db.ratings.push({
-        id: newId(),
-        activityId: input.activityId,
-        raterId: me,
-        rateeId: input.rateeId,
-        fun: input.fun,
-        friendliness: input.friendliness,
-        feltSafe: input.feltSafe,
-        comment: input.comment ?? null,
-        createdAt: nowIso(),
-      });
-    }
-
-    await persist();
-  }
-
   /* BFF ------------------------------------------------------------------- */
 
   async listBffs(): Promise<PublicProfile[]> {
@@ -1043,9 +934,18 @@ export class MockBackend implements Backend {
     await persist();
   }
 
-  async reportUser(): Promise<void> {
-    // Mocken tar emot anmälan tyst; i Supabase-backendet hamnar den i reports.
-    await loadDb();
+  async reportUser(userId: Uuid, reason: string, details?: string): Promise<void> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+    db.reports.push({
+      id: newId(),
+      reporterId: me,
+      reportedUserId: userId,
+      reason,
+      details: details ?? null,
+      createdAt: nowIso(),
+    });
+    await persist();
   }
 
   /* Bilder ---------------------------------------------------------------- */

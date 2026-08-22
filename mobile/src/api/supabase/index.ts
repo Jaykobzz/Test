@@ -26,9 +26,7 @@ import type {
   Message,
   MyProfile,
   PublicProfile,
-  RateableActivity,
   SendMessageInput,
-  SubmitRatingInput,
   ThreadSummary,
   Uuid,
 } from "../types";
@@ -45,8 +43,7 @@ interface ProfileRow {
   home_area_label: string | null;
   approx_age: number;
   bankid_verified: boolean;
-  avg_stars: number | null;
-  rating_count: number;
+  member_since: string;
   activities_hosted: number;
   activities_joined: number;
   bff_count: number;
@@ -93,8 +90,7 @@ function toPublicProfile(
     homeAreaLabel: row.home_area_label,
     approxAge: row.approx_age,
     bankIdVerified: row.bankid_verified,
-    avgStars: row.avg_stars,
-    ratingCount: row.rating_count,
+    memberSince: row.member_since,
     activitiesHosted: row.activities_hosted,
     activitiesJoined: row.activities_joined,
     bffCount: row.bff_count,
@@ -218,10 +214,6 @@ export class SupabaseBackend implements Backend {
     fail(error);
     if (!data) return null;
 
-    const { data: summary } = await supabase()
-      .rpc("rating_summary", { p_user: data.id })
-      .maybeSingle<{ avg_stars: number | null; rating_count: number }>();
-
     return {
       id: data.id,
       displayName: data.display_name,
@@ -233,8 +225,6 @@ export class SupabaseBackend implements Backend {
       homeAreaLabel: data.home_area_label,
       birthYear: data.birth_year,
       bankIdVerified: data.verified_at !== null,
-      avgStars: summary?.avg_stars ?? null,
-      ratingCount: summary?.rating_count ?? 0,
       needsOnboarding: data.avatar_url === "pending" || (data.interests ?? []).length === 0,
     };
   }
@@ -311,7 +301,7 @@ export class SupabaseBackend implements Backend {
       hostId: row.host_id,
       hostName: row.host_name,
       hostAvatar: row.host_avatar,
-      hostStars: row.host_stars,
+      hostActivityCount: row.host_activity_count,
       title: row.title,
       description: row.description,
       category: row.category,
@@ -379,9 +369,11 @@ export class SupabaseBackend implements Backend {
       .eq("activity_id", activityId)
       .maybeSingle<{ id: string }>();
 
-    const { data: summary } = await supabase()
-      .rpc("rating_summary", { p_user: activity.host_id })
-      .maybeSingle<{ avg_stars: number | null }>();
+    const { data: hostProfile } = await supabase()
+      .from("public_profiles")
+      .select("activities_hosted")
+      .eq("id", activity.host_id)
+      .maybeSingle<{ activities_hosted: number }>();
 
     const mine = rows.find((r) => r.user_id === me);
 
@@ -390,7 +382,7 @@ export class SupabaseBackend implements Backend {
       hostId: activity.host_id,
       hostName: activity.host.display_name,
       hostAvatar: activity.host.avatar_url,
-      hostStars: summary?.avg_stars ?? null,
+      hostActivityCount: hostProfile?.activities_hosted ?? 0,
       title: activity.title,
       description: activity.description,
       category: activity.category,
@@ -436,7 +428,6 @@ export class SupabaseBackend implements Backend {
         ends_at: input.endsAt,
         visibility: input.visibility,
         capacity: input.capacity ?? null,
-        min_rating: input.minRating ?? null,
         min_age: input.minAge ?? null,
       })
       .select()
@@ -716,67 +707,6 @@ export class SupabaseBackend implements Backend {
       .subscribe();
 
     return () => { void supabase().removeChannel(channel); };
-  }
-
-  /* Betyg ----------------------------------------------------------------- */
-
-  async activitiesAwaitingRating(): Promise<RateableActivity[]> {
-    const me = await currentUserId();
-    const cutoff = new Date(Date.now() - 14 * 86_400_000).toISOString();
-
-    const { data: hosted } = await supabase()
-      .from("activities")
-      .select("id, title, ends_at")
-      .eq("host_id", me)
-      .eq("status", "completed")
-      .gte("ends_at", cutoff);
-
-    const { data: attended } = await supabase()
-      .from("activity_participants")
-      .select("activity:activities(id, title, ends_at, status)")
-      .eq("user_id", me)
-      .eq("status", "accepted");
-
-    const candidates = new Map<string, { id: string; title: string; ends_at: string }>();
-    for (const a of hosted ?? []) candidates.set(a.id, a);
-    for (const row of attended ?? []) {
-      const a = row.activity as unknown as
-        { id: string; title: string; ends_at: string; status: string } | null;
-      if (a && a.status === "completed" && a.ends_at >= cutoff) {
-        candidates.set(a.id, { id: a.id, title: a.title, ends_at: a.ends_at });
-      }
-    }
-
-    const result = await Promise.all([...candidates.values()].map(async (activity) => {
-      const { data: people } = await supabase()
-        .rpc("pending_ratings", { p_activity_id: activity.id });
-
-      return {
-        activityId: activity.id,
-        title: activity.title,
-        endsAt: activity.ends_at,
-        people: (people ?? []).map((p: { user_id: string; display_name: string;
-                                         avatar_url: string }) => ({
-          userId: p.user_id,
-          displayName: p.display_name,
-          avatarUrl: p.avatar_url,
-        })),
-      };
-    }));
-
-    return result.filter((a) => a.people.length > 0);
-  }
-
-  async submitRating(input: SubmitRatingInput): Promise<void> {
-    const { error } = await supabase().rpc("submit_rating", {
-      p_activity_id: input.activityId,
-      p_ratee_id: input.rateeId,
-      p_fun: input.fun,
-      p_friendliness: input.friendliness,
-      p_felt_safe: input.feltSafe,
-      p_comment: input.comment ?? null,
-    });
-    fail(error);
   }
 
   /* BFF ------------------------------------------------------------------- */

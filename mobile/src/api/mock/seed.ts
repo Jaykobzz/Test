@@ -16,8 +16,8 @@ export interface SeedProfile {
   interests: string[];
   homeAreaLabel: string;
   birthYear: number;
-  avgStars: number | null;
-  ratingCount: number;
+  /** Hur länge personen varit med, i dagar bakåt från nu. */
+  memberForDays: number;
 }
 
 export interface SeedActivity {
@@ -49,8 +49,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["fiske", "paddling", "svamp"],
     homeAreaLabel: "Skarpnäck",
     birthYear: 1984,
-    avgStars: 4.8,
-    ratingCount: 23,
+    memberForDays: 420,
   },
   {
     id: "11111111-1111-4111-8111-111111111102",
@@ -60,8 +59,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["lopning", "fika", "bocker"],
     homeAreaLabel: "Bagarmossen",
     birthYear: 1991,
-    avgStars: 4.9,
-    ratingCount: 31,
+    memberForDays: 610,
   },
   {
     id: "11111111-1111-4111-8111-111111111103",
@@ -71,8 +69,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["padel", "gym", "tvspel"],
     homeAreaLabel: "Farsta",
     birthYear: 1988,
-    avgStars: 4.4,
-    ratingCount: 17,
+    memberForDays: 300,
   },
   {
     id: "11111111-1111-4111-8111-111111111104",
@@ -82,8 +79,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["matlagning", "konst", "loppis"],
     homeAreaLabel: "Hökarängen",
     birthYear: 1995,
-    avgStars: 5,
-    ratingCount: 6,
+    memberForDays: 95,
   },
   {
     id: "11111111-1111-4111-8111-111111111105",
@@ -93,8 +89,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["bradspel", "film", "bygga"],
     homeAreaLabel: "Enskede",
     birthYear: 1979,
-    avgStars: 4.6,
-    ratingCount: 44,
+    memberForDays: 880,
   },
   {
     id: "11111111-1111-4111-8111-111111111106",
@@ -104,8 +99,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["hundar", "vandring", "foto"],
     homeAreaLabel: "Älvsjö",
     birthYear: 1993,
-    avgStars: 4.7,
-    ratingCount: 12,
+    memberForDays: 240,
   },
   {
     id: "11111111-1111-4111-8111-111111111107",
@@ -115,8 +109,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["bad", "lopning", "teknik"],
     homeAreaLabel: "Tyresö",
     birthYear: 1986,
-    avgStars: 4.5,
-    ratingCount: 19,
+    memberForDays: 505,
   },
   {
     id: "11111111-1111-4111-8111-111111111108",
@@ -126,8 +119,7 @@ export const SEED_PROFILES: SeedProfile[] = [
     interests: ["foraldrar", "fika", "tradgard"],
     homeAreaLabel: "Gubbängen",
     birthYear: 1992,
-    avgStars: null,
-    ratingCount: 0,
+    memberForDays: 60,
   },
 ];
 

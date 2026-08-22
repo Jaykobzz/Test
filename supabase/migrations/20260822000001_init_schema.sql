@@ -6,8 +6,10 @@
 --      kunna känna igen en återvändande person utan att kunna läsa numret.
 --   2. Exakt hemposition är privat. Andra ser bara ett områdesnamn och ett
 --      avståndsspann — aldrig råa koordinater.
---   3. Trygghetssignaler ("kändes inte trygg") är separerade från det publika
---      stjärnbetyget, så att de inte kan användas som offentligt gapstock.
+--   3. Ingen betygsätter någon. Ett betyg mäter passform mellan två personer
+--      men läses som en egenskap hos den ena, och en låg siffra följer med
+--      överallt. Trygghet hanteras i stället som anmälan: privat, granskad,
+--      och aldrig synlig på någons profil.
 
 create schema if not exists extensions;
 create extension if not exists "postgis"  with schema extensions;
@@ -118,7 +120,6 @@ create table activities (
   -- Vem
   visibility      activity_visibility not null default 'public',
   capacity        int check (capacity is null or capacity between 1 and 200),
-  min_rating      numeric(3,2) check (min_rating is null or min_rating between 1 and 5),
   min_age         int check (min_age is null or min_age between 15 and 120),
 
   status          activity_status not null default 'open',
@@ -140,9 +141,6 @@ create index activities_status_idx    on activities (status) where status = 'ope
 
 comment on column activities.visibility is
   'public = syns för alla i närheten. bff = syns bara för värdens accepterade BFF:s.';
-comment on column activities.min_rating is
-  'Frivilligt filter: värden kan kräva ett minsta snittbetyg för att få ansöka.';
-
 -- ---------------------------------------------------------------------------
 -- Ansökningar om att haka på
 -- ---------------------------------------------------------------------------
@@ -225,47 +223,6 @@ create table messages (
 );
 
 create index messages_thread_idx on messages (thread_id, created_at desc);
-
--- ---------------------------------------------------------------------------
--- Stjärnor
--- ---------------------------------------------------------------------------
-
-create table ratings (
-  id            uuid primary key default gen_random_uuid(),
-  activity_id   uuid not null references activities (id) on delete cascade,
-  rater_id      uuid not null references profiles (id) on delete cascade,
-  ratee_id      uuid not null references profiles (id) on delete cascade,
-
-  fun           smallint not null check (fun between 1 and 5),          -- hur kul var det
-  friendliness  smallint not null check (friendliness between 1 and 5), -- hur trevlig
-  felt_safe     boolean  not null,                                      -- kändes det tryggt
-  comment       text check (length(comment) <= 500),
-
-  created_at    timestamptz not null default now(),
-
-  unique (activity_id, rater_id, ratee_id),
-  constraint no_self_rating check (rater_id <> ratee_id)
-);
-
-create index ratings_ratee_idx on ratings (ratee_id);
-
-comment on table ratings is
-  'Ett betyg per person per aktivitet. felt_safe = false lämnar aldrig servern som '
-  'publik siffra — den går till trygghetskön i safety_flags.';
-
--- Trygghetslarm, avskilt från det publika betyget. Endast moderation läser detta.
-create table safety_flags (
-  id           uuid primary key default gen_random_uuid(),
-  rating_id    uuid unique references ratings (id) on delete cascade,
-  flagged_user uuid not null references profiles (id) on delete cascade,
-  raised_by    uuid not null references profiles (id) on delete cascade,
-  activity_id  uuid references activities (id) on delete set null,
-  note         text,
-  status       report_status not null default 'open',
-  created_at   timestamptz not null default now()
-);
-
-create index safety_flags_user_idx on safety_flags (flagged_user, status);
 
 -- ---------------------------------------------------------------------------
 -- BFF

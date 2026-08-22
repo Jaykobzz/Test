@@ -17,7 +17,7 @@ import { INTERESTS } from "@/api/interests";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import {
-  Avatar, Button, Card, Chip, Divider, Field, Gap, Loading, Row, Screen, Stars, Txt,
+  Avatar, Button, Card, Chip, Credentials, Divider, Field, Gap, Loading, Row, Screen, Txt,
 } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { pickImage } from "@/lib/image";
@@ -142,15 +142,7 @@ export default function ProfileScreen() {
           <Gap size="md" />
           <Txt variant="title">{profile.displayName}</Txt>
           <Gap size="xs" />
-          <Row gap="sm">
-            <Stars value={profile.avgStars} count={profile.ratingCount} />
-            {profile.bankIdVerified && (
-              <Row gap="xs">
-                <Ionicons name="shield-checkmark" size={13} color={theme.color.accent} />
-                <Txt variant="small" tone="muted">BankID</Txt>
-              </Row>
-            )}
-          </Row>
+          <Credentials verified={profile.bankIdVerified} />
           {profile.homeAreaLabel && (
             <>
               <Gap size="xs" />

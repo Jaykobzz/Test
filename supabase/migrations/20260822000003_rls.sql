@@ -14,8 +14,6 @@ alter table activity_participants enable row level security;
 alter table threads               enable row level security;
 alter table thread_members        enable row level security;
 alter table messages              enable row level security;
-alter table ratings               enable row level security;
-alter table safety_flags          enable row level security;
 alter table friendships           enable row level security;
 alter table blocks                enable row level security;
 alter table reports               enable row level security;
@@ -142,16 +140,17 @@ create policy "bocka av i delade listor" on messages
   with check (kind = 'list' and is_thread_member(thread_id, (select auth.uid())));
 
 -- ---------------------------------------------------------------------------
--- ratings — du ser vad DU har satt, aldrig vad andra satt på dig.
--- Den som betygsätts ser bara sitt snitt via public_profiles. Det är med flit:
--- ett synligt "vem gav mig tvåan" bjuder in till hämnd.
+-- Ingen betygstabell.
+--
+-- Det fanns en tidigare i utvecklingen och den togs medvetet bort. Ett betyg
+-- mäter hur väl två personer passade ihop, men läses av alla andra som en
+-- egenskap hos den ena — och en låg siffra följer med personen överallt.
+-- I en app vars hela syfte är att sänka tröskeln för att höra av sig blir det
+-- ett permanent utestängningsverktyg riktat mot dem som behöver den mest.
+--
+-- Trygghet hanteras i stället av reports: privat, granskad av människa, och
+-- aldrig synlig på någons profil.
 -- ---------------------------------------------------------------------------
-
-create policy "se betyg du själv satt" on ratings
-  for select to authenticated
-  using (rater_id = (select auth.uid()));
-
--- safety_flags har medvetet noll policies: bara service_role kommer åt den.
 
 -- ---------------------------------------------------------------------------
 -- friendships — BFF
@@ -205,12 +204,8 @@ grant execute on function discover_activities(double precision, double precision
 grant execute on function apply_to_activity(uuid, text)       to authenticated;
 grant execute on function decide_application(uuid, boolean)   to authenticated;
 grant execute on function ensure_direct_thread(uuid)          to authenticated;
-grant execute on function submit_rating(uuid, uuid, smallint, smallint, boolean, text)
-                                                              to authenticated;
-grant execute on function pending_ratings(uuid)               to authenticated;
 grant execute on function request_bff(uuid)                   to authenticated;
 grant execute on function respond_bff(uuid, boolean)          to authenticated;
-grant execute on function rating_summary(uuid)                to authenticated;
 grant execute on function are_bffs(uuid, uuid)                to authenticated;
 grant execute on function complete_due_activities()           to authenticated;
 

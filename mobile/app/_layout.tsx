@@ -73,10 +73,6 @@ function RootNavigator() {
       <Stack.Screen name="aktivitet/[id]" options={{ title: "" }} />
       <Stack.Screen name="chatt/[id]" options={{ title: "" }} />
       <Stack.Screen name="person/[id]" options={{ title: "" }} />
-      <Stack.Screen
-        name="betygsatt/[activityId]"
-        options={{ title: "Hur var det?", presentation: "modal" }}
-      />
       <Stack.Screen name="vanner" options={{ title: "BFFs" }} />
     </Stack>
   );

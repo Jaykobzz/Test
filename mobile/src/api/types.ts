@@ -32,13 +32,16 @@ export interface MyProfile {
   homeAreaLabel: string | null;
   birthYear: number;
   bankIdVerified: boolean;
-  avgStars: number | null;
-  ratingCount: number;
   /** Sant tills namn och bild är på plats. Styr om onboarding visas. */
   needsOnboarding: boolean;
 }
 
-/** Någon annans profil — beskuren. Inga koordinater, inget juridiskt namn. */
+/**
+ * Någon annans profil — beskuren. Inga koordinater, inget juridiskt namn.
+ *
+ * Och inget omdöme. Siffrorna här är fakta om vad personen gjort; ingen av
+ * dem är någon annans åsikt om hen.
+ */
 export interface PublicProfile {
   id: Uuid;
   displayName: string;
@@ -48,8 +51,7 @@ export interface PublicProfile {
   homeAreaLabel: string | null;
   approxAge: number;
   bankIdVerified: boolean;
-  avgStars: number | null;
-  ratingCount: number;
+  memberSince: IsoDate;
   activitiesHosted: number;
   activitiesJoined: number;
   bffCount: number;
@@ -65,7 +67,8 @@ export interface ActivityCard {
   hostId: Uuid;
   hostName: string;
   hostAvatar: string;
-  hostStars: number | null;
+  /** Antal genomförda aktiviteter värden varit med på. Fakta, inte omdöme. */
+  hostActivityCount: number;
   title: string;
   description: string | null;
   category: string | null;
@@ -113,7 +116,6 @@ export interface CreateActivityInput {
   endsAt: IsoDate;
   visibility: ActivityVisibility;
   capacity?: number | null;
-  minRating?: number | null;
   minAge?: number | null;
 }
 
@@ -156,28 +158,6 @@ export interface ThreadSummary {
   lastMessage: string | null;
   lastMessageAt: IsoDate;
   unreadCount: number;
-}
-
-export interface RateablePerson {
-  userId: Uuid;
-  displayName: string;
-  avatarUrl: string;
-}
-
-export interface RateableActivity {
-  activityId: Uuid;
-  title: string;
-  endsAt: IsoDate;
-  people: RateablePerson[];
-}
-
-export interface SubmitRatingInput {
-  activityId: Uuid;
-  rateeId: Uuid;
-  fun: number;
-  friendliness: number;
-  feltSafe: boolean;
-  comment?: string;
 }
 
 export interface BffRequest {

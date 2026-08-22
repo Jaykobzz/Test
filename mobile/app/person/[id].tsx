@@ -18,7 +18,7 @@ import { INTERESTS } from "@/api/interests";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import {
-  Button, Card, Chip, Divider, Gap, Loading, Row, Screen, Stars, Txt,
+  Button, Card, Chip, Credentials, Divider, Gap, Loading, Row, Screen, Txt,
 } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { radius, space } from "@/theme";
@@ -157,15 +157,10 @@ export default function PersonScreen() {
           <Txt variant="title">{person.displayName}, {person.approxAge}</Txt>
 
           <Gap size="xs" />
-          <Row gap="md">
-            <Stars value={person.avgStars} count={person.ratingCount} />
-            {person.bankIdVerified && (
-              <Row gap="xs">
-                <Ionicons name="shield-checkmark" size={13} color={theme.color.accent} />
-                <Txt variant="small" tone="muted">BankID</Txt>
-              </Row>
-            )}
-          </Row>
+          <Credentials
+            verified={person.bankIdVerified}
+            memberSince={person.memberSince}
+          />
 
           {person.homeAreaLabel && (
             <>

@@ -18,12 +18,12 @@ import { getBackend } from "@/api";
 import { interestLabel } from "@/api/interests";
 import type { ActivityDetail, Applicant } from "@/api/types";
 import {
-  Avatar, Badge, Button, Card, Divider, Gap, IconButton, Loading, Row, Screen, Stars, Txt,
+  Avatar, Badge, Button, Card, Credentials, Divider, Gap, IconButton, Loading, Row, Screen, Txt,
 } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance, mapsUrl } from "@/lib/geo";
 import { formatActivityWhen } from "@/lib/time";
-import { radius, space } from "@/theme";
+import { space } from "@/theme";
 
 export default function ActivityScreen() {
   const theme = useTheme();
@@ -213,7 +213,7 @@ export default function ActivityScreen() {
             id={activity.hostId}
             name={activity.hostName}
             avatar={activity.hostAvatar}
-            stars={activity.hostStars}
+            activityCount={activity.hostActivityCount}
             onPress={() => router.push(`/person/${activity.hostId}`)}
           />
 
@@ -230,7 +230,7 @@ export default function ActivityScreen() {
                     id={person.profile.id}
                     name={person.profile.displayName}
                     avatar={person.profile.avatarUrl}
-                    stars={person.profile.avgStars}
+                    activityCount={person.profile.activitiesJoined}
                     onPress={() => router.push(`/person/${person.profile.id}`)}
                   />
                 ))}
@@ -310,13 +310,13 @@ function InfoRow({
 function PersonRow({
   name,
   avatar,
-  stars,
+  activityCount,
   onPress,
 }: {
   id: string;
   name: string;
   avatar: string;
-  stars: number | null;
+  activityCount?: number;
   onPress: () => void;
 }) {
   const theme = useTheme();
@@ -327,7 +327,7 @@ function PersonRow({
           <Avatar uri={avatar} name={name} size={44} />
           <View>
             <Txt variant="bodyStrong">{name}</Txt>
-            <Stars value={stars} size={12} showCount={false} />
+            <Credentials verified activityCount={activityCount} size="micro" />
           </View>
         </Row>
         <Ionicons name="chevron-forward" size={18} color={theme.color.textFaint} />
@@ -359,12 +359,15 @@ function ApplicantCard({
               <Txt variant="bodyStrong">
                 {profile.displayName}, {profile.approxAge}
               </Txt>
-              <Row gap="sm">
-                <Stars value={profile.avgStars} count={profile.ratingCount} size={12} />
-                {profile.homeAreaLabel && (
-                  <Txt variant="small" tone="faint">· {profile.homeAreaLabel}</Txt>
-                )}
-              </Row>
+              <Credentials
+                verified={profile.bankIdVerified}
+                activityCount={profile.activitiesJoined}
+                memberSince={profile.memberSince}
+                size="micro"
+              />
+              {profile.homeAreaLabel && (
+                <Txt variant="small" tone="faint">{profile.homeAreaLabel}</Txt>
+              )}
             </View>
           </Row>
         </Pressable>

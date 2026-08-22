@@ -41,7 +41,6 @@ profiles ──┬──< activities ──< activity_participants
            │                  │
            │                  └──< messages
            │
-           ├──< ratings ──── safety_flags
            ├──< friendships   (BFF, ett par = en rad)
            ├──< blocks
            └──< reports
@@ -76,7 +75,7 @@ Tre lager, i den ordningen:
    (`can_see_activity`, `is_thread_member`, `are_bffs` …) är `security definer`
    just för att policies annars skulle läsa samma tabell de skyddar och ge
    oändlig rekursion.
-3. **RPC:er.** Allt som har regler — ansöka, acceptera, betygsätta, bli BFF —
+3. **RPC:er.** Allt som har regler — ansöka, acceptera, öppna en chatt, bli BFF —
    går genom en funktion som validerar först. Tabellerna saknar därför
    insert-policies för de operationerna. Det är avsiktligt.
 
@@ -117,25 +116,49 @@ Sessionen ligger i SecureStore (Keychain / EncryptedSharedPreferences), inte
 AsyncStorage. Adaptern i `src/api/supabase/client.ts` delar värdet i bitar
 eftersom SecureStore tar max ~2 kB och en Supabase-session är större.
 
-## Betygsmodellen
+## Varför det inte finns några betyg
 
-Två stjärnfrågor och en trygghetsfråga:
+FRIEND hade ett stjärnsystem tidigt: *hur kul var det*, *hur trevlig var hen*,
+och en separat trygghetsfråga. Det är borttaget, och det är värt att förstå
+varför — annars byggs det tillbaka av någon som tycker att det verkar
+självklart.
 
-| Fråga | Var den hamnar |
+Ett betyg mäter **passform mellan två personer**, men presenteras som en
+**egenskap hos den ena**. Micke som är för tystlåten för dig är precis lagom
+för någon annan. Sätter du en tvåa kodar du in "vi passade inte ihop" som "den
+här personen är dålig", och siffran följer med hen till alla andra.
+
+System som det här kollapsar dessutom alltid åt ett av två håll. Antingen ger
+alla fyror och femmor av artighet, och skalan säger ingenting. Eller så biter
+den — och då har appen byggt ett permanent utestängningsverktyg riktat mot
+blyga och ovana människor. Alltså exakt de den finns för.
+
+Värst var `activities.min_rating`, där en värd kunde kräva ett minsta snitt för
+att någon skulle få ansöka. Det gjorde utestängningen till en produktfunktion.
+
+### Vad som gör jobbet i stället
+
+| Behov | Lösning |
 |---|---|
-| Hur kul var det? | `ratings.fun` → publikt snitt |
-| Hur trevlig var hen? | `ratings.friendliness` → publikt snitt |
-| Kändes det tryggt? | `ratings.felt_safe` → `safety_flags` vid nej |
+| Veta vem man möter | BankID vid registrering. Ingen anonymitet. |
+| Sålla bland sökande | Värden accepterar var och en för hand. |
+| Bedöma en främling | Fakta på profilen: verifierad, antal genomförda aktiviteter, medlem sedan. |
+| Hantera obehag | `reports` → moderation. Privat, aldrig synlig på profilen. |
+| Slippa någon helt | `blocks`. Ömsesidig osynlighet, direkt. |
 
-`rating_summary()` räknar `avg((fun + friendliness) / 2)`. Trygghetssvaret
-ingår inte. Ett nej skapar en rad i `safety_flags`, som saknar RLS-policies
-helt och därför bara är läsbar för `service_role`.
+Filtreringen som betygen försökte göra utför värden redan, med mer kontext än
+en siffra någonsin bär.
 
-Betygsfönstret är fjorton dagar. Båda måste ha varit på aktiviteten på riktigt
-— värd eller accepterad deltagare — och aktiviteten måste vara slut.
+`public_profiles` innehåller därför inga omdömen alls, och testsviten har en
+regressionsvakt som failar om en kolumn med `rating`, `stars`, `score` eller
+`felt_safe` dyker upp någonstans i schemat.
 
-`ratings` har bara en select-policy: `rater_id = auth.uid()`. Du ser vad du
-själv satt, aldrig vad andra satt på dig.
+### Vad som saknas
+
+Stunden efter aktiviteten är tom nu. Den föreslagna ersättaren är en ömsesidig
+och helt privat fråga — *"Skulle du göra om det med Sara?"* — där ett nej inte
+gör någonting alls, och bara ett dubbelt ja syns, som ett BFF-förslag. Då blir
+det en matchning i stället för en bedömning. Inte byggd än.
 
 ## Att lägga till något
 

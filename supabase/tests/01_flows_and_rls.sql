@@ -303,16 +303,24 @@ select assert_true(
   'men vanliga profilfält går att ändra');
 commit;
 
-/* Betyg ---------------------------------------------------------------- */
-begin;
-set local role authenticated;
-set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
+/* Inga betyg — regressionsvakt ------------------------------------------
+   Betygsättning togs bort medvetet. Testerna nedan finns för att fånga om
+   den smyger tillbaka: en profil får bära fakta om vad någon gjort, aldrig
+   någon annans omdöme om hen.                                              */
 
-select assert_denied(
-  $$ select submit_rating('bbbbbbbb-0000-4000-8000-000000000001',
-       'aaaaaaaa-0000-4000-8000-000000000001', 5::smallint, 5::smallint, true) $$,
-  'man kan inte betygsätta en aktivitet som inte varit än');
-commit;
+select assert_true(
+  not exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public'
+      and table_name in ('ratings', 'safety_flags')),
+  'det finns ingen betygstabell i schemat');
+
+select assert_true(
+  not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and column_name ilike any (array['%rating%', '%stars%', '%score%', '%felt_safe%'])),
+  'ingen kolumn någonstans bär ett omdöme om en person');
 
 -- Flytta aktiviteten bakåt i tiden så att den räknas som genomförd.
 update activities
@@ -325,38 +333,36 @@ begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
+-- Det profilen visar i stället: vad personen faktiskt gjort.
 select assert_true(
-  (submit_rating('bbbbbbbb-0000-4000-8000-000000000001',
-     'aaaaaaaa-0000-4000-8000-000000000001',
-     5::smallint, 4::smallint, true, 'Trevlig och tålmodig!')).fun = 5,
-  'betyg går att sätta efter aktiviteten');
-
-select assert_denied(
-  $$ select submit_rating('bbbbbbbb-0000-4000-8000-000000000001',
-       auth.uid(), 5::smallint, 5::smallint, true) $$,
-  'man kan inte betygsätta sig själv');
-
--- Trygghetslarm på Johan
-select submit_rating('bbbbbbbb-0000-4000-8000-000000000001',
-  'aaaaaaaa-0000-4000-8000-000000000003',
-  2::smallint, 2::smallint, false, 'Stod för nära hela tiden.');
+  (select activities_hosted from public_profiles
+    where id = 'aaaaaaaa-0000-4000-8000-000000000001') = 1,
+  'profilen räknar genomförda aktiviteter man varit värd för');
 
 select assert_true(
-  (select count(*) from pending_ratings('bbbbbbbb-0000-4000-8000-000000000001')) = 0,
-  'inga fler kvar att betygsätta');
+  (select member_since from public_profiles
+    where id = 'aaaaaaaa-0000-4000-8000-000000000001') is not null,
+  'profilen visar hur länge man varit med');
+
+select assert_true(
+  (select bankid_verified from public_profiles
+    where id = 'aaaaaaaa-0000-4000-8000-000000000001'),
+  'profilen visar att identiteten är styrkt med BankID');
 commit;
 
+/* Anmälan — trygghet utan betyg ----------------------------------------- */
 begin;
 set local role authenticated;
-set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000001';
+set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
+
+insert into reports (reporter_id, reported_user_id, activity_id, reason, details)
+values (auth.uid(), 'aaaaaaaa-0000-4000-8000-000000000003',
+        'bbbbbbbb-0000-4000-8000-000000000001',
+        'obehagligt_beteende', 'Stod för nära hela tiden.');
 
 select assert_true(
-  (select avg_stars from rating_summary('aaaaaaaa-0000-4000-8000-000000000001')) = 4.50,
-  'snittet är medelvärdet av kul och trevlig');
-
-select assert_true(
-  (select count(*) from ratings) = 0,
-  'den som betygsatts ser inte vem som satt vad');
+  (select count(*) from reports) = 1,
+  'man ser sin egen anmälan');
 commit;
 
 begin;
@@ -364,39 +370,20 @@ set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000003';
 
 select assert_true(
-  (select avg_stars from rating_summary(auth.uid())) = 2.00,
-  'ett lågt betyg slår igenom i snittet');
+  (select count(*) from reports) = 0,
+  'den anmälde ser varken anmälan eller vem som gjort den');
 
 select assert_true(
-  (select count(*) from safety_flags) = 0,
-  'trygghetslarm är osynliga för den anmälde');
+  (select count(*) from public_profiles where id = auth.uid()) = 1,
+  'en anmälan syns inte på den anmäldes profil');
 commit;
 
--- Larmet finns, men bara för moderation (service_role / postgres).
+-- Anmälan finns, men bara för moderation (service_role / postgres).
 select assert_true(
-  (select count(*) from safety_flags
-    where flagged_user = 'aaaaaaaa-0000-4000-8000-000000000003') = 1,
-  'trygghetslarmet hamnade i moderationskön');
-
--- Den publika profilen bär ett snittbetyg men aldrig något spår av
--- trygghetslarmet. Läses som inloggad, eftersom public_profiles kräver
--- en auth.uid() precis som i skarp drift.
-begin;
-set local role authenticated;
-set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
-
-select assert_true(
-  (select avg_stars from public_profiles
-    where id = 'aaaaaaaa-0000-4000-8000-000000000003') = 2.00,
-  'den publika profilen visar snittbetyget');
-
-select assert_true(
-  not exists (
-    select 1 from information_schema.columns
-    where table_name = 'public_profiles'
-      and column_name ilike any (array['%safe%', '%flag%'])),
-  'den publika profilen bär inget spår av trygghetslarmet');
-commit;
+  (select count(*) from reports
+    where reported_user_id = 'aaaaaaaa-0000-4000-8000-000000000003'
+      and status = 'open') = 1,
+  'anmälan hamnade i moderationskön');
 
 /* Blockering ----------------------------------------------------------- */
 begin;

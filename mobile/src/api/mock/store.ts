@@ -49,7 +49,6 @@ export interface MockActivity {
   endsAt: string;
   visibility: ActivityVisibility;
   capacity: number | null;
-  minRating: number | null;
   minAge: number | null;
   status: ActivityStatus;
   createdAt: string;
@@ -91,18 +90,6 @@ export interface MockMessage {
   createdAt: string;
 }
 
-export interface MockRating {
-  id: Uuid;
-  activityId: Uuid;
-  raterId: Uuid;
-  rateeId: Uuid;
-  fun: number;
-  friendliness: number;
-  feltSafe: boolean;
-  comment: string | null;
-  createdAt: string;
-}
-
 export interface MockFriendship {
   id: Uuid;
   requesterId: Uuid;
@@ -120,11 +107,10 @@ export interface MockDb {
   threads: MockThread[];
   threadMembers: MockThreadMember[];
   messages: MockMessage[];
-  ratings: MockRating[];
   friendships: MockFriendship[];
   blocks: { blockerId: Uuid; blockedId: Uuid }[];
-  /** Betyg som seedprofilerna redan fått, så att stjärnorna inte är tomma. */
-  seededRatings: Record<Uuid, { avg: number; count: number }>;
+  reports: { id: Uuid; reporterId: Uuid; reportedUserId: Uuid; reason: string;
+             details: string | null; createdAt: string }[];
   /** Personnummer -> profil. Motsvarar personal_number_hash i Postgres. */
   identities: Record<string, Uuid>;
 }
@@ -149,7 +135,7 @@ function buildSeed(): MockDb {
     homeLng: DEFAULT_LOCATION.lng,
     homeAreaLabel: p.homeAreaLabel,
     birthYear: p.birthYear,
-    createdAt: new Date(now - 90 * 86_400_000).toISOString(),
+    createdAt: new Date(now - p.memberForDays * 86_400_000).toISOString(),
   }));
 
   const activities: MockActivity[] = SEED_ACTIVITIES.map((a) => {
@@ -169,19 +155,11 @@ function buildSeed(): MockDb {
       endsAt: endsAt.toISOString(),
       visibility: a.visibility,
       capacity: a.capacity,
-      minRating: null,
       minAge: null,
       status: endsAt.getTime() < now ? "completed" : "open",
       createdAt: new Date(now - 3 * 86_400_000).toISOString(),
     };
   });
-
-  const seededRatings: MockDb["seededRatings"] = {};
-  for (const p of SEED_PROFILES) {
-    if (p.avgStars !== null) {
-      seededRatings[p.id] = { avg: p.avgStars, count: p.ratingCount };
-    }
-  }
 
   // Seedprofilerna har hakat på varandras aktiviteter, så att deltagarlistor
   // och kapacitet inte är tomma innan du själv gjort något.
@@ -221,10 +199,9 @@ function buildSeed(): MockDb {
     threads: [],
     threadMembers: [],
     messages: [],
-    ratings: [],
     friendships,
     blocks: [],
-    seededRatings,
+    reports: [],
     identities: {},
   };
 }

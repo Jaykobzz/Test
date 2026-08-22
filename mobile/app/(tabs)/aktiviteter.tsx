@@ -1,8 +1,9 @@
 /**
  * Mina aktiviteter — det du är värd för och det du hakat på.
  *
- * Överst ligger påminnelsen om att betygsätta. Den hamnar där för att betyg
- * är hela systemets bränsle; frågar man inte direkt efteråt får man inga.
+ * Sådant som varit ligger kvar under "Varit". Chatten finns kvar där, och
+ * därifrån går det att göra om samma sak med samma folk — det är så en
+ * engångsträff blir en vana.
  */
 
 import { useFocusEffect, useRouter } from "expo-router";
@@ -10,10 +11,9 @@ import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 
 import { getBackend } from "@/api";
-import type { ActivityCard, RateableActivity } from "@/api/types";
+import type { ActivityCard } from "@/api/types";
 import { ActivityListItem } from "@/components/ActivityListItem";
-import { Avatar, Button, Card, Chip, EmptyState, Gap, Loading, Row, Screen, Txt }
-  from "@/components/ui";
+import { Chip, EmptyState, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
 import { space } from "@/theme";
 
 type Tab = "hosting" | "joined";
@@ -24,19 +24,14 @@ export default function MyActivitiesScreen() {
   const [tab, setTab] = useState<Tab>("joined");
   const [hosting, setHosting] = useState<ActivityCard[]>([]);
   const [joined, setJoined] = useState<ActivityCard[]>([]);
-  const [toRate, setToRate] = useState<RateableActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [mine, rateable] = await Promise.all([
-        getBackend().myActivities(),
-        getBackend().activitiesAwaitingRating(),
-      ]);
+      const mine = await getBackend().myActivities();
       setHosting(mine.hosting);
       setJoined(mine.joined);
-      setToRate(rateable);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -83,14 +78,6 @@ export default function MyActivitiesScreen() {
           />
         }
       >
-        {toRate.map((activity) => (
-          <RatingPrompt
-            key={activity.activityId}
-            activity={activity}
-            onPress={() => router.push(`/betygsatt/${activity.activityId}`)}
-          />
-        ))}
-
         {upcoming.length === 0 && past.length === 0 && (
           <EmptyState
             icon="calendar-outline"
@@ -136,45 +123,5 @@ export default function MyActivitiesScreen() {
         )}
       </ScrollView>
     </Screen>
-  );
-}
-
-function RatingPrompt({
-  activity,
-  onPress,
-}: {
-  activity: RateableActivity;
-  onPress: () => void;
-}) {
-  const names = activity.people.map((p) => p.displayName);
-  const who = names.length === 1
-    ? names[0]
-    : `${names.slice(0, -1).join(", ")} och ${names[names.length - 1]}`;
-
-  return (
-    <Card>
-      <View style={{ padding: space.lg, gap: space.md }}>
-        <Row gap="sm">
-          {activity.people.slice(0, 4).map((person) => (
-            <Avatar
-              key={person.userId}
-              uri={person.avatarUrl}
-              name={person.displayName}
-              size={34}
-            />
-          ))}
-        </Row>
-
-        <View>
-          <Txt variant="heading">Hur var {activity.title.toLowerCase()}?</Txt>
-          <Gap size="xs" />
-          <Txt variant="small" tone="muted">
-            Sätt betyg på {who}. Det tar tio sekunder och hjälper alla andra.
-          </Txt>
-        </View>
-
-        <Button label="Sätt betyg" icon="star" onPress={onPress} />
-      </View>
-    </Card>
   );
 }

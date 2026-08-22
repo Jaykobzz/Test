@@ -11,7 +11,7 @@ import { View } from "react-native";
 
 import type { ActivityCard } from "@/api/types";
 import { interestLabel } from "@/api/interests";
-import { Avatar, Badge, Card, Gap, Row, Stars, Txt } from "@/components/ui";
+import { Avatar, Badge, Card, Credentials, Gap, Row, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance } from "@/lib/geo";
 import { formatActivityWhen } from "@/lib/time";
@@ -83,7 +83,7 @@ export function ActivityListItem({
             <Avatar uri={activity.hostAvatar} name={activity.hostName} size={30} />
             <View>
               <Txt variant="smallStrong">{activity.hostName}</Txt>
-              <Stars value={activity.hostStars} size={11} showCount={false} />
+              <Credentials verified activityCount={activity.hostActivityCount} size="micro" />
             </View>
           </Row>
 

@@ -5,10 +5,11 @@ Hitta folk i närheten som vill göra samma sak som du.
 Du lägger upp något du ändå ska göra — *Fiska i Drevviken 13–15* — och folk i
 området ansöker om att haka på. Du väljer vilka du säger ja till. De du
 accepterar hamnar direkt i en chattgrupp med dig, där ni kan skicka bilder,
-kartnålar och listor inför det ni ska göra. Efteråt sätter ni betyg på
-varandra, chatten finns kvar, och den ni gillade kan ni göra till BFF.
+kartnålar och listor inför det ni ska göra. Efteråt finns chatten kvar, ni kan
+göra om samma sak, och den ni gillade kan ni göra till BFF.
 
 Alla är verifierade med BankID. Inga anonyma konton, inga profiler utan bild.
+Och ingen betygsätter någon — se nedan.
 
 ---
 
@@ -79,7 +80,7 @@ Kräver ett Expo-konto och `eas.json`. Bundle-id och paketnamn står i
 Startar en tillfällig Postgres, lägger på en attrapp av det Supabase
 tillhandahåller (`auth.uid()`, `storage.foldername()`, rollerna), kör alla
 migrationer och går sedan igenom hela flödet som tre riktiga användare med
-RLS påslagen — ansöka, acceptera, chatta, betygsätta, blockera.
+RLS påslagen — ansöka, acceptera, chatta, anmäla, blockera.
 
 Kräver `postgresql-16` och `postgresql-16-postgis-3`.
 
@@ -88,13 +89,16 @@ Kräver `postgresql-16` och `postgresql-16-postgis-3`.
 ## Hur det hänger ihop
 
 ```
-Ansökan  ──accepteras av värden──▶  Chattgrupp  ──aktiviteten är slut──▶  Betyg
-                                        │                                   │
-                                        └── finns kvar efteråt              ▼
-                                            (gör om, boka nytt)         BFF-förfrågan
-                                                                            │
-                                                                            ▼
-                                                            Aktiviteter bara för BFFs
+Ansökan  ──accepteras av värden──▶  Chattgrupp  ──aktiviteten är slut──┐
+                                        │                              │
+                                        └── finns kvar efteråt ◀───────┘
+                                            (gör om, boka nytt)
+                                                    │
+                                                    ▼
+                                              BFF-förfrågan
+                                                    │
+                                                    ▼
+                                    Aktiviteter bara för BFFs
 ```
 
 Att acceptera någon är den enda handling som skapar en chatt. Det är med
@@ -115,14 +119,17 @@ bara ett områdesnamn och ett avstånd. `public_profiles` är den enda vy en
 användare kan läsa andras profiler genom, och den saknar koordinatkolumner
 helt.
 
-**Trygghet är inte en publik siffra.** Betyget består av *kul* och *trevlig*.
-Frågan "kändes det tryggt?" räknas inte in i snittet — ett nej skapar i
-stället ett larm i `safety_flags`, som bara moderation kan läsa. Den som
-betygsatts ser aldrig vem som satt vad. Ett offentligt creep-räknarverk hade
-blivit ett vapen i stället för ett skydd.
+**Ingen betygsätter någon.** Det fanns ett stjärnsystem tidigare i utvecklingen
+och det är borttaget med flit. Ett betyg mäter hur väl två personer passade
+ihop, men läses av alla andra som en egenskap hos den ena — och en låg siffra
+följer med personen överallt. I en app vars hela syfte är att sänka tröskeln
+för att höra av sig blir det ett permanent utestängningsverktyg riktat mot dem
+som behöver den mest. Profilen visar i stället fakta: BankID-verifierad, antal
+genomförda aktiviteter, medlem sedan. Trygghet hanteras som anmälan — privat,
+granskad av människa, aldrig synlig på någons profil.
 
 **Reglerna bor i databasen.** Vem som får acceptera en ansökan, vem som får
-läsa en tråd, vem som får sätta ett betyg — allt är RLS-policies och RPC:er.
+läsa en tråd, vem som får öppna en chatt — allt är RLS-policies och RPC:er.
 Appen kan inte kringgå dem ens om klientkoden ändras, och mock-backendet
 speglar samma regler så att beteendet är detsamma i båda lägena.
 
@@ -142,8 +149,11 @@ via en svensk bank och en juridisk person — samma gränssnitt håller ändå.
 - **Push-notiser.** En ansökan syns först när man öppnar appen.
 - **Inbäddad karta.** Platser delas som nålar och öppnas i telefonens kartapp;
   det finns ingen karta inuti FRIEND.
-- **Moderationsverktyg.** `safety_flags` och `reports` fylls på korrekt, men
-  det finns ingen vy att beta av dem i.
+- **Moderationsverktyg.** `reports` fylls på korrekt, men det finns ingen vy
+  att beta av kön i.
+- **Ömsesidig "vi klickade"-signal.** Föreslagen ersättare för stunden efter
+  aktiviteten: båda svarar privat på om de vill göra om det, och bara ett
+  dubbelt ja syns — som ett BFF-förslag. Inte byggd än.
 - **Listor på Android.** `Alert.prompt` finns bara på iOS; Android behöver ett
   eget litet formulär.
 

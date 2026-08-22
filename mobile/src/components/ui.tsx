@@ -363,73 +363,85 @@ export function Avatar({
   );
 }
 
-/* Stjärnor ---------------------------------------------------------------- */
+/* Meriter ----------------------------------------------------------------- */
 
-/** Visar ett snittbetyg. Utan betyg står det "Ny här" i stället för noll stjärnor. */
-export function Stars({
-  value,
-  count,
-  size = 14,
-  showCount = true,
+/**
+ * Det som visas i stället för ett betyg.
+ *
+ * FRIEND hade stjärnbetyg en gång och de togs bort med flit: ett betyg mäter
+ * hur väl två personer passade ihop men läses som en egenskap hos den ena, och
+ * siffran följer med personen överallt. Det som står här är i stället fakta —
+ * identiteten är styrkt, och så här mycket har personen faktiskt gjort.
+ */
+export function Credentials({
+  verified,
+  activityCount,
+  memberSince,
+  size = "small",
 }: {
-  value: number | null;
-  count?: number;
-  size?: number;
-  showCount?: boolean;
+  verified?: boolean;
+  activityCount?: number;
+  memberSince?: string;
+  size?: "micro" | "small";
 }) {
   const theme = useTheme();
+  const variant = size === "micro" ? "micro" : "small";
+  const iconSize = size === "micro" ? 11 : 13;
 
-  if (value === null) {
-    return <Txt variant="small" tone="faint">Ny här</Txt>;
+  const parts: ReactNode[] = [];
+
+  if (verified) {
+    parts.push(
+      <Row key="v" gap="xs">
+        <Ionicons name="shield-checkmark" size={iconSize} color={theme.color.accent} />
+        <Txt variant={variant} tone="muted">BankID</Txt>
+      </Row>,
+    );
+  }
+
+  if (activityCount !== undefined) {
+    parts.push(
+      <Txt key="a" variant={variant} tone="muted">
+        {activityCount === 0
+          ? "Inga aktiviteter än"
+          : activityCount === 1
+            ? "1 aktivitet"
+            : `${activityCount} aktiviteter`}
+      </Txt>,
+    );
+  }
+
+  if (memberSince) {
+    parts.push(
+      <Txt key="m" variant={variant} tone="faint">
+        Med sedan {formatMonthYear(memberSince)}
+      </Txt>,
+    );
   }
 
   return (
-    <Row gap="xs">
-      <Ionicons name="star" size={size} color={theme.color.highlight} />
-      <Txt variant="smallStrong">{value.toFixed(1).replace(".", ",")}</Txt>
-      {showCount && count !== undefined && (
-        <Txt variant="small" tone="faint">({count})</Txt>
-      )}
+    <Row gap="sm" wrap>
+      {parts.map((part, i) => (
+        <Row key={i} gap="sm">
+          {i > 0 && <Txt variant={variant} tone="faint">·</Txt>}
+          {part}
+        </Row>
+      ))}
     </Row>
   );
 }
 
-/** Interaktiv stjärnrad för betygsättning. */
-export function StarPicker({
-  value,
-  onChange,
-  label,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-  label: string;
-}) {
-  const theme = useTheme();
+const MONTHS = [
+  "januari", "februari", "mars", "april", "maj", "juni",
+  "juli", "augusti", "september", "oktober", "november", "december",
+];
 
-  return (
-    <View>
-      <Txt variant="smallStrong" tone="muted">{label}</Txt>
-      <Gap size="sm" />
-      <Row gap="sm">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Pressable
-            key={star}
-            onPress={() => onChange(star)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: value === star }}
-            accessibilityLabel={`${star} av 5`}
-            hitSlop={6}
-          >
-            <Ionicons
-              name={star <= value ? "star" : "star-outline"}
-              size={34}
-              color={star <= value ? theme.color.highlight : theme.color.textFaint}
-            />
-          </Pressable>
-        ))}
-      </Row>
-    </View>
-  );
+/** "mars" om det är i år, annars "mars 2025". */
+function formatMonthYear(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const month = MONTHS[d.getMonth()] ?? "";
+  return d.getFullYear() === now.getFullYear() ? month : `${month} ${d.getFullYear()}`;
 }
 
 /* Chips ------------------------------------------------------------------- */
