@@ -3,7 +3,7 @@
  *
  * Ersätter Pressables opacitetsblink, som är den enskilt tydligaste
  * markören för ett gränssnitt som inte fått omsorg. iOS har aldrig använt
- * opacitet för tryck — allt som går att trycka på sjunker in något, med en
+ * opacitet för tryck, allt som går att trycka på sjunker in något, med en
  * fjäder som fortsätter från sin nuvarande hastighet om man trycker igen
  * innan den hunnit tillbaka.
  *

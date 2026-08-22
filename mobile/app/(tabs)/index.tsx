@@ -1,5 +1,5 @@
 /**
- * Upptäck — flödet med aktiviteter i närheten.
+ * Upptäck, flödet med aktiviteter i närheten.
  *
  * Sorterat på när det händer, inte på hur nära det är: det är lättare att ta
  * sig lite längre bort än att flytta på en tid man redan har bokat.
@@ -226,7 +226,7 @@ export default function DiscoverScreen() {
               body={
                 filter.length
                   ? "Inga aktiviteter matchar filtret. Prova att ta bort något."
-                  : "Ingen har lagt upp något i närheten än. Bli den första — det brukar räcka med en."
+                  : "Ingen har lagt upp något i närheten än. Bli den första, det brukar räcka med en."
               }
               action={{
                 label: filter.length ? "Rensa filter" : "Skapa aktivitet",

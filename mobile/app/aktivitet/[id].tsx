@@ -2,9 +2,9 @@
  * En aktivitet.
  *
  * Skärmen har tre skepnader beroende på vem som tittar:
- *   värden      — ser ansökningar och kan acceptera eller tacka nej
- *   accepterad  — ser deltagarna och kommer in i chatten
- *   övriga      — ser vad det handlar om och kan ansöka
+ *   värden     , ser ansökningar och kan acceptera eller tacka nej
+ *   accepterad , ser deltagarna och kommer in i chatten
+ *   övriga     , ser vad det handlar om och kan ansöka
  */
 
 import { Ionicons } from "@expo/vector-icons";

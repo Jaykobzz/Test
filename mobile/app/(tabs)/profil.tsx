@@ -162,7 +162,7 @@ export default function ProfileScreen() {
                     width: 42,
                     height: 42,
                     borderRadius: radius.pill,
-                    backgroundColor: theme.color.accentSoft,
+                    backgroundColor: theme.color.primarySoft,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
                 <Txt variant="body">{profile.bio}</Txt>
               ) : (
                 <Txt variant="body" tone="faint">
-                  Skriv några rader om dig själv — det gör att fler vågar höra av sig.
+                  Skriv några rader om dig själv, det gör att fler vågar höra av sig.
                 </Txt>
               )}
 
@@ -273,8 +273,8 @@ export default function ProfileScreen() {
             <Gap size="lg" />
             <View
               style={{
-                backgroundColor: theme.color.highlightSoft,
-                borderRadius: radius.md,
+                backgroundColor: theme.color.surfaceAlt,
+                borderRadius: radius.field,
                 padding: space.md,
               }}
             >

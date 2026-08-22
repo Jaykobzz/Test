@@ -25,7 +25,7 @@ import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 import { Icon, type IconName } from "@/components/icons/Icon";
 import { Tappable } from "@/components/Tappable";
 import { useTheme } from "@/hooks/useTheme";
-import { font, radius, shadow, space } from "@/theme";
+import { font, radius, shadowFor, space } from "@/theme";
 
 /* Text -------------------------------------------------------------------- */
 
@@ -113,18 +113,18 @@ export function Card({
   const theme = useTheme();
   const base: ViewStyle = {
     backgroundColor: theme.color.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.card,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.color.border,
     overflow: "hidden",
   };
 
-  if (!onPress) return <View style={[base, shadow, style]}>{children}</View>;
+  if (!onPress) return <View style={[base, shadowFor(theme), style]}>{children}</View>;
 
-  // Stora ytor sjunker in mindre — en full kortbredd som krymper 3 % ser ut
+  // Stora ytor sjunker in mindre, en full kortbredd som krymper 3 % ser ut
   // att studsa, medan samma rörelse på en knapp känns precis.
   return (
-    <Tappable onPress={onPress} scale={0.985} style={[base, shadow, style]}>
+    <Tappable onPress={onPress} scale={0.985} style={[base, shadowFor(theme), style]}>
       {children}
     </Tappable>
   );
@@ -298,7 +298,7 @@ export function IconButton({
  * Profilbild med initialer som reserv.
  *
  * Bildkravet betyder att alla ska HA en bild, men nätet kan vara borta och
- * en URL kan ha ruttnat — då ska det ändå se helt ut.
+ * en URL kan ha ruttnat, då ska det ändå se helt ut.
  */
 export function Avatar({
   uri,
@@ -368,7 +368,7 @@ export function Avatar({
  *
  * FRIEND hade stjärnbetyg en gång och de togs bort med flit: ett betyg mäter
  * hur väl två personer passade ihop men läses som en egenskap hos den ena, och
- * siffran följer med personen överallt. Det som står här är i stället fakta —
+ * siffran följer med personen överallt. Det som står här är i stället fakta:
  * identiteten är styrkt, och så här mycket har personen faktiskt gjort.
  */
 export function Credentials({
@@ -463,8 +463,8 @@ export function Chip({
   const tones = {
     neutral: { bg: theme.color.surfaceAlt, fg: theme.color.textMuted },
     primary: { bg: theme.color.primarySoft, fg: theme.color.primary },
-    accent: { bg: theme.color.accentSoft, fg: theme.color.accent },
-    highlight: { bg: theme.color.highlightSoft, fg: theme.color.text },
+    accent: { bg: theme.color.primarySoft, fg: theme.color.accent },
+    highlight: { bg: theme.color.surfaceAlt, fg: theme.color.text },
   };
   const palette = selected
     ? { bg: theme.color.primary, fg: theme.color.onPrimary }
@@ -534,7 +534,7 @@ export function Field({
               : focused
                 ? theme.color.primary
                 : theme.color.border,
-            borderRadius: radius.md,
+            borderRadius: radius.field,
             paddingHorizontal: space.md,
             paddingVertical: space.md,
             minHeight: inputProps.multiline ? 96 : undefined,

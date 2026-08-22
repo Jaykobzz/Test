@@ -1,8 +1,8 @@
 /**
- * Mina aktiviteter — det du är värd för och det du hakat på.
+ * Mina aktiviteter, det du är värd för och det du hakat på.
  *
  * Sådant som varit ligger kvar under "Varit". Chatten finns kvar där, och
- * därifrån går det att göra om samma sak med samma folk — det är så en
+ * därifrån går det att göra om samma sak med samma folk, det är så en
  * engångsträff blir en vana.
  */
 
@@ -112,7 +112,7 @@ export default function MyActivitiesScreen() {
             title={tab === "hosting" ? "Du är inte värd för något än" : "Du har inte hakat på något än"}
             body={
               tab === "hosting"
-                ? "Lägg upp något du ändå ska göra. Fiska, springa, spela — folk hakar på."
+                ? "Lägg upp något du ändå ska göra. Fiska, springa, spela, folk hakar på."
                 : "Kika i Upptäck och ansök om något som ser kul ut."
             }
             action={{
@@ -181,7 +181,7 @@ function groupPrompts(prompts: RematchPrompt[]): PromptGroup[] {
 /**
  * Frågan efter en genomförd aktivitet.
  *
- * Formulerad kring aktiviteten, inte kring personen — appens jobb är att få
+ * Formulerad kring aktiviteten, inte kring personen, appens jobb är att få
  * folk att göra saker ihop, och "vill du göra det igen" är en mycket lättare
  * fråga att svara ärligt på än "vill du bli kompis".
  */
@@ -229,7 +229,7 @@ function RematchPromptCard({
  * Ett dubbelt ja.
  *
  * Dyker bara upp när båda svarat ja, så det finns ingen risk att det här
- * kortet berättar något om ett nej. Primär åtgärd är att göra något nytt —
+ * kortet berättar något om ett nej. Primär åtgärd är att göra något nytt:
  * inte att bli vänner. Vänskapen är det som händer om det upprepas.
  */
 function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
@@ -260,7 +260,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
     <Card>
       <View
         style={{
-          backgroundColor: theme.color.accentSoft,
+          backgroundColor: theme.color.primarySoft,
           padding: space.lg,
           gap: space.md,
         }}
@@ -298,7 +298,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
         </Row>
 
         <Txt variant="small" tone="faint">
-          Vill ni fortsätta ses kan ni bli BFFs på {match.displayName}s profil —
+          Vill ni fortsätta ses kan ni bli BFFs på {match.displayName}s profil:
           då ser ni varandras privata aktiviteter.
         </Txt>
       </View>

@@ -3,7 +3,7 @@
  *
  * Sessionen ligger i SecureStore (Keychain på iOS, EncryptedSharedPreferences
  * på Android) i stället för AsyncStorage. Det är en BankID-verifierad identitet
- * — en token som ger tillgång till den ska inte ligga i klartext på disk.
+ *, en token som ger tillgång till den ska inte ligga i klartext på disk.
  */
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
@@ -24,7 +24,7 @@ const chunkedSecureStore = {
     const parts: string[] = [];
     for (let i = 0; i < Number(count); i++) {
       const part = await SecureStore.getItemAsync(`${key}.${i}`);
-      if (part === null) return null; // Trasig kedja — behandla som utloggad.
+      if (part === null) return null; // Trasig kedja, behandla som utloggad.
       parts.push(part);
     }
     return parts.join("");

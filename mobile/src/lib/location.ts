@@ -14,7 +14,7 @@ export interface PlaceGuess extends LatLng {
 /**
  * Nuvarande position med områdesnamn.
  *
- * Nekad behörighet är inget fel — appen ska funka ändå, bara med en förvald
+ * Nekad behörighet är inget fel, appen ska funka ändå, bara med en förvald
  * utgångspunkt som användaren kan ändra.
  */
 export async function getCurrentPlace(): Promise<PlaceGuess> {
@@ -52,7 +52,7 @@ export async function describePlace(point: LatLng): Promise<string> {
 }
 
 /**
- * Hemposition att spara på profilen — alltid grovhuggen till ~1 km rutnät.
+ * Hemposition att spara på profilen, alltid grovhuggen till ~1 km rutnät.
  * Appen ska veta ungefär var du bor, aldrig exakt.
  */
 export async function getHomePlace(): Promise<PlaceGuess> {

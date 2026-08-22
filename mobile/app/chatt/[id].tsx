@@ -2,7 +2,7 @@
  * Chatten.
  *
  * Fyra sorters meddelanden: text, bild, plats och lista. De tre sista finns
- * för att det är dem man faktiskt behöver inför något man ska göra ihop —
+ * för att det är dem man faktiskt behöver inför något man ska göra ihop:
  * "här är bryggan", "här är vad vi ska ta med".
  */
 
@@ -271,7 +271,7 @@ export default function ChatScreen() {
                 flex: 1,
                 color: theme.color.text,
                 backgroundColor: theme.color.surfaceAlt,
-                borderRadius: radius.lg,
+                borderRadius: radius.card,
                 paddingHorizontal: space.md,
                 paddingTop: 10,
                 paddingBottom: 10,
@@ -374,8 +374,8 @@ function MessageBubble({
   const bubble = {
     maxWidth: "82%" as const,
     backgroundColor: isMine ? theme.color.primary : theme.color.surface,
-    borderRadius: radius.lg,
-    borderBottomRightRadius: isMine ? 4 : radius.lg,
+    borderRadius: radius.card,
+    borderBottomRightRadius: isMine ? 4 : radius.card,
     padding: space.md,
     gap: space.sm,
   };
@@ -398,7 +398,7 @@ function MessageBubble({
             style={{
               width: 220,
               height: 165,
-              borderRadius: radius.md,
+              borderRadius: radius.field,
               backgroundColor: theme.color.surfaceAlt,
             }}
             contentFit="cover"

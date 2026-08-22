@@ -1,7 +1,7 @@
 /**
  * Chattlistan.
  *
- * Trådar överlever sina aktiviteter med flit — det är efter fisketuren man
+ * Trådar överlever sina aktiviteter med flit, det är efter fisketuren man
  * bestämmer nästa fisketur.
  */
 
@@ -65,7 +65,7 @@ export default function ChatsScreen() {
             <EmptyState
               icon="chatbubbles-outline"
               title="Inga chattar än"
-              body="När någon accepterar din ansökan — eller du accepterar någon annans — hamnar ni i en chatt här."
+              body="När någon accepterar din ansökan, eller du accepterar någon annans, hamnar ni i en chatt här."
               action={{ label: "Hitta något att göra", onPress: () => router.push("/(tabs)") }}
             />
           </View>
@@ -97,7 +97,7 @@ function ThreadRow({ thread, onPress }: { thread: ThreadSummary; onPress: () => 
               style={{
                 width: 52,
                 height: 52,
-                borderRadius: thread.kind === "direct" ? 26 : radius.md,
+                borderRadius: thread.kind === "direct" ? 26 : radius.field,
                 backgroundColor: theme.color.surfaceAlt,
               }}
               contentFit="cover"
@@ -107,7 +107,7 @@ function ThreadRow({ thread, onPress }: { thread: ThreadSummary; onPress: () => 
               style={{
                 width: 52,
                 height: 52,
-                borderRadius: radius.md,
+                borderRadius: radius.field,
                 backgroundColor: theme.color.primarySoft,
                 alignItems: "center",
                 justifyContent: "center",

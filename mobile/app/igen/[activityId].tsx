@@ -2,7 +2,7 @@
  * "Skulle du göra om det?"
  *
  * En person i taget, två knappar. Svaret är privat och den andra får aldrig
- * veta vad du valde — vilket är hela anledningen till att det går att svara
+ * veta vad du valde, vilket är hela anledningen till att det går att svara
  * ärligt. Ett nej gör ingenting alls: ingen siffra, ingen markering, ingen
  * påverkan på personens flöde eller möjlighet att ansöka någonstans.
  *
@@ -55,7 +55,7 @@ export default function RematchScreen() {
               width: 64,
               height: 64,
               borderRadius: radius.pill,
-              backgroundColor: theme.color.accentSoft,
+              backgroundColor: theme.color.primarySoft,
               alignItems: "center",
               justifyContent: "center",
             }}

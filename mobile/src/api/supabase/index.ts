@@ -4,7 +4,7 @@
  * Tunt lager: nästan all logik ligger i databasen som RPC:er och RLS-policies,
  * så det mesta här är att anropa rätt funktion och översätta snake_case till
  * appens camelCase. Regler som "bara värden får acceptera" står medvetet INTE
- * här — de hör hemma i databasen, där de inte kan kringgås av en klient.
+ * här, de hör hemma i databasen, där de inte kan kringgås av en klient.
  */
 
 import * as FileSystem from "expo-file-system";
@@ -137,7 +137,7 @@ export class SupabaseBackend implements Backend {
 
   /* Inloggning ------------------------------------------------------------ */
 
-  /** Anropar edge-funktionen bankid-auth utan session — vi har ingen än. */
+  /** Anropar edge-funktionen bankid-auth utan session, vi har ingen än. */
   private async callBankId(action: string, body: object): Promise<Record<string, unknown>> {
     const response = await fetch(`${SUPABASE_URL}/functions/v1/bankid-auth/${action}`, {
       method: "POST",
@@ -234,7 +234,7 @@ export class SupabaseBackend implements Backend {
   async updateMyProfile(patch: Partial<MyProfile>): Promise<MyProfile> {
     const id = await currentUserId();
 
-    // Endast kolumnerna nedan är skrivbara för `authenticated` — resten
+    // Endast kolumnerna nedan är skrivbara för `authenticated`, resten
     // avvisas av kolumngrants i migrationen även om de skulle skickas med.
     const row: Record<string, unknown> = {};
     if (patch.displayName !== undefined) row.display_name = patch.displayName;
@@ -404,7 +404,7 @@ export class SupabaseBackend implements Backend {
         : Math.max(activity.capacity - accepted.length, 0),
       myStatus: mine?.status ?? null,
       isMine: activity.host_id === me,
-      // RLS returnerar bara ansökningar till värden — listan är tom för andra.
+      // RLS returnerar bara ansökningar till värden, listan är tom för andra.
       applicants: pending,
       accepted,
       threadId: thread?.id ?? null,
@@ -873,7 +873,7 @@ export class SupabaseBackend implements Backend {
   ): Promise<string> {
     const me = await currentUserId();
 
-    // Sökvägen måste börja med ägarens uuid — storage-policyerna läser första
+    // Sökvägen måste börja med ägarens uuid, storage-policyerna läser första
     // mappnivån för att avgöra vem som får skriva. Chattbilder är tråd först,
     // avsändare sedan.
     const folder = pathPrefix ? `${pathPrefix}/${me}` : me;
@@ -890,7 +890,7 @@ export class SupabaseBackend implements Backend {
     fail(error);
 
     if (bucket === "chat-images") {
-      // Privat hink — en signerad länk som håller ett dygn.
+      // Privat hink, en signerad länk som håller ett dygn.
       const { data } = await supabase().storage.from(bucket)
         .createSignedUrl(path, 86_400);
       return data?.signedUrl ?? path;

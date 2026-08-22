@@ -1,7 +1,7 @@
 /**
  * Aktivitetskortet i flödet.
  *
- * Bilden är stor med flit — bildkravet finns för att man ska kunna se vad man
+ * Bilden är stor med flit, bildkravet finns för att man ska kunna se vad man
  * tackar ja till, inte för att fylla en databaskolumn.
  */
 

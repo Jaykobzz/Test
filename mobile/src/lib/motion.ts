@@ -12,7 +12,7 @@
  *      utan betydelse är brus, och brus är precis det som får ett gränssnitt
  *      att kännas billigt.
  *
- * Allt respekterar systemets "minska rörelse" — se useMotion().
+ * Allt respekterar systemets "minska rörelse", se useMotion().
  */
 
 import * as Haptics from "expo-haptics";
@@ -27,7 +27,7 @@ import { useReducedMotion, type WithSpringConfig } from "react-native-reanimated
  * det som gör att snabba upprepade tryck känns följsamma i stället för hackiga.
  */
 export const spring = {
-  /** Tryckrespons. Snärtig, nästan ingen studs — ska kännas som ett membran. */
+  /** Tryckrespons. Snärtig och nästan utan studs, som ett membran. */
   press: { mass: 0.35, stiffness: 620, damping: 32 } satisfies WithSpringConfig,
 
   /** Element som kommer in eller flyttar sig. Lite eftersläpning, ingen studs. */
@@ -47,7 +47,7 @@ export const PRESS_SCALE = 0.972;
  * Fördröjning mellan syskon i en lista som tonar in.
  *
  * 34 ms är avsiktligt kort. Det ska läsas som "listan landar" och inte som
- * att varje kort presenterar sig — den senare varianten är trevlig en gång
+ * att varje kort presenterar sig, den senare varianten är trevlig en gång
  * och outhärdlig den tionde.
  */
 export const STAGGER_MS = 34;
@@ -94,7 +94,7 @@ export const haptic = {
  * Rörelseinställningar för den här enheten.
  *
  * Har användaren slagit på "minska rörelse" i systemet stängs förflyttning och
- * skalning av — men inte opacitet, som är den enda övergången som är trygg vid
+ * skalning av, men inte opacitet, som är den enda övergången som är trygg vid
  * rörelsekänslighet. Det är ett tillgänglighetskrav, inte en artighet.
  */
 export function useMotion() {

@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const hasSession = await getBackend().restoreSession();
         if (active && hasSession) await refresh();
       } catch {
-        // Trasig eller utgången session — användaren får logga in igen.
+        // Trasig eller utgången session, användaren får logga in igen.
       } finally {
         if (active) setLoading(false);
       }
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const deadline = Date.now() + POLL_TIMEOUT_MS;
 
       // Pollar tills BankID är klart. Samma slinga fungerar mot mocken och
-      // mot skarp BankID — det är därför gränssnittet ser ut som det gör.
+      // mot skarp BankID, det är därför gränssnittet ser ut som det gör.
       while (Date.now() < deadline) {
         if (cancelled.current) return;
 

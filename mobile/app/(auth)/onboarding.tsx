@@ -191,7 +191,7 @@ export default function OnboardingScreen() {
       <View
         style={{
           backgroundColor: theme.color.surfaceAlt,
-          borderRadius: radius.md,
+          borderRadius: radius.field,
           padding: space.md,
         }}
       >
@@ -202,7 +202,7 @@ export default function OnboardingScreen() {
               {locating ? "Letar upp ditt område …" : home?.label ?? "Område okänt"}
             </Txt>
             <Txt variant="small" tone="faint">
-              Vi sparar bara ungefär var du bor — aldrig din exakta adress.
+              Vi sparar bara ungefär var du bor, aldrig din exakta adress.
             </Txt>
           </View>
         </Row>

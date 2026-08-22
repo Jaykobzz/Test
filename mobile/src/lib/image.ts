@@ -22,7 +22,7 @@ const PRESETS: Record<ImageBucket, PickOptions> = {
 /**
  * Väljer en bild ur biblioteket och komprimerar den.
  *
- * Returnerar null när användaren avbryter — det är ett normalt utfall och
+ * Returnerar null när användaren avbryter, det är ett normalt utfall och
  * inget att kasta fel för.
  */
 export async function pickImage(bucket: ImageBucket): Promise<string | null> {

@@ -1,5 +1,5 @@
 /**
- * Domäntyper — appens gemensamma vokabulär.
+ * Domäntyper, appens gemensamma vokabulär.
  *
  * De här formerna är det enda både mock-backendet och Supabase-backendet lovar
  * att leverera. Skärmarna vet inte vilket som är inkopplat.
@@ -17,11 +17,11 @@ export type FriendshipStatus = "pending" | "accepted" | "declined";
 export interface Interest {
   slug: string;
   label: string;
-  /** Namn på en Ionicons-linjeikon. Aldrig emoji — se api/interests.ts. */
+  /** Namn på en Ionicons-linjeikon. Aldrig emoji, se api/interests.ts. */
   icon: string;
 }
 
-/** Din egen profil — inkluderar det bara du får se. */
+/** Din egen profil, inkluderar det bara du får se. */
 export interface MyProfile {
   id: Uuid;
   displayName: string;
@@ -38,7 +38,7 @@ export interface MyProfile {
 }
 
 /**
- * Någon annans profil — beskuren. Inga koordinater, inget juridiskt namn.
+ * Någon annans profil, beskuren. Inga koordinater, inget juridiskt namn.
  *
  * Och inget omdöme. Siffrorna här är fakta om vad personen gjort; ingen av
  * dem är någon annans åsikt om hen.
@@ -174,7 +174,7 @@ export interface RematchPrompt {
 }
 
 /**
- * Ett dubbelt ja. Uppstår bara när båda sagt att de vill göra om det —
+ * Ett dubbelt ja. Uppstår bara när båda sagt att de vill göra om det:
  * ett ensidigt ja blir aldrig något alls, och den som sagt nej får aldrig
  * veta att någon sagt ja om hen.
  */

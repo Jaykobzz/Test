@@ -6,7 +6,7 @@
  * ingen har ritat gränssnittet.
  *
  * Banorna ligger i design/icons/icons.json och genereras till paths.ts.
- * Konstruktionsreglerna står i design/icons/SPEC.md — 24×24-rutnät, 1,6 i
+ * Konstruktionsreglerna står i design/icons/SPEC.md, 24×24-rutnät, 1,6 i
  * streck, runda ändar, ingen fyllning, och inget detaljerat mindre än tre
  * enheter eftersom ikonerna renderas så små som 14 px.
  */
@@ -23,7 +23,7 @@ export { ICON_NAMES } from "./paths";
  * Streckvikten skalar inte linjärt med storleken.
  *
  * En ikon på 14 px med 1,6 i streck blir grå gröt; samma ikon på 40 px med
- * samma streck blir spretig. Vikten justeras därför något mot mitten — det är
+ * samma streck blir spretig. Vikten justeras därför något mot mitten, det är
  * samma optiska korrigering en typsnittsformgivare gör mellan brödtext och
  * rubrik.
  */

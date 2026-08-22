@@ -1,5 +1,5 @@
 /**
- * GENERERAD FIL — redigera inte för hand.
+ * GENERERAD FIL. Redigera inte för hand.
  *
  * Källa: design/icons/icons.json
  * Kör:   python3 design/icons/generate.py
@@ -10,7 +10,7 @@
 export interface IconShape {
   /** SVG-bana på ett 24×24-rutnät. */
   d?: string;
-  /** Cirkel som [cx, cy, r]. Används där en bana bara skulle bli krångligare. */
+  /** Cirkel som [cx, cy, r]. Används där en bana bara blir krångligare. */
   c?: readonly [number, number, number];
 }
 

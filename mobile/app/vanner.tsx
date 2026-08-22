@@ -1,5 +1,5 @@
 /**
- * BFFs — de permanenta vännerna.
+ * BFFs, de permanenta vännerna.
  *
  * Skillnaden mot en vanlig aktivitetskompis: BFFs ser aktiviteter du lägger
  * upp med synlighet "bara mina BFFs", och ni kan alltid chatta.

@@ -23,7 +23,7 @@ export function distanceMeters(a: LatLng, b: LatLng): number {
 }
 
 /**
- * Avstånd som text. Under en kilometer avrundas till närmaste hundra meter —
+ * Avstånd som text. Under en kilometer avrundas till närmaste hundra meter:
  * "740 m" låter mer exakt än vad en GPS-position förtjänar.
  */
 export function formatDistance(meters: number | null): string {

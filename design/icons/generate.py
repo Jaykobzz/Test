@@ -4,7 +4,7 @@ Genererar klientens ikonfil ur icons.json.
 
 icons.json är enda källan. Ändra en bana där, kör det här skriptet, och både
 kontaktkartan och appen följer med. Redigera aldrig den genererade filen för
-hand — nästa körning skriver över den.
+hand . nästa körning skriver över den.
 """
 
 import json
@@ -17,7 +17,7 @@ ICONS = json.load(open(HERE / "icons.json"))
 
 lines = [
     "/**",
-    " * GENERERAD FIL — redigera inte för hand.",
+    " * GENERERAD FIL. Redigera inte för hand.",
     " *",
     " * Källa: design/icons/icons.json",
     " * Kör:   python3 design/icons/generate.py",
@@ -28,7 +28,7 @@ lines = [
     "export interface IconShape {",
     "  /** SVG-bana på ett 24×24-rutnät. */",
     "  d?: string;",
-    "  /** Cirkel som [cx, cy, r]. Används där en bana bara skulle bli krångligare. */",
+    "  /** Cirkel som [cx, cy, r]. Används där en bana bara blir krångligare. */",
     "  c?: readonly [number, number, number];",
     "}",
     "",

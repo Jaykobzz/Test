@@ -1,7 +1,7 @@
 /**
  * Utgångsläge för mock-backendet.
  *
- * Aktiviteterna ligger runt södra Stockholm, med Drevviken som mittpunkt —
+ * Aktiviteterna ligger runt södra Stockholm, med Drevviken som mittpunkt:
  * samma trakt som exemplet appen ritades kring. Tiderna är relativa till när
  * du startar appen, så flödet är aldrig tomt och aldrig gammalt.
  */
@@ -145,7 +145,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
     id: "22222222-2222-4222-8222-222222222202",
     hostId: SEED_PROFILES[1]!.id,
     title: "Lugn morgonrunda 5 km",
-    description: "Runt Bagarmossen. Vi springer i pratfart — ingen hets.",
+    description: "Runt Bagarmossen. Vi springer i pratfart, ingen hets.",
     category: "lopning",
     coverUrl: cover("morgonrunda"),
     locationName: "Bagarmossens centrum",
@@ -159,7 +159,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
   {
     id: "22222222-2222-4222-8222-222222222203",
     hostId: SEED_PROFILES[2]!.id,
-    title: "Padel — vi saknar två",
+    title: "Padel, vi saknar två",
     description: "Bokad bana. Nybörjarvänligt, vi kör mest för att det är kul.",
     category: "padel",
     coverUrl: cover("padelbana"),
@@ -251,7 +251,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
   {
     id: "22222222-2222-4222-8222-222222222209",
     hostId: SEED_PROFILES[0]!.id,
-    title: "Svampskogen — bara för BFFs",
+    title: "Svampskogen, bara för BFFs",
     description: "Jag visar mitt kantarellställe. Därför inte offentligt.",
     category: "svamp",
     coverUrl: cover("kantareller"),

@@ -1,5 +1,5 @@
 /**
- * Mock-backend — hela FRIEND utan server.
+ * Mock-backend, hela FRIEND utan server.
  *
  * Syftet är att man ska kunna köra `npx expo start` och klicka igenom flödet
  * på riktigt: logga in, skapa aktivitet, ansöka, acceptera, chatta, betygsätta,
@@ -108,7 +108,7 @@ function acceptedCount(db: MockDb, activityId: Uuid): number {
   ).length;
 }
 
-/** Genomförda aktiviteter personen varit med på — värd eller deltagare. */
+/** Genomförda aktiviteter personen varit med på, värd eller deltagare. */
 function completedActivityCount(db: MockDb, userId: Uuid): number {
   return db.activities.filter(
     (a) =>
@@ -270,7 +270,7 @@ function pushSystemMessage(db: MockDb, threadId: Uuid, body: string): void {
   threadListeners.get(threadId)?.forEach((fn) => fn(toMessage(db, message)));
 }
 
-/** Markerar passerade aktiviteter som genomförda — samma jobb som complete_due_activities(). */
+/** Markerar passerade aktiviteter som genomförda, samma jobb som complete_due_activities(). */
 function completeDueActivities(db: MockDb): void {
   const now = Date.now();
   for (const activity of db.activities) {
@@ -322,7 +322,7 @@ export class MockBackend implements Backend {
 
     if (!userId) {
       // Deterministiskt förnamn ur personnumret, precis som mock-providern
-      // på servern gör — samma testnummer blir samma person.
+      // på servern gör, samma testnummer blir samma person.
       let hash = 0;
       for (const ch of order.pnr) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
       const givenName = FIRST_NAMES[hash % FIRST_NAMES.length]!;
@@ -355,7 +355,7 @@ export class MockBackend implements Backend {
   }
 
   async bankIdCancel(): Promise<void> {
-    // Tillståndslös mock — inget att avbryta.
+    // Tillståndslös mock, inget att avbryta.
   }
 
   async restoreSession(): Promise<boolean> {
@@ -616,7 +616,7 @@ export class MockBackend implements Backend {
 
     participant.status = "accepted";
 
-    // Att acceptera är också det som öppnar chatten — det är hela poängen.
+    // Att acceptera är också det som öppnar chatten, det är hela poängen.
     const threadId = ensureActivityThread(db, activity.id);
     if (!db.threadMembers.some((m) => m.threadId === threadId && m.userId === participant.userId)) {
       db.threadMembers.push({
@@ -652,7 +652,7 @@ export class MockBackend implements Backend {
       );
     }
 
-    // Aktiviteten kan ha varit full — nu finns en plats igen.
+    // Aktiviteten kan ha varit full, nu finns en plats igen.
     const activity = activityOrThrow(db, participant.activityId);
     if (activity.status === "full") activity.status = "open";
 
@@ -940,8 +940,8 @@ export class MockBackend implements Backend {
     const db = await loadDb();
     const me = meOrThrow(db);
 
-    // Bara dubbla ja lämnar den här funktionen. Ett ensidigt ja — åt något
-    // håll — ger ingenting, och den som svarat nej syns aldrig här.
+    // Bara dubbla ja lämnar den här funktionen. Ett ensidigt ja, åt något
+    // håll, ger ingenting, och den som svarat nej syns aldrig här.
     return db.rematches
       .filter((mine) => {
         if (mine.fromUser !== me || !mine.wantsAgain || mine.acknowledgedAt) return false;
@@ -1074,7 +1074,7 @@ export class MockBackend implements Backend {
     if (!db.blocks.some((b) => b.blockerId === me && b.blockedId === userId)) {
       db.blocks.push({ blockerId: me, blockedId: userId });
     }
-    // En blockering upphäver vänskapen — annars ligger de kvar i BFF-listan.
+    // En blockering upphäver vänskapen, annars ligger de kvar i BFF-listan.
     db.friendships = db.friendships.filter(
       (f) =>
         !(
@@ -1102,7 +1102,7 @@ export class MockBackend implements Backend {
   /* Bilder ---------------------------------------------------------------- */
 
   async uploadImage(_bucket: ImageBucket, localUri: string): Promise<string> {
-    // Utan server finns ingen uppladdning — den lokala fil-URI:n duger som
+    // Utan server finns ingen uppladdning, den lokala fil-URI:n duger som
     // "url" eftersom bara den här telefonen ska visa bilden.
     return localUri;
   }

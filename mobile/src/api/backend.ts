@@ -3,7 +3,7 @@
  *
  * Två implementationer uppfyller det: `mock/` (allt lokalt på telefonen, ingen
  * server) och `supabase/` (riktig databas, RLS, BankID). Skärmarna importerar
- * aldrig någon av dem direkt — de går via `getBackend()` i ./index.ts.
+ * aldrig någon av dem direkt, de går via `getBackend()` i ./index.ts.
  */
 
 import type {

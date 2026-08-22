@@ -1,7 +1,7 @@
 /**
  * Inloggning med BankID.
  *
- * I mock-läge räcker vilket rimligt personnummer som helst — samma nummer ger
+ * I mock-läge räcker vilket rimligt personnummer som helst, samma nummer ger
  * alltid samma person, så du kan hoppa mellan två testkonton genom att logga
  * ut och skriva ett annat nummer.
  */
@@ -36,7 +36,7 @@ export default function LoginScreen() {
             style={{
               width: 84,
               height: 84,
-              borderRadius: radius.xl,
+              borderRadius: radius.sheet,
               backgroundColor: theme.color.primary,
               alignItems: "center",
               justifyContent: "center",
@@ -111,7 +111,7 @@ function WaitingCard({ message, onCancel }: { message: string; onCancel: () => v
     <View
       style={{
         backgroundColor: theme.color.surface,
-        borderRadius: radius.lg,
+        borderRadius: radius.card,
         padding: space.xl,
         alignItems: "center",
         gap: space.md,

@@ -3,7 +3,7 @@
  *
  * En snurrande spinner säger "vänta" och ingenting mer. En platshållare som
  * har samma form som det som ska komma säger vad som är på väg och gör att
- * sidan inte hoppar när datan landar — det är skillnaden mellan att vänta och
+ * sidan inte hoppar när datan landar, det är skillnaden mellan att vänta och
  * att se något laddas.
  *
  * Pulsen är opacitet, inte en glidande glans. Glansen är ett webbmanér som
@@ -27,7 +27,7 @@ import { radius, space } from "@/theme";
 export function Skeleton({
   width,
   height = 14,
-  rounded = radius.sm,
+  rounded = radius.field,
   style,
 }: {
   width?: number | `${number}%`;
@@ -71,7 +71,7 @@ export function Skeleton({
   );
 }
 
-/** Ett aktivitetskort under laddning — samma mått som det riktiga kortet. */
+/** Ett aktivitetskort under laddning, samma mått som det riktiga kortet. */
 export function ActivityCardSkeleton() {
   const theme = useTheme();
 
@@ -79,7 +79,7 @@ export function ActivityCardSkeleton() {
     <View
       style={{
         backgroundColor: theme.color.surface,
-        borderRadius: radius.lg,
+        borderRadius: radius.card,
         borderWidth: 1,
         borderColor: theme.color.border,
         overflow: "hidden",

@@ -3,7 +3,7 @@
  *
  * Allt ligger i minnet och speglas till AsyncStorage, så appen kommer ihåg vad
  * du gjort mellan omstarter. Formen efterliknar tabellerna i Postgres med
- * flit — då blir Supabase-implementationen en översättning och inte en
+ * flit, då blir Supabase-implementationen en översättning och inte en
  * omskrivning.
  */
 
@@ -190,7 +190,7 @@ function buildSeed(): MockDb {
     createdAt: new Date(now - 2 * 86_400_000).toISOString(),
   }));
 
-  // Micke och Sara är redan BFF med varandra — visar hur BFF-flödet ser ut.
+  // Micke och Sara är redan BFF med varandra, visar hur BFF-flödet ser ut.
   const friendships: MockFriendship[] = [
     {
       id: "44444444-4444-4444-8444-444444444401",
@@ -230,7 +230,7 @@ export async function loadDb(): Promise<MockDb> {
       return db;
     }
   } catch {
-    // Trasigt lagringsinnehåll ska inte låsa appen — bygg om från seed.
+    // Trasigt lagringsinnehåll ska inte låsa appen, bygg om från seed.
   }
 
   db = buildSeed();

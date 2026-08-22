@@ -2,7 +2,7 @@
  * Någon annans profil.
  *
  * Här finns BFF-knappen, och här finns blockera och anmäl. De två sista ligger
- * medvetet på samma skärm som allt trevligt — man ska inte behöva leta efter
+ * medvetet på samma skärm som allt trevligt, man ska inte behöva leta efter
  * dem när man väl behöver dem.
  */
 
@@ -265,8 +265,8 @@ function BffAction({
     return (
       <View
         style={{
-          backgroundColor: theme.color.accentSoft,
-          borderRadius: radius.md,
+          backgroundColor: theme.color.primarySoft,
+          borderRadius: radius.field,
           padding: space.md,
         }}
       >

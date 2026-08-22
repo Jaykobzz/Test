@@ -1,7 +1,7 @@
 /**
  * Väljer backend en gång vid start.
  *
- * Med EXPO_PUBLIC_USE_MOCK_BACKEND=1 körs allt lokalt på telefonen — bra för
+ * Med EXPO_PUBLIC_USE_MOCK_BACKEND=1 körs allt lokalt på telefonen, bra för
  * att klicka igenom flödet innan Supabase är uppsatt. Annars går appen mot
  * riktig databas.
  */

@@ -2,7 +2,7 @@
  * Skapa aktivitet.
  *
  * Formuläret är byggt kring att det ska gå snabbt att lägga upp "Fiska i
- * Drevviken 13–15". Bild, titel, plats och tid — resten är frivilligt.
+ * Drevviken 13–15". Bild, titel, plats och tid, resten är frivilligt.
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -133,13 +133,13 @@ export default function NewActivityScreen() {
     <Screen scroll edges={[]}>
       <Gap size="lg" />
 
-      {/* Bilden först — det är den folk ser i flödet. */}
+      {/* Bilden först, det är den folk ser i flödet. */}
       <Pressable onPress={chooseCover} accessibilityLabel="Välj omslagsbild">
         {coverUri ? (
           <View>
             <Image
               source={{ uri: coverUri }}
-              style={{ width: "100%", height: 190, borderRadius: radius.lg }}
+              style={{ width: "100%", height: 190, borderRadius: radius.card }}
               contentFit="cover"
             />
             <View
@@ -164,7 +164,7 @@ export default function NewActivityScreen() {
           <View
             style={{
               height: 190,
-              borderRadius: radius.lg,
+              borderRadius: radius.card,
               backgroundColor: theme.color.primarySoft,
               borderWidth: 2,
               borderStyle: "dashed",
@@ -176,7 +176,7 @@ export default function NewActivityScreen() {
           >
             <Ionicons name="image" size={30} color={theme.color.primary} />
             <Txt variant="smallStrong" tone="primary">Välj en bild</Txt>
-            <Txt variant="small" tone="muted">Krav — det är den som får folk att haka på</Txt>
+            <Txt variant="small" tone="muted">Krav, det är den som får folk att haka på</Txt>
           </View>
         )}
       </Pressable>
@@ -245,7 +245,7 @@ export default function NewActivityScreen() {
       <View
         style={{
           backgroundColor: theme.color.surface,
-          borderRadius: radius.md,
+          borderRadius: radius.field,
           borderWidth: 1,
           borderColor: theme.color.border,
           padding: space.md,
@@ -396,7 +396,7 @@ function VisibilityChoice({
               alignItems: "center",
               gap: space.md,
               padding: space.md,
-              borderRadius: radius.md,
+              borderRadius: radius.field,
               borderWidth: 1.5,
               borderColor: selected ? theme.color.primary : theme.color.border,
               backgroundColor: selected ? theme.color.primarySoft : theme.color.surface,
