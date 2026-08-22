@@ -16,7 +16,7 @@
 --      eller "väntar på svar"; då läcker tvetydigheten bort.
 --
 -- Frågan är formulerad kring aktiviteten, inte kring personen: appens jobb är
--- att få folk att göra saker ihop. Vänskapen är vad som händer om det
+-- att få folk att göra saker ihop. Kompisrelationen är vad som händer om det
 -- upprepas.
 
 set search_path = public, extensions;

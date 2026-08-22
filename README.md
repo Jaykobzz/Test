@@ -9,8 +9,8 @@ ska göra.
 
 Efteråt får ni frågan om ni vill göra om det. Vill båda det hörs ni av — vill
 bara den ena det händer ingenting alls, och ingen får veta. Gör ni om det
-tillräckligt många gånger har ni blivit vänner. Det är ordningen: **aktiviteten
-är produkten, vänskapen är vad som växer ur den.**
+tillräckligt många gånger har ni blivit kompisar. Det är ordningen: **aktiviteten
+är produkten, kompisarna är vad som växer ur den.**
 
 Alla är verifierade med BankID. Inga anonyma konton, inga profiler utan bild.
 Och ingen betygsätter någon — se nedan.
@@ -107,10 +107,10 @@ Ansökan ──accepteras av värden──▶ Chattgrupp ──slut──▶ "G�
                                        └──────────────▶  Boka in nästa
                                           chatten kvar        │
                                                               ▼
-                                                        Vänförfrågan
+                                                        Kompisförfrågan
                                                               │
                                                               ▼
-                                              Aktiviteter bara för vänner
+                                              Aktiviteter bara för kompisar
 ```
 
 Att acceptera någon är den enda handling som skapar en chatt. Det är med

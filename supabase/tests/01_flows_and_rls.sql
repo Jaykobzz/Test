@@ -63,7 +63,7 @@ values ('bbbbbbbb-0000-4000-8000-000000000001',
         now() + interval '20 hours', now() + interval '22 hours',
         'public', 2);
 
--- Samma värd, men bara för vänner.
+-- Samma värd, men bara för kompisar.
 insert into activities (id, host_id, title, cover_url, location_name, lat, lng,
                         starts_at, ends_at, visibility)
 values ('bbbbbbbb-0000-4000-8000-000000000002',
@@ -76,18 +76,18 @@ select assert_true(
   'värden ser sina egna aktiviteter');
 commit;
 
-/* Synlighet: Sara ser den publika men inte vän-aktiviteten -------------- */
+/* Synlighet: Sara ser den publika men inte kompis-aktiviteten -------------- */
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
 select assert_true(
   (select count(*) from activities) = 1,
-  'utan vän syns bara den publika aktiviteten');
+  'utan kompis syns bara den publika aktiviteten');
 
 select assert_true(
   (select count(*) from discover_activities(59.2700, 18.1300, 15000)) = 1,
-  'discover_activities döljer vän-aktiviteten för utomstående');
+  'discover_activities döljer kompis-aktiviteten för utomstående');
 
 select assert_true(
   (select count(*) from discover_activities(59.2700, 18.1300, 200)) = 0,
@@ -238,7 +238,7 @@ select assert_true(
   'aktiviteten stängs när sista platsen tas');
 commit;
 
-/* vän: efter accepterad vänskap syns vän-aktiviteten ------------------- */
+/* kompis: efter accepterad kompisförfrågan syns kompis-aktiviteten ------------------- */
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
@@ -257,11 +257,11 @@ set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
 select assert_true(
   are_friends(auth.uid(), 'aaaaaaaa-0000-4000-8000-000000000001'),
-  'vänskapen är ömsesidig');
+  'kompisrelationen är ömsesidig');
 
 select assert_true(
   (select count(*) from activities where visibility = 'friends') = 1,
-  'vän ser nu den privata aktiviteten');
+  'kompis ser nu den privata aktiviteten');
 commit;
 
 begin;
@@ -269,7 +269,7 @@ set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000003';
 select assert_true(
   (select count(*) from activities where visibility = 'friends') = 0,
-  'den som inte är vän ser den fortfarande inte');
+  'den som inte är kompis ser den fortfarande inte');
 commit;
 
 /* Profilsekretess ------------------------------------------------------ */

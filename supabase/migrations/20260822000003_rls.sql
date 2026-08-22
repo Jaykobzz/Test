@@ -153,17 +153,17 @@ create policy "bocka av i delade listor" on messages
 -- ---------------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------------
--- friendships — vän
+-- friendships — kompis
 -- ---------------------------------------------------------------------------
 
-create policy "se dina vänskapsrelationer" on friendships
+create policy "se dina kompisrelationer" on friendships
   for select to authenticated
   using (
     requester_id = (select auth.uid())
     or addressee_id = (select auth.uid())
   );
 
-create policy "avsluta en vänskap" on friendships
+create policy "avsluta en kompisrelation" on friendships
   for delete to authenticated
   using (
     requester_id = (select auth.uid())

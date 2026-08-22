@@ -1,7 +1,7 @@
 /**
  * Någon annans profil.
  *
- * Här finns vänknappen, och här finns blockera och anmäl. De två sista ligger
+ * Här finns kompisknappen, och här finns blockera och anmäl. De två sista ligger
  * medvetet på samma skärm som allt trevligt, man ska inte behöva leta efter
  * dem när man väl behöver dem.
  */
@@ -175,7 +175,7 @@ export default function PersonScreen() {
         <Row gap="sm" justify="space-around">
           <Stat value={person.activitiesHosted} label="värd för" />
           <Stat value={person.activitiesJoined} label="varit med på" />
-          <Stat value={person.friendCount} label="vänner" />
+          <Stat value={person.friendCount} label="kompisar" />
         </Row>
 
         <Gap size="xl" />
@@ -272,11 +272,11 @@ function FriendAction({
       >
         <Row gap="sm" justify="center">
           <Ionicons name="heart" size={17} color={theme.color.accent} />
-          <Txt variant="bodyStrong">Ni är vänner</Txt>
+          <Txt variant="bodyStrong">Ni är kompisar</Txt>
         </Row>
         <Gap size="xs" />
         <Txt variant="small" tone="muted" align="center">
-          {person.displayName} ser aktiviteter du lägger upp bara för vänner.
+          {person.displayName} ser aktiviteter du lägger upp bara för kompisar.
         </Txt>
       </View>
     );
@@ -286,7 +286,7 @@ function FriendAction({
     return (
       <View style={{ gap: space.sm }}>
         <Txt variant="small" tone="muted" align="center">
-          {person.displayName} vill bli vän med dig.
+          {person.displayName} vill bli kompis med dig.
         </Txt>
         <Row gap="sm">
           <View style={{ flex: 1 }}>
@@ -307,14 +307,14 @@ function FriendAction({
   if (person.friendStatus === "pending") {
     return (
       <Txt variant="small" tone="faint" align="center">
-        Du har frågat om att bli vän. Väntar på svar.
+        Du har frågat om att bli kompis. Väntar på svar.
       </Txt>
     );
   }
 
   return (
     <Button
-      label="Bli vän"
+      label="Bli kompis"
       icon="heart-outline"
       onPress={onRequest}
       loading={working}

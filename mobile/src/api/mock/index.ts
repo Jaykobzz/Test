@@ -3,7 +3,7 @@
  *
  * Syftet är att man ska kunna köra `npx expo start` och klicka igenom flödet
  * på riktigt: logga in, skapa aktivitet, ansöka, acceptera, chatta, betygsätta,
- * bli vän. Ingen Supabase, ingen inloggning mot något externt.
+ * bli kompis. Ingen Supabase, ingen inloggning mot något externt.
  *
  * Reglerna nedan speglar RLS-policyerna och RPC-kontrollerna i databasen. Om
  * du ändrar en regel här ska motsvarande ändring göras i migrationerna, annars
@@ -989,7 +989,7 @@ export class MockBackend implements Backend {
     }
   }
 
-  /* vän ------------------------------------------------------------------- */
+  /* kompis ------------------------------------------------------------------- */
 
   async listFriends(): Promise<PublicProfile[]> {
     const db = await loadDb();
@@ -1019,7 +1019,7 @@ export class MockBackend implements Backend {
   async requestFriend(userId: Uuid): Promise<void> {
     const db = await loadDb();
     const me = meOrThrow(db);
-    if (me === userId) throw new Error("Du är redan din egen bästa vän");
+    if (me === userId) throw new Error("Du är redan din egen bästa kompis");
 
     const existing = friendshipBetween(db, me, userId);
 
@@ -1074,7 +1074,7 @@ export class MockBackend implements Backend {
     if (!db.blocks.some((b) => b.blockerId === me && b.blockedId === userId)) {
       db.blocks.push({ blockerId: me, blockedId: userId });
     }
-    // En blockering upphäver vänskapen, annars ligger de kvar i vänlistan.
+    // En blockering upphäver kompisrelationen, annars ligger de kvar i kompislistan.
     db.friendships = db.friendships.filter(
       (f) =>
         !(

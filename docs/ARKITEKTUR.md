@@ -42,7 +42,7 @@ profiles ──┬──< activities ──< activity_participants
            │                  └──< messages
            │
            ├──< rematch_signals  ("göra om det?", privat)
-           ├──< friendships   (vän, ett par = en rad)
+           ├──< friendships   (kompis, ett par = en rad)
            ├──< blocks
            └──< reports
 ```
@@ -57,7 +57,7 @@ chattgrupp; en direktchatt har ingen aktivitet. `check`-villkoret
 värden accepterar sin första deltagare. En aktivitet ingen hakat på har ingen
 tom tråd liggande.
 
-**Vänskap lagras som ett par, inte två rader.** Ett unikt index på
+**Kompisrelation lagras som ett par, inte två rader.** Ett unikt index på
 `(least(a,b), greatest(a,b))` gör spegelvända dubbletter omöjliga.
 `request_friend()` känner igen en förfrågan åt andra hållet och tolkar den nya
 som ett ja.
@@ -76,7 +76,7 @@ Tre lager, i den ordningen:
    (`can_see_activity`, `is_thread_member`, `are_friends` …) är `security definer`
    just för att policies annars skulle läsa samma tabell de skyddar och ge
    oändlig rekursion.
-3. **RPC:er.** Allt som har regler — ansöka, acceptera, öppna en chatt, bli vän —
+3. **RPC:er.** Allt som har regler — ansöka, acceptera, öppna en chatt, bli kompis —
    går genom en funktion som validerar först. Tabellerna saknar därför
    insert-policies för de operationerna. Det är avsiktligt.
 
@@ -164,7 +164,7 @@ andra vill samma sak.
 Frågan är formulerad kring aktiviteten, inte kring personen — *"skulle du göra
 om det med Sara?"*, inte *"vill du bli kompis med Sara?"*. Det är en mycket
 lättare fråga att svara ärligt på, och den speglar vad appen är till för.
-Vänskap är det som växer ur upprepningen, inte det man ansöker om.
+Kompisrelation är det som växer ur upprepningen, inte det man ansöker om.
 
 ### Tre egenskaper, och vad som skyddar dem
 

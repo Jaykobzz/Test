@@ -247,7 +247,7 @@ $$;
 
 comment on function discover_activities is
   'Flödet i Upptäck. Filtrerar på radie, tid och intresse, och respekterar '
-  'både blockeringar och vänsynlighet.';
+  'både blockeringar och kompissynlighet.';
 
 -- ---------------------------------------------------------------------------
 -- Ansök om att haka på
@@ -437,7 +437,7 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- Direktchatt mellan två personer (vän eller tidigare aktivitetskompisar)
+-- Direktchatt mellan två personer (kompis eller tidigare aktivitetskompisar)
 -- ---------------------------------------------------------------------------
 
 create or replace function ensure_direct_thread(p_other uuid)
@@ -503,7 +503,7 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- vän
+-- kompis
 -- ---------------------------------------------------------------------------
 
 create or replace function request_friend(p_other uuid)
@@ -520,7 +520,7 @@ begin
     raise exception 'Inte inloggad' using errcode = '28000';
   end if;
   if v_me = p_other then
-    raise exception 'Du är redan din egen bästa vän' using errcode = '22023';
+    raise exception 'Du är redan din egen bästa kompis' using errcode = '22023';
   end if;
   if is_blocked_between(v_me, p_other) then
     raise exception 'Går inte' using errcode = '42501';

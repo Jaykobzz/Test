@@ -74,7 +74,7 @@ export interface Backend {
   rematches(): Promise<Rematch[]>;
   acknowledgeRematch(activityId: Uuid, userId: Uuid): Promise<void>;
 
-  /* vän ------------------------------------------------------------------- */
+  /* kompis ------------------------------------------------------------------- */
   listFriends(): Promise<PublicProfile[]>;
   listFriendRequests(): Promise<FriendRequest[]>;
   requestFriend(userId: Uuid): Promise<void>;

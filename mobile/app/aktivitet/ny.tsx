@@ -376,7 +376,7 @@ function VisibilityChoice({
     {
       key: "friends",
       icon: "heart",
-      title: "Bara mina vänner",
+      title: "Bara mina kompisar",
       body: "Ingen annan ser den. Bra för sånt du bara delar med folk du känner.",
     },
   ];

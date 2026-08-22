@@ -190,7 +190,7 @@ function buildSeed(): MockDb {
     createdAt: new Date(now - 2 * 86_400_000).toISOString(),
   }));
 
-  // Micke och Sara är redan vän med varandra, visar hur vänflödet ser ut.
+  // Micke och Sara är redan kompis med varandra, visar hur kompisflödet ser ut.
   const friendships: MockFriendship[] = [
     {
       id: "44444444-4444-4444-8444-444444444401",

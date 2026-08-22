@@ -130,7 +130,7 @@ async function resolveUser(
     legal_given_name: givenName,
     legal_family_name: surname,
     birth_year: birthYear,
-    display_name: givenName || "Ny vän",
+    display_name: givenName || "Ny kompis",
     avatar_url: "pending",
   });
 

@@ -153,7 +153,7 @@ export default function ProfileScreen() {
 
         <Gap size="xl" />
 
-        <Card onPress={() => router.push("/vanner")}>
+        <Card onPress={() => router.push("/kompisar")}>
           <View style={{ padding: space.lg }}>
             <Row justify="space-between">
               <Row gap="md">
@@ -170,7 +170,7 @@ export default function ProfileScreen() {
                   <Ionicons name="heart" size={20} color={theme.color.accent} />
                 </View>
                 <View>
-                  <Txt variant="bodyStrong">Vänner</Txt>
+                  <Txt variant="bodyStrong">Kompisar</Txt>
                   <Txt variant="small" tone="muted">
                     {friends.length === 0
                       ? "Inga än"

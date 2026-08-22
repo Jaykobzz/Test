@@ -141,7 +141,7 @@ create index activities_host_idx      on activities (host_id);
 create index activities_status_idx    on activities (status) where status = 'open';
 
 comment on column activities.visibility is
-  'public = syns för alla i närheten. friends = syns bara för värdens accepterade vänner:s.';
+  'public = syns för alla i närheten. friends = syns bara för värdens accepterade kompisar:s.';
 -- ---------------------------------------------------------------------------
 -- Ansökningar om att haka på
 -- ---------------------------------------------------------------------------
@@ -226,7 +226,7 @@ create table messages (
 create index messages_thread_idx on messages (thread_id, created_at desc);
 
 -- ---------------------------------------------------------------------------
--- vän
+-- kompis
 -- ---------------------------------------------------------------------------
 
 create table friendships (

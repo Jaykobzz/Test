@@ -768,7 +768,7 @@ export class SupabaseBackend implements Backend {
     fail(error);
   }
 
-  /* vän ------------------------------------------------------------------- */
+  /* kompis ------------------------------------------------------------------- */
 
   async listFriends(): Promise<PublicProfile[]> {
     const me = await currentUserId();

@@ -1,8 +1,8 @@
 /**
- * vänner, de permanenta vännerna.
+ * kompisar, de permanenta kompisarna.
  *
- * Skillnaden mot en vanlig aktivitetskompis: vänner ser aktiviteter du lägger
- * upp med synlighet "bara mina vänner", och ni kan alltid chatta.
+ * Skillnaden mot en vanlig aktivitetskompis: kompisar ser aktiviteter du lägger
+ * upp med synlighet "bara mina kompisar", och ni kan alltid chatta.
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -71,7 +71,7 @@ export default function FriendsScreen() {
       >
         {incoming.length > 0 && (
           <>
-            <Txt variant="heading">Vill bli vän med dig</Txt>
+            <Txt variant="heading">Vill bli kompis med dig</Txt>
             {incoming.map((request) => (
               <Card key={request.friendshipId}>
                 <View style={{ padding: space.lg, gap: space.md }}>
@@ -117,14 +117,14 @@ export default function FriendsScreen() {
         {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 ? (
           <EmptyState
             icon="heart-outline"
-            title="Inga vänner än"
-            body="När du varit med om något kul med någon kan du fråga om ni ska bli vänner. Då ser ni varandras privata aktiviteter."
+            title="Inga kompisar än"
+            body="När du varit med om något kul med någon kan du fråga om ni ska bli kompisar. Då ser ni varandras privata aktiviteter."
             action={{ label: "Hitta något att göra", onPress: () => router.push("/(tabs)") }}
           />
         ) : (
           friends.length > 0 && (
             <>
-              <Txt variant="heading">Dina vänner ({friends.length})</Txt>
+              <Txt variant="heading">Dina kompisar ({friends.length})</Txt>
               {friends.map((person) => (
                 <Card key={person.id} onPress={() => router.push(`/person/${person.id}`)}>
                   <View style={{ padding: space.lg }}>

@@ -230,7 +230,7 @@ function RematchPromptCard({
  *
  * Dyker bara upp när båda svarat ja, så det finns ingen risk att det här
  * kortet berättar något om ett nej. Primär åtgärd är att göra något nytt:
- * inte att bli vänner. Vänskapen är det som händer om det upprepas.
+ * inte att bli kompisar. Kompisrelationen är det som händer om det upprepas.
  */
 function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
   const theme = useTheme();
@@ -298,7 +298,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
         </Row>
 
         <Txt variant="small" tone="faint">
-          Vill ni fortsätta ses kan ni bli vänner på {match.displayName}s profil:
+          Vill ni fortsätta ses kan ni bli kompisar på {match.displayName}s profil:
           då ser ni varandras privata aktiviteter.
         </Txt>
       </View>

@@ -38,7 +38,7 @@ export function ActivityListItem({
         />
 
         <Row gap="xs" wrap style={{ position: "absolute", top: space.md, left: space.md }}>
-          {activity.visibility === "friends" && <Badge label="Bara vänner" icon="heart" tone="accent" />}
+          {activity.visibility === "friends" && <Badge label="Bara kompisar" icon="heart" tone="accent" />}
           {activity.myStatus === "pending" && <Badge label="Ansökt" tone="dark" />}
           {activity.myStatus === "accepted" && <Badge label="Du är med" tone="primary" />}
           {activity.isMine && <Badge label="Din aktivitet" tone="dark" />}
