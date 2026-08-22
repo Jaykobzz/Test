@@ -7,3 +7,8 @@ __pycache__/
 *.pyc
 # Seedad canvasfil, byggs om ur design/mockup/*.dc.html
 design/mockup/haka-pa-skarmar.html
+
+# Mellansteg vid rendering av skärmbilderna. PNG:erna checkas in, HTML:en
+# byggs om av design/skarmar/bygg.py och innehåller inbäddade foton.
+design/skarmar/png/*.html
+design/skarmar/node_modules/

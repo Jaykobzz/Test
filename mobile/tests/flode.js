@@ -19,13 +19,16 @@ for (const ext of [".jpg", ".jpeg", ".png"]) {
 const memory = new Map();
 const stubs = {
   "react-native": {
+    __esModule: true,
     Image: { resolveAssetSource: (m) => ({ uri: (m && m.uri) || "stub" }) },
   },
   "@react-native-async-storage/async-storage": {
+    __esModule: true,
     default: {
       getItem: async (k) => (memory.has(k) ? memory.get(k) : null),
       setItem: async (k, v) => { memory.set(k, v); },
       removeItem: async (k) => { memory.delete(k); },
+      multiRemove: async (ks) => { ks.forEach((k) => memory.delete(k)); },
     },
   },
 };

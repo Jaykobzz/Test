@@ -22,7 +22,23 @@ import type {
 } from "../types";
 import { DEFAULT_LOCATION, SEED_ACTIVITIES, SEED_PROFILES } from "./seed";
 
-const STORAGE_KEY = "friend.mock.db.v1";
+/**
+ * Höj numret så fort MockDb byter form.
+ *
+ * Den sparade databasen ligger kvar i telefonen mellan omgångar. Utan ett
+ * versionsnummer läses en gammal form in i ny kod, och resultatet är inte en
+ * krasch utan något värre: fält som saknas blir undefined och funktioner ser
+ * ut att vara trasiga fast de är rätt byggda. Byter nyckeln namn börjar
+ * appen i stället om från seed, vilket är det enda rimliga för testdata.
+ *
+ * v2: aktiviteter fick kind, deltagare fick experience och en obligatorisk
+ *     introMessage, och appen bytte namn från FRIEND till Haka på.
+ */
+const SCHEMA_VERSION = 2;
+const STORAGE_KEY = `hakapa.mock.db.v${SCHEMA_VERSION}`;
+
+/** Nycklar från tidigare former. Städas bort så de inte ligger och tar plats. */
+const OLD_KEYS = ["friend.mock.db.v1"];
 
 export interface MockProfile {
   id: Uuid;
@@ -253,6 +269,11 @@ export async function loadDb(): Promise<MockDb> {
 
   db = buildSeed();
   await persist();
+  try {
+    void AsyncStorage.multiRemove(OLD_KEYS).catch(() => undefined);
+  } catch {
+    // Städning av gamla nycklar är aldrig värd att starta om appen för.
+  }
   return db;
 }
 
