@@ -121,6 +121,26 @@ export const SEED_PROFILES: SeedProfile[] = [
     birthYear: 1992,
     memberForDays: 60,
   },
+  {
+    id: "11111111-1111-4111-8111-111111111109",
+    displayName: "Amir",
+    bio: "Uppvuxen i Farsta. Spelar fotboll på grus när ingen annan orkar.",
+    avatarUrl: avatar(51),
+    interests: ["fotboll", "skateboard", "middag"],
+    homeAreaLabel: "Farsta",
+    birthYear: 1990,
+    memberForDays: 150,
+  },
+  {
+    id: "11111111-1111-4111-8111-111111111110",
+    displayName: "Thu",
+    bio: "Flyttade hit förra året. Vill prata svenska med någon som inte har bråttom.",
+    avatarUrl: avatar(38),
+    interests: ["sprak", "cykling", "foto"],
+    homeAreaLabel: "Årsta",
+    birthYear: 1997,
+    memberForDays: 40,
+  },
 ];
 
 export const SEED_ACTIVITIES: SeedActivity[] = [
