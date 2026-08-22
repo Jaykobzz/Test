@@ -31,7 +31,7 @@
     "android": {
       "package": "se.hakapa.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon-foreground.png",
         "backgroundColor": "#15604B"
       },
       "permissions": [
