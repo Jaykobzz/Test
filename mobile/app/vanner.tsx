@@ -1,8 +1,8 @@
 /**
- * BFFs, de permanenta vännerna.
+ * vänner, de permanenta vännerna.
  *
- * Skillnaden mot en vanlig aktivitetskompis: BFFs ser aktiviteter du lägger
- * upp med synlighet "bara mina BFFs", och ni kan alltid chatta.
+ * Skillnaden mot en vanlig aktivitetskompis: vänner ser aktiviteter du lägger
+ * upp med synlighet "bara mina vänner", och ni kan alltid chatta.
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,7 @@ import { Alert, Pressable, RefreshControl, ScrollView, View } from "react-native
 import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
-import type { BffRequest, PublicProfile } from "@/api/types";
+import type { FriendRequest, PublicProfile } from "@/api/types";
 import {
   Avatar, Button, Card, Credentials, EmptyState, Gap, Loading, Row, Screen, Txt,
 } from "@/components/ui";
@@ -23,18 +23,18 @@ export default function FriendsScreen() {
   const router = useRouter();
   const theme = useTheme();
 
-  const [bffs, setBffs] = useState<PublicProfile[]>([]);
-  const [requests, setRequests] = useState<BffRequest[]>([]);
+  const [friends, setFriends] = useState<PublicProfile[]>([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const [friends, pending] = await Promise.all([
-        getBackend().listBffs(),
-        getBackend().listBffRequests(),
+        getBackend().listFriends(),
+        getBackend().listFriendRequests(),
       ]);
-      setBffs(friends);
+      setFriends(friends);
       setRequests(pending);
     } finally {
       setLoading(false);
@@ -48,7 +48,7 @@ export default function FriendsScreen() {
 
   async function respond(friendshipId: string, accept: boolean) {
     try {
-      await getBackend().respondBff(friendshipId, accept);
+      await getBackend().respondFriend(friendshipId, accept);
       await load();
     } catch (error) {
       Alert.alert("Gick inte", describe(error));
@@ -71,7 +71,7 @@ export default function FriendsScreen() {
       >
         {incoming.length > 0 && (
           <>
-            <Txt variant="heading">Vill bli BFF med dig</Txt>
+            <Txt variant="heading">Vill bli vän med dig</Txt>
             {incoming.map((request) => (
               <Card key={request.friendshipId}>
                 <View style={{ padding: space.lg, gap: space.md }}>
@@ -114,18 +114,18 @@ export default function FriendsScreen() {
           </>
         )}
 
-        {bffs.length === 0 && incoming.length === 0 && outgoing.length === 0 ? (
+        {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 ? (
           <EmptyState
             icon="heart-outline"
-            title="Inga BFFs än"
-            body="När du varit med om något kul med någon kan du fråga om ni ska bli BFFs. Då ser ni varandras privata aktiviteter."
+            title="Inga vänner än"
+            body="När du varit med om något kul med någon kan du fråga om ni ska bli vänner. Då ser ni varandras privata aktiviteter."
             action={{ label: "Hitta något att göra", onPress: () => router.push("/(tabs)") }}
           />
         ) : (
-          bffs.length > 0 && (
+          friends.length > 0 && (
             <>
-              <Txt variant="heading">Dina BFFs ({bffs.length})</Txt>
-              {bffs.map((person) => (
+              <Txt variant="heading">Dina vänner ({friends.length})</Txt>
+              {friends.map((person) => (
                 <Card key={person.id} onPress={() => router.push(`/person/${person.id}`)}>
                   <View style={{ padding: space.lg }}>
                     <Row justify="space-between">

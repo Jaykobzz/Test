@@ -153,7 +153,7 @@ create policy "bocka av i delade listor" on messages
 -- ---------------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------------
--- friendships — BFF
+-- friendships — vän
 -- ---------------------------------------------------------------------------
 
 create policy "se dina vänskapsrelationer" on friendships
@@ -204,9 +204,9 @@ grant execute on function discover_activities(double precision, double precision
 grant execute on function apply_to_activity(uuid, text)       to authenticated;
 grant execute on function decide_application(uuid, boolean)   to authenticated;
 grant execute on function ensure_direct_thread(uuid)          to authenticated;
-grant execute on function request_bff(uuid)                   to authenticated;
-grant execute on function respond_bff(uuid, boolean)          to authenticated;
-grant execute on function are_bffs(uuid, uuid)                to authenticated;
+grant execute on function request_friend(uuid)                   to authenticated;
+grant execute on function respond_friend(uuid, boolean)          to authenticated;
+grant execute on function are_friends(uuid, uuid)                to authenticated;
 grant execute on function complete_due_activities()           to authenticated;
 
 -- Predikaten anropas av RLS internt och behöver inga klientgrants.

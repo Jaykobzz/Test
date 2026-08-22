@@ -298,7 +298,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
         </Row>
 
         <Txt variant="small" tone="faint">
-          Vill ni fortsätta ses kan ni bli BFFs på {match.displayName}s profil:
+          Vill ni fortsätta ses kan ni bli vänner på {match.displayName}s profil:
           då ser ni varandras privata aktiviteter.
         </Txt>
       </View>

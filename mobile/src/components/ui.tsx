@@ -606,7 +606,7 @@ export function EmptyState({
   );
 }
 
-/** Liten etikett ovanpå bilder, t.ex. "3 platser kvar" eller "Bara BFFs". */
+/** Liten etikett ovanpå bilder, t.ex. "3 platser kvar" eller "Bara vänner". */
 export function Badge({
   label,
   icon,

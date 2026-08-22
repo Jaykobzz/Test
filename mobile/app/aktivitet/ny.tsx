@@ -374,9 +374,9 @@ function VisibilityChoice({
       body: "Syns i flödet för alla som är i området.",
     },
     {
-      key: "bff",
+      key: "friends",
       icon: "heart",
-      title: "Bara mina BFFs",
+      title: "Bara mina vänner",
       body: "Ingen annan ser den. Bra för sånt du bara delar med folk du känner.",
     },
   ];

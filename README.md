@@ -107,10 +107,10 @@ Ansökan ──accepteras av värden──▶ Chattgrupp ──slut──▶ "G�
                                        └──────────────▶  Boka in nästa
                                           chatten kvar        │
                                                               ▼
-                                                        BFF-förfrågan
+                                                        Vänförfrågan
                                                               │
                                                               ▼
-                                              Aktiviteter bara för BFFs
+                                              Aktiviteter bara för vänner
 ```
 
 Att acceptera någon är den enda handling som skapar en chatt. Det är med

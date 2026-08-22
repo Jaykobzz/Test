@@ -155,8 +155,8 @@ export default function ActivityScreen() {
 
         <View style={{ padding: space.lg }}>
           <Row gap="xs" wrap>
-            {activity.visibility === "bff" && (
-              <Badge label="Bara BFFs" icon="heart" tone="accent" />
+            {activity.visibility === "friends" && (
+              <Badge label="Bara vänner" icon="heart" tone="accent" />
             )}
             {activity.status === "cancelled" && <Badge label="Inställd" tone="dark" />}
             {past && activity.status !== "cancelled" && <Badge label="Har varit" tone="dark" />}

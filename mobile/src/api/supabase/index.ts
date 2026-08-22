@@ -16,7 +16,7 @@ import type {
   Applicant,
   BankIdCollect,
   BankIdStart,
-  BffRequest,
+  FriendRequest,
   CreateActivityInput,
   DiscoverParams,
   FriendshipStatus,
@@ -48,7 +48,7 @@ interface ProfileRow {
   member_since: string;
   activities_hosted: number;
   activities_joined: number;
-  bff_count: number;
+  friend_count: number;
 }
 
 interface ActivityRow {
@@ -95,10 +95,10 @@ function toPublicProfile(
     memberSince: row.member_since,
     activitiesHosted: row.activities_hosted,
     activitiesJoined: row.activities_joined,
-    bffCount: row.bff_count,
-    bffStatus: friendship?.status ?? "none",
-    bffRequestId: friendship?.id ?? null,
-    bffAwaitingMyAnswer:
+    friendCount: row.friend_count,
+    friendStatus: friendship?.status ?? "none",
+    friendRequestId: friendship?.id ?? null,
+    friendAwaitingMyAnswer:
       !!friendship && friendship.status === "pending" && friendship.addressee_id === meId,
   };
 }
@@ -768,9 +768,9 @@ export class SupabaseBackend implements Backend {
     fail(error);
   }
 
-  /* BFF ------------------------------------------------------------------- */
+  /* vän ------------------------------------------------------------------- */
 
-  async listBffs(): Promise<PublicProfile[]> {
+  async listFriends(): Promise<PublicProfile[]> {
     const me = await currentUserId();
 
     const { data, error } = await supabase()
@@ -791,11 +791,11 @@ export class SupabaseBackend implements Backend {
 
     return (profiles ?? []).map((p) => ({
       ...toPublicProfile(p as ProfileRow, undefined, me),
-      bffStatus: "accepted" as const,
+      friendStatus: "accepted" as const,
     }));
   }
 
-  async listBffRequests(): Promise<BffRequest[]> {
+  async listFriendRequests(): Promise<FriendRequest[]> {
     const me = await currentUserId();
 
     const { data, error } = await supabase()
@@ -827,18 +827,18 @@ export class SupabaseBackend implements Backend {
     });
   }
 
-  async requestBff(userId: Uuid): Promise<void> {
-    const { error } = await supabase().rpc("request_bff", { p_other: userId });
+  async requestFriend(userId: Uuid): Promise<void> {
+    const { error } = await supabase().rpc("request_friend", { p_other: userId });
     fail(error);
   }
 
-  async respondBff(friendshipId: Uuid, accept: boolean): Promise<void> {
+  async respondFriend(friendshipId: Uuid, accept: boolean): Promise<void> {
     const { error } = await supabase()
-      .rpc("respond_bff", { p_friendship_id: friendshipId, p_accept: accept });
+      .rpc("respond_friend", { p_friendship_id: friendshipId, p_accept: accept });
     fail(error);
   }
 
-  async removeBff(friendshipId: Uuid): Promise<void> {
+  async removeFriend(friendshipId: Uuid): Promise<void> {
     const { error } = await supabase().from("friendships").delete().eq("id", friendshipId);
     fail(error);
   }

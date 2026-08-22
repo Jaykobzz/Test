@@ -42,7 +42,7 @@ profiles ──┬──< activities ──< activity_participants
            │                  └──< messages
            │
            ├──< rematch_signals  ("göra om det?", privat)
-           ├──< friendships   (BFF, ett par = en rad)
+           ├──< friendships   (vän, ett par = en rad)
            ├──< blocks
            └──< reports
 ```
@@ -59,7 +59,7 @@ tom tråd liggande.
 
 **Vänskap lagras som ett par, inte två rader.** Ett unikt index på
 `(least(a,b), greatest(a,b))` gör spegelvända dubbletter omöjliga.
-`request_bff()` känner igen en förfrågan åt andra hållet och tolkar den nya
+`request_friend()` känner igen en förfrågan åt andra hållet och tolkar den nya
 som ett ja.
 
 **Positioner har både lat/lng och en genererad `geography`-kolumn.** Klienten
@@ -73,10 +73,10 @@ Tre lager, i den ordningen:
    användaren äger. Personnummerhash och BankID-verifiering går inte att röra
    ens på sin egen rad.
 2. **RLS-policies.** Vem som ser vilken rad. Predikaten
-   (`can_see_activity`, `is_thread_member`, `are_bffs` …) är `security definer`
+   (`can_see_activity`, `is_thread_member`, `are_friends` …) är `security definer`
    just för att policies annars skulle läsa samma tabell de skyddar och ge
    oändlig rekursion.
-3. **RPC:er.** Allt som har regler — ansöka, acceptera, öppna en chatt, bli BFF —
+3. **RPC:er.** Allt som har regler — ansöka, acceptera, öppna en chatt, bli vän —
    går genom en funktion som validerar först. Tabellerna saknar därför
    insert-policies för de operationerna. Det är avsiktligt.
 

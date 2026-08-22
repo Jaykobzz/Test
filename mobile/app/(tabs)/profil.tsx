@@ -29,8 +29,8 @@ export default function ProfileScreen() {
   const { profile, refresh, signOut } = useAuth();
 
   const [editing, setEditing] = useState(false);
-  const [bffs, setBffs] = useState<PublicProfile[]>([]);
-  const [pendingBffs, setPendingBffs] = useState(0);
+  const [friends, setFriends] = useState<PublicProfile[]>([]);
+  const [pendingFriends, setPendingFriends] = useState(0);
   const [saving, setSaving] = useState(false);
 
   const [draftName, setDraftName] = useState("");
@@ -39,11 +39,11 @@ export default function ProfileScreen() {
 
   const load = useCallback(async () => {
     const [friends, requests] = await Promise.all([
-      getBackend().listBffs(),
-      getBackend().listBffRequests(),
+      getBackend().listFriends(),
+      getBackend().listFriendRequests(),
     ]);
-    setBffs(friends);
-    setPendingBffs(requests.filter((r) => r.incoming).length);
+    setFriends(friends);
+    setPendingFriends(requests.filter((r) => r.incoming).length);
   }, []);
 
   useFocusEffect(useCallback(() => { void load(); }, [load]));
@@ -170,12 +170,12 @@ export default function ProfileScreen() {
                   <Ionicons name="heart" size={20} color={theme.color.accent} />
                 </View>
                 <View>
-                  <Txt variant="bodyStrong">BFFs</Txt>
+                  <Txt variant="bodyStrong">Vänner</Txt>
                   <Txt variant="small" tone="muted">
-                    {bffs.length === 0
+                    {friends.length === 0
                       ? "Inga än"
-                      : bffs.length === 1 ? "1 person" : `${bffs.length} personer`}
-                    {pendingBffs > 0 && ` · ${pendingBffs} väntar på svar`}
+                      : friends.length === 1 ? "1 person" : `${friends.length} personer`}
+                    {pendingFriends > 0 && ` · ${pendingFriends} väntar på svar`}
                   </Txt>
                 </View>
               </Row>

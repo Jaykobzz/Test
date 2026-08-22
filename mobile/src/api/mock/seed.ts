@@ -251,7 +251,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
   {
     id: "22222222-2222-4222-8222-222222222209",
     hostId: SEED_PROFILES[0]!.id,
-    title: "Svampskogen, bara för BFFs",
+    title: "Svampskogen, bara för vänner",
     description: "Jag visar mitt kantarellställe. Därför inte offentligt.",
     category: "svamp",
     coverUrl: cover("kantareller"),
@@ -260,7 +260,7 @@ export const SEED_ACTIVITIES: SeedActivity[] = [
     lng: 18.1571,
     startsInHours: 98,
     durationHours: 4,
-    visibility: "bff",
+    visibility: "friends",
     capacity: 3,
   },
   {

@@ -1,7 +1,7 @@
 /**
  * Någon annans profil.
  *
- * Här finns BFF-knappen, och här finns blockera och anmäl. De två sista ligger
+ * Här finns vänknappen, och här finns blockera och anmäl. De två sista ligger
  * medvetet på samma skärm som allt trevligt, man ska inte behöva leta efter
  * dem när man väl behöver dem.
  */
@@ -50,11 +50,11 @@ export default function PersonScreen() {
 
   const isMe = person.id === me?.id;
 
-  async function requestBff() {
+  async function requestFriend() {
     if (!person) return;
     setWorking(true);
     try {
-      await getBackend().requestBff(person.id);
+      await getBackend().requestFriend(person.id);
       await load();
     } catch (error) {
       Alert.alert("Gick inte", describe(error));
@@ -63,11 +63,11 @@ export default function PersonScreen() {
     }
   }
 
-  async function respondBff(accept: boolean) {
-    if (!person?.bffRequestId) return;
+  async function respondFriend(accept: boolean) {
+    if (!person?.friendRequestId) return;
     setWorking(true);
     try {
-      await getBackend().respondBff(person.bffRequestId, accept);
+      await getBackend().respondFriend(person.friendRequestId, accept);
       await load();
     } catch (error) {
       Alert.alert("Gick inte", describe(error));
@@ -175,7 +175,7 @@ export default function PersonScreen() {
         <Row gap="sm" justify="space-around">
           <Stat value={person.activitiesHosted} label="värd för" />
           <Stat value={person.activitiesJoined} label="varit med på" />
-          <Stat value={person.bffCount} label="BFFs" />
+          <Stat value={person.friendCount} label="vänner" />
         </Row>
 
         <Gap size="xl" />
@@ -215,11 +215,11 @@ export default function PersonScreen() {
 
         {!isMe && (
           <>
-            <BffAction
+            <FriendAction
               person={person}
               working={working}
-              onRequest={requestBff}
-              onRespond={respondBff}
+              onRequest={requestFriend}
+              onRespond={respondFriend}
             />
 
             <Gap size="sm" />
@@ -248,7 +248,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   );
 }
 
-function BffAction({
+function FriendAction({
   person,
   working,
   onRequest,
@@ -261,7 +261,7 @@ function BffAction({
 }) {
   const theme = useTheme();
 
-  if (person.bffStatus === "accepted") {
+  if (person.friendStatus === "accepted") {
     return (
       <View
         style={{
@@ -272,21 +272,21 @@ function BffAction({
       >
         <Row gap="sm" justify="center">
           <Ionicons name="heart" size={17} color={theme.color.accent} />
-          <Txt variant="bodyStrong">Ni är BFFs</Txt>
+          <Txt variant="bodyStrong">Ni är vänner</Txt>
         </Row>
         <Gap size="xs" />
         <Txt variant="small" tone="muted" align="center">
-          {person.displayName} ser aktiviteter du lägger upp bara för BFFs.
+          {person.displayName} ser aktiviteter du lägger upp bara för vänner.
         </Txt>
       </View>
     );
   }
 
-  if (person.bffAwaitingMyAnswer) {
+  if (person.friendAwaitingMyAnswer) {
     return (
       <View style={{ gap: space.sm }}>
         <Txt variant="small" tone="muted" align="center">
-          {person.displayName} vill bli BFF med dig.
+          {person.displayName} vill bli vän med dig.
         </Txt>
         <Row gap="sm">
           <View style={{ flex: 1 }}>
@@ -304,17 +304,17 @@ function BffAction({
     );
   }
 
-  if (person.bffStatus === "pending") {
+  if (person.friendStatus === "pending") {
     return (
       <Txt variant="small" tone="faint" align="center">
-        Du har frågat om att bli BFF. Väntar på svar.
+        Du har frågat om att bli vän. Väntar på svar.
       </Txt>
     );
   }
 
   return (
     <Button
-      label="Bli BFF"
+      label="Bli vän"
       icon="heart-outline"
       onPress={onRequest}
       loading={working}

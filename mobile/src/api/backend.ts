@@ -12,7 +12,7 @@ import type {
   Applicant,
   BankIdCollect,
   BankIdStart,
-  BffRequest,
+  FriendRequest,
   CreateActivityInput,
   DiscoverParams,
   ImageBucket,
@@ -74,12 +74,12 @@ export interface Backend {
   rematches(): Promise<Rematch[]>;
   acknowledgeRematch(activityId: Uuid, userId: Uuid): Promise<void>;
 
-  /* BFF ------------------------------------------------------------------- */
-  listBffs(): Promise<PublicProfile[]>;
-  listBffRequests(): Promise<BffRequest[]>;
-  requestBff(userId: Uuid): Promise<void>;
-  respondBff(friendshipId: Uuid, accept: boolean): Promise<void>;
-  removeBff(friendshipId: Uuid): Promise<void>;
+  /* vän ------------------------------------------------------------------- */
+  listFriends(): Promise<PublicProfile[]>;
+  listFriendRequests(): Promise<FriendRequest[]>;
+  requestFriend(userId: Uuid): Promise<void>;
+  respondFriend(friendshipId: Uuid, accept: boolean): Promise<void>;
+  removeFriend(friendshipId: Uuid): Promise<void>;
 
   /* Trygghet -------------------------------------------------------------- */
   blockUser(userId: Uuid): Promise<void>;

@@ -10,7 +10,7 @@ set search_path = public, extensions;
 -- Små predikat som RLS-policies bygger på
 -- ---------------------------------------------------------------------------
 
-create or replace function are_bffs(a uuid, b uuid)
+create or replace function are_friends(a uuid, b uuid)
 returns boolean
 language sql
 stable
@@ -94,7 +94,7 @@ as $$
            a.host_id = p_user
         or is_accepted_participant(a.id, p_user)
         or (a.visibility = 'public')
-        or (a.visibility = 'bff' and are_bffs(a.host_id, p_user))
+        or (a.visibility = 'friends' and are_friends(a.host_id, p_user))
       )
   );
 $$;
@@ -129,7 +129,7 @@ select
      where ap.user_id = p.id and ap.status = 'accepted')     as activities_joined,
   (select count(*)::int from friendships f
      where f.status = 'accepted'
-       and (f.requester_id = p.id or f.addressee_id = p.id)) as bff_count
+       and (f.requester_id = p.id or f.addressee_id = p.id)) as friend_count
 from profiles p
 where p.is_suspended = false
   and auth.uid() is not null
@@ -237,7 +237,7 @@ as $$
     and not is_blocked_between(a.host_id, me.uid)
     and (
          a.visibility = 'public'
-      or (a.visibility = 'bff' and are_bffs(a.host_id, me.uid))
+      or (a.visibility = 'friends' and are_friends(a.host_id, me.uid))
       or a.host_id = me.uid
     )
     and not hp.is_suspended
@@ -247,7 +247,7 @@ $$;
 
 comment on function discover_activities is
   'Flödet i Upptäck. Filtrerar på radie, tid och intresse, och respekterar '
-  'både blockeringar och BFF-synlighet.';
+  'både blockeringar och vänsynlighet.';
 
 -- ---------------------------------------------------------------------------
 -- Ansök om att haka på
@@ -437,7 +437,7 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- Direktchatt mellan två personer (BFF eller tidigare aktivitetskompisar)
+-- Direktchatt mellan två personer (vän eller tidigare aktivitetskompisar)
 -- ---------------------------------------------------------------------------
 
 create or replace function ensure_direct_thread(p_other uuid)
@@ -464,7 +464,7 @@ begin
 
   -- Man får bara öppna en direktchatt med någon man faktiskt delat något med.
   if not (
-    are_bffs(v_me, p_other)
+    are_friends(v_me, p_other)
     or exists (
       select 1
       from activity_participants a
@@ -503,10 +503,10 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
--- BFF
+-- vän
 -- ---------------------------------------------------------------------------
 
-create or replace function request_bff(p_other uuid)
+create or replace function request_friend(p_other uuid)
 returns friendships
 language plpgsql
 security definer
@@ -555,7 +555,7 @@ begin
 end;
 $$;
 
-create or replace function respond_bff(p_friendship_id uuid, p_accept boolean)
+create or replace function respond_friend(p_friendship_id uuid, p_accept boolean)
 returns friendships
 language plpgsql
 security definer

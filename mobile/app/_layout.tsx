@@ -77,7 +77,7 @@ function RootNavigator() {
         name="igen/[activityId]"
         options={{ title: "Göra om det?", presentation: "modal" }}
       />
-      <Stack.Screen name="vanner" options={{ title: "BFFs" }} />
+      <Stack.Screen name="vanner" options={{ title: "Vänner" }} />
     </Stack>
   );
 }

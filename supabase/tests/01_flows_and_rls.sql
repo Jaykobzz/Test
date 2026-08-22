@@ -63,31 +63,31 @@ values ('bbbbbbbb-0000-4000-8000-000000000001',
         now() + interval '20 hours', now() + interval '22 hours',
         'public', 2);
 
--- Samma värd, men bara för BFFs.
+-- Samma värd, men bara för vänner.
 insert into activities (id, host_id, title, cover_url, location_name, lat, lng,
                         starts_at, ends_at, visibility)
 values ('bbbbbbbb-0000-4000-8000-000000000002',
         'aaaaaaaa-0000-4000-8000-000000000001',
         'Svampstället', 'https://x/c2.jpg', 'Nackareservatet', 59.2903, 18.1571,
-        now() + interval '4 days', now() + interval '4 days 3 hours', 'bff');
+        now() + interval '4 days', now() + interval '4 days 3 hours', 'friends');
 
 select assert_true(
   (select count(*) from activities where host_id = auth.uid()) = 2,
   'värden ser sina egna aktiviteter');
 commit;
 
-/* Synlighet: Sara ser den publika men inte BFF-aktiviteten -------------- */
+/* Synlighet: Sara ser den publika men inte vän-aktiviteten -------------- */
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
 select assert_true(
   (select count(*) from activities) = 1,
-  'utan BFF syns bara den publika aktiviteten');
+  'utan vän syns bara den publika aktiviteten');
 
 select assert_true(
   (select count(*) from discover_activities(59.2700, 18.1300, 15000)) = 1,
-  'discover_activities döljer BFF-aktiviteten för utomstående');
+  'discover_activities döljer vän-aktiviteten för utomstående');
 
 select assert_true(
   (select count(*) from discover_activities(59.2700, 18.1300, 200)) = 0,
@@ -238,17 +238,17 @@ select assert_true(
   'aktiviteten stängs när sista platsen tas');
 commit;
 
-/* BFF: efter accepterad vänskap syns BFF-aktiviteten ------------------- */
+/* vän: efter accepterad vänskap syns vän-aktiviteten ------------------- */
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
-select request_bff('aaaaaaaa-0000-4000-8000-000000000001');
+select request_friend('aaaaaaaa-0000-4000-8000-000000000001');
 commit;
 
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000001';
-select respond_bff((select id from friendships), true);
+select respond_friend((select id from friendships), true);
 commit;
 
 begin;
@@ -256,20 +256,20 @@ set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000002';
 
 select assert_true(
-  are_bffs(auth.uid(), 'aaaaaaaa-0000-4000-8000-000000000001'),
+  are_friends(auth.uid(), 'aaaaaaaa-0000-4000-8000-000000000001'),
   'vänskapen är ömsesidig');
 
 select assert_true(
-  (select count(*) from activities where visibility = 'bff') = 1,
-  'BFF ser nu den privata aktiviteten');
+  (select count(*) from activities where visibility = 'friends') = 1,
+  'vän ser nu den privata aktiviteten');
 commit;
 
 begin;
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-0000-4000-8000-000000000003';
 select assert_true(
-  (select count(*) from activities where visibility = 'bff') = 0,
-  'den som inte är BFF ser den fortfarande inte');
+  (select count(*) from activities where visibility = 'friends') = 0,
+  'den som inte är vän ser den fortfarande inte');
 commit;
 
 /* Profilsekretess ------------------------------------------------------ */

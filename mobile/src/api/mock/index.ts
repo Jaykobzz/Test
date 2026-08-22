@@ -3,7 +3,7 @@
  *
  * Syftet är att man ska kunna köra `npx expo start` och klicka igenom flödet
  * på riktigt: logga in, skapa aktivitet, ansöka, acceptera, chatta, betygsätta,
- * bli BFF. Ingen Supabase, ingen inloggning mot något externt.
+ * bli vän. Ingen Supabase, ingen inloggning mot något externt.
  *
  * Reglerna nedan speglar RLS-policyerna och RPC-kontrollerna i databasen. Om
  * du ändrar en regel här ska motsvarande ändring göras i migrationerna, annars
@@ -17,7 +17,7 @@ import type {
   Applicant,
   BankIdCollect,
   BankIdStart,
-  BffRequest,
+  FriendRequest,
   CreateActivityInput,
   DiscoverParams,
   FriendshipStatus,
@@ -85,7 +85,7 @@ function activityOrThrow(db: MockDb, id: Uuid): MockActivity {
   return activity;
 }
 
-function areBffs(db: MockDb, a: Uuid, b: Uuid): boolean {
+function areFriends(db: MockDb, a: Uuid, b: Uuid): boolean {
   return db.friendships.some(
     (f) =>
       f.status === "accepted" &&
@@ -133,8 +133,8 @@ function toPublicProfile(db: MockDb, userId: Uuid): PublicProfile {
   const me = db.currentUserId;
   const friendship = me ? friendshipBetween(db, me, userId) : undefined;
 
-  let bffStatus: FriendshipStatus | "none" = "none";
-  if (friendship) bffStatus = friendship.status;
+  let friendStatus: FriendshipStatus | "none" = "none";
+  if (friendship) friendStatus = friendship.status;
 
   return {
     id: p.id,
@@ -152,13 +152,13 @@ function toPublicProfile(db: MockDb, userId: Uuid): PublicProfile {
     activitiesJoined: db.participants.filter(
       (x) => x.userId === userId && x.status === "accepted",
     ).length,
-    bffCount: db.friendships.filter(
+    friendCount: db.friendships.filter(
       (f) =>
         f.status === "accepted" && (f.requesterId === userId || f.addresseeId === userId),
     ).length,
-    bffStatus,
-    bffRequestId: friendship?.id ?? null,
-    bffAwaitingMyAnswer:
+    friendStatus,
+    friendRequestId: friendship?.id ?? null,
+    friendAwaitingMyAnswer:
       !!friendship && friendship.status === "pending" && friendship.addresseeId === me,
   };
 }
@@ -446,7 +446,7 @@ export class MockBackend implements Backend {
         if (!me) return a.visibility === "public";
         if (isBlocked(db, a.hostId, me)) return false;
         if (a.hostId === me) return true;
-        if (a.visibility === "bff") return areBffs(db, a.hostId, me);
+        if (a.visibility === "friends") return areFriends(db, a.hostId, me);
         return true;
       })
       .map((a) => toActivityCard(db, a, origin))
@@ -989,9 +989,9 @@ export class MockBackend implements Backend {
     }
   }
 
-  /* BFF ------------------------------------------------------------------- */
+  /* vän ------------------------------------------------------------------- */
 
-  async listBffs(): Promise<PublicProfile[]> {
+  async listFriends(): Promise<PublicProfile[]> {
     const db = await loadDb();
     const me = meOrThrow(db);
 
@@ -1001,7 +1001,7 @@ export class MockBackend implements Backend {
       .sort((a, b) => a.displayName.localeCompare(b.displayName, "sv"));
   }
 
-  async listBffRequests(): Promise<BffRequest[]> {
+  async listFriendRequests(): Promise<FriendRequest[]> {
     const db = await loadDb();
     const me = meOrThrow(db);
 
@@ -1016,7 +1016,7 @@ export class MockBackend implements Backend {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
-  async requestBff(userId: Uuid): Promise<void> {
+  async requestFriend(userId: Uuid): Promise<void> {
     const db = await loadDb();
     const me = meOrThrow(db);
     if (me === userId) throw new Error("Du är redan din egen bästa vän");
@@ -1046,7 +1046,7 @@ export class MockBackend implements Backend {
     await persist();
   }
 
-  async respondBff(friendshipId: Uuid, accept: boolean): Promise<void> {
+  async respondFriend(friendshipId: Uuid, accept: boolean): Promise<void> {
     const db = await loadDb();
     const me = meOrThrow(db);
     const friendship = db.friendships.find((f) => f.id === friendshipId);
@@ -1057,7 +1057,7 @@ export class MockBackend implements Backend {
     await persist();
   }
 
-  async removeBff(friendshipId: Uuid): Promise<void> {
+  async removeFriend(friendshipId: Uuid): Promise<void> {
     const db = await loadDb();
     const me = meOrThrow(db);
     db.friendships = db.friendships.filter(
@@ -1074,7 +1074,7 @@ export class MockBackend implements Backend {
     if (!db.blocks.some((b) => b.blockerId === me && b.blockedId === userId)) {
       db.blocks.push({ blockerId: me, blockedId: userId });
     }
-    // En blockering upphäver vänskapen, annars ligger de kvar i BFF-listan.
+    // En blockering upphäver vänskapen, annars ligger de kvar i vänlistan.
     db.friendships = db.friendships.filter(
       (f) =>
         !(

@@ -8,7 +8,7 @@
 export type Uuid = string;
 export type IsoDate = string;
 
-export type ActivityVisibility = "public" | "bff";
+export type ActivityVisibility = "public" | "friends";
 export type ActivityStatus = "draft" | "open" | "full" | "cancelled" | "completed";
 export type JoinStatus = "pending" | "accepted" | "declined" | "withdrawn" | "removed";
 export type MessageKind = "text" | "image" | "place" | "list" | "system";
@@ -55,12 +55,12 @@ export interface PublicProfile {
   memberSince: IsoDate;
   activitiesHosted: number;
   activitiesJoined: number;
-  bffCount: number;
+  friendCount: number;
   /** Relationen mellan dig och den här personen. */
-  bffStatus: FriendshipStatus | "none";
-  bffRequestId: Uuid | null;
+  friendStatus: FriendshipStatus | "none";
+  friendRequestId: Uuid | null;
   /** Sant när förfrågan väntar på ditt svar (inte på deras). */
-  bffAwaitingMyAnswer: boolean;
+  friendAwaitingMyAnswer: boolean;
 }
 
 export interface ActivityCard {
@@ -188,7 +188,7 @@ export interface Rematch {
   matchedAt: IsoDate;
 }
 
-export interface BffRequest {
+export interface FriendRequest {
   friendshipId: Uuid;
   profile: PublicProfile;
   createdAt: IsoDate;
