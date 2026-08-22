@@ -104,6 +104,20 @@ flödet.
 
 Sätt upp pg_cron i Supabase, förslagsvis var femte minut.
 
+### 6b. Demo som går att installera
+
+Uppskjutet, inte bortvalt. Så länge det räcker med bilder gör det det.
+
+Två vägar när det blir aktuellt. Expo Go är gratis men kräver att mottagaren
+installerar ett utvecklarverktyg och öppnar en länk, vilket gör att appen inte
+känns som en app. TestFlight ger en riktig inbjudan och en ikon på hemskärmen,
+men kräver Apple Developer Program, 99 dollar om året, och att appen byggs med
+EAS i stället för att köras i Expo Go.
+
+TestFlight är rätt väg för att låta familj och vänner tycka till, och det är
+ändå den väg pushnotiserna kräver (punkt 4), så de två hör ihop och bör göras
+samtidigt.
+
 ---
 
 ## Väntar på beslut
