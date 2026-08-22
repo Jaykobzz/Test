@@ -1,4 +1,4 @@
--- FRIEND — radsäkerhet
+-- Haka på — radsäkerhet
 --
 -- Grundhållningen: allt är stängt tills en policy öppnar det, och skrivningar
 -- som har regler (ansöka, acceptera, betygsätta) går ALDRIG direkt mot tabellen

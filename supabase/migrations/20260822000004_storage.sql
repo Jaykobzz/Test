@@ -1,4 +1,4 @@
--- FRIEND — lagringshinkar för bilder
+-- Haka på — lagringshinkar för bilder
 --
 -- Bildkravet i appen (profilbild, omslagsbild) gör att lagringen är en del av
 -- kärnflödet, inte ett tillägg. Tre hinkar med olika öppenhet:

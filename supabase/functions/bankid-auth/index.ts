@@ -1,5 +1,5 @@
 /**
- * bankid-auth — den enda vägen in i FRIEND.
+ * bankid-auth. Den enda vägen in i appen.
  *
  * Tre endpoints:
  *   POST /bankid-auth/start    { personalNumber? }  -> { orderRef, autoStartToken, qrData? }
@@ -72,7 +72,7 @@ async function hashPersonalNumber(pnr: string, pepper: string): Promise<string> 
 
 /** Intern adress som aldrig mejlas — Supabase auth vill ha en unik identifierare. */
 function internalEmail(hash: string): string {
-  return `${hash.slice(0, 32)}@bankid.friend.internal`;
+  return `${hash.slice(0, 32)}@bankid.hakapa.internal`;
 }
 
 function json(body: unknown, status = 200): Response {

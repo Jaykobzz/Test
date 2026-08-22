@@ -1,4 +1,4 @@
-project_id = "friend"
+project_id = "hakapa"
 
 [api]
 enabled = true
@@ -21,8 +21,8 @@ file_size_limit = "10MiB"
 
 [auth]
 enabled = true
-site_url = "friend://"
-additional_redirect_urls = ["friend://auth-callback", "exp://localhost:8081"]
+site_url = "hakapa://"
+additional_redirect_urls = ["hakapa://auth-callback", "exp://localhost:8081"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 

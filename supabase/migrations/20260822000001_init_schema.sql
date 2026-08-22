@@ -1,4 +1,4 @@
--- FRIEND — grundschema
+-- Haka på — grundschema
 -- Hitta folk i närheten som vill umgås och göra saker tillsammans.
 --
 -- Designprinciper som återkommer i hela schemat:

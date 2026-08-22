@@ -1,7 +1,7 @@
 /**
  * Grundkomponenter.
  *
- * Allt som ritas i FRIEND går genom de här, så att avstånd, radier och färger
+ * Allt som ritas i appen går genom de här, så att avstånd, radier och färger
  * kommer från temat i stället för att spridas ut som magiska tal i skärmarna.
  */
 
@@ -366,7 +366,7 @@ export function Avatar({
 /**
  * Det som visas i stället för ett betyg.
  *
- * FRIEND hade stjärnbetyg en gång och de togs bort med flit: ett betyg mäter
+ * Haka på hade stjärnbetyg en gång och de togs bort med flit: ett betyg mäter
  * hur väl två personer passade ihop men läses som en egenskap hos den ena, och
  * siffran följer med personen överallt. Det som står här är i stället fakta:
  * identiteten är styrkt, och så här mycket har personen faktiskt gjort.
@@ -452,7 +452,7 @@ export function Chip({
   tone = "neutral",
 }: {
   label: string;
-  /** Namn i FRIENDs eget ikonset, inte i något bibliotek. */
+  /** Namn i appens eget ikonset, inte i något bibliotek. */
   icon?: IconName;
   selected?: boolean;
   onPress?: () => void;

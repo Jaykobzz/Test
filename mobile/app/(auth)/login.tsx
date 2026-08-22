@@ -46,7 +46,7 @@ export default function LoginScreen() {
           </View>
 
           <Gap size="lg" />
-          <Txt variant="display">FRIEND</Txt>
+          <Txt variant="display">Haka på</Txt>
           <Gap size="xs" />
           <Txt variant="body" tone="muted" align="center" style={{ maxWidth: 300 }}>
             Hitta folk i närheten som vill göra samma sak som du.
@@ -96,7 +96,7 @@ export default function LoginScreen() {
         <Row gap="sm" justify="center">
           <Ionicons name="lock-closed" size={13} color={theme.color.textFaint} />
           <Txt variant="small" tone="faint" align="center" style={{ flexShrink: 1 }}>
-            Alla på FRIEND är verifierade med BankID. Ditt personnummer lagras aldrig.
+            Alla här är verifierade med BankID. Ditt personnummer lagras aldrig.
           </Txt>
         </Row>
       </KeyboardAvoidingView>

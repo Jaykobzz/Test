@@ -1,4 +1,4 @@
--- FRIEND — beteendetester
+-- Haka på — beteendetester
 --
 -- Kör hela vägen genom appens flöde som riktiga användare, med RLS påslagen.
 -- Varje test byter till rollen `authenticated` och sätter auth.uid(), precis

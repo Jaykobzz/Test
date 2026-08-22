@@ -1,34 +1,38 @@
 {
   "expo": {
-    "name": "FRIEND",
-    "slug": "friend",
+    "name": "Haka på",
+    "slug": "hakapa",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "friend",
+    "scheme": "hakapa",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F26B3A"
+      "backgroundColor": "#15604B"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "se.friend.app",
-      "config": { "usesNonExemptEncryption": false },
+      "bundleIdentifier": "se.hakapa.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "FRIEND använder din position för att visa aktiviteter nära dig. Din exakta position delas aldrig med andra användare.",
+        "NSLocationWhenInUseUsageDescription": "Haka på använder din position för att visa aktiviteter nära dig. Din exakta position delas aldrig med andra användare.",
         "NSPhotoLibraryUsageDescription": "För att välja profilbild och bilder till dina aktiviteter.",
         "NSCameraUsageDescription": "För att ta en profilbild eller en bild till din aktivitet."
       }
     },
     "android": {
-      "package": "se.friend.app",
+      "package": "se.hakapa.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F26B3A"
+        "backgroundColor": "#15604B"
       },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
@@ -44,7 +48,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "FRIEND använder din position för att visa aktiviteter nära dig."
+          "locationWhenInUsePermission": "Haka på använder din position för att visa aktiviteter nära dig."
         }
       ],
       [
@@ -57,12 +61,14 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F26B3A",
+          "backgroundColor": "#15604B",
           "image": "./assets/splash-icon.png",
           "imageWidth": 180
         }
       ]
     ],
-    "experiments": { "typedRoutes": true }
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

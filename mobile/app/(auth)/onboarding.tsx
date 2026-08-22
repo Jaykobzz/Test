@@ -116,7 +116,7 @@ export default function OnboardingScreen() {
       <Txt variant="heading">1. En bild på dig</Txt>
       <Gap size="xs" />
       <Txt variant="small" tone="muted">
-        Alla på FRIEND visar sitt ansikte. Det är därför det känns tryggt att tacka ja.
+        Alla här visar sitt ansikte. Det är därför det känns tryggt att tacka ja.
       </Txt>
       <Gap size="md" />
 

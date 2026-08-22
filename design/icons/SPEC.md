@@ -1,4 +1,4 @@
-# FRIEND — ikonsystem
+# Haka på — ikonsystem
 
 Ett eget set, inte ett bibliotek. Skälet är enkelt: ett generiskt ikonpaket
 läser som *default*, och default är den tydligaste signalen att ingen har ritat

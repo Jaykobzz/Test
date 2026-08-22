@@ -1,5 +1,5 @@
 /**
- * FRIENDs egna ikoner.
+ * Appens egna ikoner.
  *
  * Ett eget set i stället för ett bibliotek, av ett enda skäl: ett generiskt
  * ikonpaket läser som *default*, och default är den tydligaste signalen att

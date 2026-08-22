@@ -1,4 +1,4 @@
-# FRIEND
+# Haka på
 
 Få med dig folk på det du ändå ska göra.
 
@@ -168,7 +168,7 @@ via en svensk bank och en juridisk person — samma gränssnitt håller ändå.
 
 - **Push-notiser.** En ansökan syns först när man öppnar appen.
 - **Inbäddad karta.** Platser delas som nålar och öppnas i telefonens kartapp;
-  det finns ingen karta inuti FRIEND.
+  det finns ingen karta inuti appen.
 - **Moderationsverktyg.** `reports` fylls på korrekt, men det finns ingen vy
   att beta av kön i.
 - **Bjuda in någon direkt till en ny aktivitet.** Efter en matchning öppnas en

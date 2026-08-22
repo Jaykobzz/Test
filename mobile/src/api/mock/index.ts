@@ -1,5 +1,5 @@
 /**
- * Mock-backend, hela FRIEND utan server.
+ * Mock-backend, hela Haka på utan server.
  *
  * Syftet är att man ska kunna köra `npx expo start` och klicka igenom flödet
  * på riktigt: logga in, skapa aktivitet, ansöka, acceptera, chatta, betygsätta,

@@ -1,4 +1,4 @@
--- FRIEND — intressekatalog
+-- Haka på — intressekatalog
 --
 -- Listan är medvetet konkret. "Sport" säger ingenting om vad man faktiskt ska
 -- göra på tisdag; "Fiske" gör det.

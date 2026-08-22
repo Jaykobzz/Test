@@ -7,7 +7,14 @@ import { getBackend } from "@/api";
 import type { ImageBucket } from "@/api/types";
 
 export interface PickOptions {
-  /** Kvadratisk beskärning för profilbilder, 3:2 för omslag. */
+  /**
+   * Kvadratisk beskärning för profilbilder, 4:3 för omslag.
+   *
+   * Omslaget visas i två olika proportioner: cirka 2,4:1 på kortet i flödet
+   * och 1,44:1 på aktivitetsskärmen. Bilden beskärs alltså olika på de två
+   * ställena, och 4:3 är det högsta liggande formatet som ger mest material
+   * att beskära ur. Lägg motivet i mitten.
+   */
   aspect: [number, number];
   /** Längsta sidan efter komprimering. */
   maxWidth: number;
@@ -15,7 +22,7 @@ export interface PickOptions {
 
 const PRESETS: Record<ImageBucket, PickOptions> = {
   "avatars": { aspect: [1, 1], maxWidth: 800 },
-  "activity-covers": { aspect: [3, 2], maxWidth: 1400 },
+  "activity-covers": { aspect: [4, 3], maxWidth: 1400 },
   "chat-images": { aspect: [4, 3], maxWidth: 1400 },
 };
 
@@ -28,7 +35,7 @@ const PRESETS: Record<ImageBucket, PickOptions> = {
 export async function pickImage(bucket: ImageBucket): Promise<string | null> {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!permission.granted) {
-    throw new Error("FRIEND behöver tillgång till dina bilder för att du ska kunna välja en.");
+    throw new Error("Haka på behöver tillgång till dina bilder för att du ska kunna välja en.");
   }
 
   const preset = PRESETS[bucket];
@@ -47,7 +54,7 @@ export async function pickImage(bucket: ImageBucket): Promise<string | null> {
 export async function captureImage(bucket: ImageBucket): Promise<string | null> {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
   if (!permission.granted) {
-    throw new Error("FRIEND behöver tillgång till kameran för att du ska kunna ta en bild.");
+    throw new Error("Haka på behöver tillgång till kameran för att du ska kunna ta en bild.");
   }
 
   const preset = PRESETS[bucket];

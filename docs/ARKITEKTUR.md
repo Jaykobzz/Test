@@ -119,7 +119,7 @@ eftersom SecureStore tar max ~2 kB och en Supabase-session är större.
 
 ## Varför det inte finns några betyg
 
-FRIEND hade ett stjärnsystem tidigt: *hur kul var det*, *hur trevlig var hen*,
+Haka på hade ett stjärnsystem tidigt: *hur kul var det*, *hur trevlig var hen*,
 och en separat trygghetsfråga. Det är borttaget, och det är värt att förstå
 varför — annars byggs det tillbaka av någon som tycker att det verkar
 självklart.

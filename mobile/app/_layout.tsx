@@ -55,7 +55,7 @@ function RootNavigator() {
     }
   }, [loading, profile, segments, router]);
 
-  if (loading) return <Loading label="Laddar FRIEND …" />;
+  if (loading) return <Loading label="Laddar Haka på …" />;
 
   return (
     <Stack

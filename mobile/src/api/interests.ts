@@ -1,7 +1,7 @@
 /**
  * Intressekatalogen, speglad från supabase/migrations/*_seed_interests.sql.
  *
- * Ikonnamnen pekar på FRIENDs eget set i components/icons, inte på ett
+ * Ikonnamnen pekar på appens eget set i components/icons, inte på ett
  * bibliotek och absolut inte på emoji. Varje intresse har en egen ritad ikon.
  */
 

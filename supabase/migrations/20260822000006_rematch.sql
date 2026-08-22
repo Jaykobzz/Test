@@ -1,4 +1,4 @@
--- FRIEND — "skulle du göra om det?"
+-- Haka på — "skulle du göra om det?"
 --
 -- Ersätter det borttagna betygssystemet, men vänder på riktningen. Ett betyg
 -- är en dom som lämnas över någon. Det här är en fråga om vad DU vill göra

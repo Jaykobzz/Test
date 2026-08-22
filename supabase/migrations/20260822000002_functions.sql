@@ -1,4 +1,4 @@
--- FRIEND — funktioner, vyer och RPC:er
+-- Haka på — funktioner, vyer och RPC:er
 --
 -- Alla hjälpfunktioner nedan är SECURITY DEFINER av ett specifikt skäl: de anropas
 -- inifrån RLS-policies. Om de vore SECURITY INVOKER skulle en policy på t.ex.
