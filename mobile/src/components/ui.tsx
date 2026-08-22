@@ -90,7 +90,19 @@ export function Screen({
       {scroll ? (
         <ScrollView
           contentContainerStyle={[padding, { paddingBottom: space.xxxl }]}
-          keyboardShouldPersistTaps="handled"
+          /*
+            "always" och inte "handled".
+
+            Med "handled" avgör React Native själv om ett tryck ska stänga
+            tangentbordet eller nå knappen under, och med en animerad
+            Pressable inuti en ScrollView blir svaret ofta fel: trycket
+            stänger tangentbordet och knappen känner aldrig av det. För
+            användaren ser det ut som att knappen är död.
+
+            "always" släpper alltid igenom trycket till det som ligger under.
+          */
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
         >
           {children}
         </ScrollView>
