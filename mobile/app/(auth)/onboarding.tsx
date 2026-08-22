@@ -101,9 +101,11 @@ export default function OnboardingScreen() {
 
   async function save() {
     if (!canSave || !avatarUri) {
-      // Utan det här gör ett tryck ingenting alls, och det är omöjligt att
-      // gissa varför. Hellre ett tydligt besked än en död knapp.
+      // En avstängd knapp ger ingen återkoppling alls. En rad finstilt text
+      // ovanför den är nästan lika illa: den syns inte när man tittar på
+      // knappen man just tryckt på. Därför en ruta man måste stänga.
       setTriedToSave(true);
+      Alert.alert("Något fattas", missing ?? "Fyll i allt tre steg först.");
       return;
     }
     setSaving(true);
@@ -139,7 +141,7 @@ export default function OnboardingScreen() {
       <Gap size="xl" />
 
       {/* 1. Bilden */}
-      <Txt variant="heading">1. En bild på dig</Txt>
+      <StepTitle n={1} label="En bild på dig" done={avatarUri !== null} />
       <Gap size="xs" />
       <Txt variant="small" tone="muted">
         Alla här visar sitt ansikte. Det är därför det känns tryggt att tacka ja.
@@ -191,7 +193,7 @@ export default function OnboardingScreen() {
       <Divider />
 
       {/* 2. Vem du är */}
-      <Txt variant="heading">2. Vem är du?</Txt>
+      <StepTitle n={2} label="Vem är du?" done={displayName.trim().length >= 2} />
       <Gap size="md" />
 
       <Field
@@ -238,7 +240,11 @@ export default function OnboardingScreen() {
       <Divider />
 
       {/* 3. Intressen */}
-      <Txt variant="heading">3. Vad gillar du?</Txt>
+      <StepTitle
+        n={3}
+        label="Vad gillar du?"
+        done={interests.length >= MIN_INTERESTS}
+      />
       <Gap size="xs" />
       <Txt variant="small" tone="muted">
         Välj minst {MIN_INTERESTS}. De styr vad du får se i flödet.
@@ -278,6 +284,37 @@ export default function OnboardingScreen() {
         loading={saving}
       />
     </Screen>
+  );
+}
+
+/**
+ * Rubrik som visar om steget är klart.
+ *
+ * Poängen är att svaret på "varför händer inget" ska gå att se innan man
+ * trycker, inte bara efteråt.
+ */
+function StepTitle({ n, label, done }: { n: number; label: string; done: boolean }) {
+  const theme = useTheme();
+  return (
+    <Row gap="sm">
+      <View
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          backgroundColor: done ? theme.color.primary : theme.color.surfaceAlt,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {done ? (
+          <Ionicons name="checkmark" size={13} color={theme.color.onPrimary} />
+        ) : (
+          <Txt variant="micro" tone="faint">{n}</Txt>
+        )}
+      </View>
+      <Txt variant="heading">{label}</Txt>
+    </Row>
   );
 }
 
