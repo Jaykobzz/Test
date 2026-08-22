@@ -8,12 +8,12 @@ import type { ImageBucket } from "@/api/types";
 
 export interface PickOptions {
   /**
-   * Kvadratisk beskärning för profilbilder, 4:3 för omslag.
+   * Kvadratisk beskärning för profilbilder, 3:2 för omslag.
    *
-   * Omslaget visas i två olika proportioner: cirka 2,4:1 på kortet i flödet
-   * och 1,44:1 på aktivitetsskärmen. Bilden beskärs alltså olika på de två
-   * ställena, och 4:3 är det högsta liggande formatet som ger mest material
-   * att beskära ur. Lägg motivet i mitten.
+   * Omslaget visas i två proportioner: cirka 2,4:1 på kortet i flödet och
+   * 1,44:1 på aktivitetsskärmen. Den senare är nästan exakt 3:2, så hjälten
+   * på aktivitetsskärmen beskärs knappt alls. Kortet i flödet beskär bort
+   * ovan- och underkant, så lägg motivet i mitten.
    */
   aspect: [number, number];
   /** Längsta sidan efter komprimering. */
@@ -22,7 +22,7 @@ export interface PickOptions {
 
 const PRESETS: Record<ImageBucket, PickOptions> = {
   "avatars": { aspect: [1, 1], maxWidth: 800 },
-  "activity-covers": { aspect: [4, 3], maxWidth: 1400 },
+  "activity-covers": { aspect: [3, 2], maxWidth: 1400 },
   "chat-images": { aspect: [4, 3], maxWidth: 1400 },
 };
 
