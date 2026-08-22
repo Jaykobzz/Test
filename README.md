@@ -32,10 +32,14 @@ Appen har ett inbyggt mock-backend. Ingen server, ingen databas, inget konto —
 allt sparas lokalt på telefonen med exempeldata runt södra Stockholm.
 
 ```bash
-cd mobile
+git clone -b claude/repo-assessment-h6zbod https://github.com/Jaykobzz/Test.git
+cd Test/mobile
 npm install
 npx expo start
 ```
+
+> Branchen måste anges. Appen ligger inte på `main` än — `main` innehåller bara
+> repots gamla filer och designpaketet.
 
 Skanna QR-koden med Expo Go. Logga in med **vilket tolvsiffrigt personnummer
 som helst** — samma nummer ger alltid samma person, så du kan hoppa mellan två
