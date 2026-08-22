@@ -123,7 +123,24 @@ export default function SpontaneousScreen() {
   }
 
   return (
-    <Screen scroll>
+    <Screen
+      scroll
+      footer={
+        <>
+          {missing && (
+            <>
+              <Txt variant="small" tone="faint" align="center">{missing}</Txt>
+              <Gap size="sm" />
+            </>
+          )}
+          <Button
+            label={saving ? "Lägger upp …" : "Lägg upp"}
+            onPress={create}
+            loading={saving}
+          />
+        </>
+      }
+    >
       <Gap size="lg" />
       <Txt variant="body" tone="muted">
         Går ut till folk i närheten som gillar samma sak. Den försvinner av sig
@@ -231,22 +248,6 @@ export default function SpontaneousScreen() {
         />
       </Row>
 
-      <Gap size="xl" />
-
-      {missing && (
-        <>
-          <Txt variant="small" tone="faint" align="center">{missing}</Txt>
-          <Gap size="sm" />
-        </>
-      )}
-
-      <Button
-        label={saving ? "Lägger upp …" : "Lägg upp"}
-        onPress={create}
-        loading={saving}
-      />
-
-      <Gap size="xxl" />
     </Screen>
   );
 }

@@ -77,12 +77,19 @@ export default function NewActivityScreen() {
     })();
   }, []);
 
-  const ready =
-    coverUri !== null &&
-    title.trim().length >= 3 &&
-    locationName.trim().length > 0 &&
-    point !== null &&
-    startsAt.getTime() > Date.now();
+  /** Vad som fattas, eller null när allt är klart. */
+  const missing =
+    coverUri === null
+      ? "En bild krävs."
+      : title.trim().length < 3
+        ? "Ge aktiviteten en titel."
+        : !locationName.trim() || !point
+          ? "Fyll i var ni ska vara."
+          : startsAt.getTime() <= Date.now()
+            ? "Välj en tid som ligger framåt."
+            : null;
+
+  const ready = missing === null;
 
   async function chooseCover() {
     try {
@@ -104,7 +111,12 @@ export default function NewActivityScreen() {
   }
 
   async function create() {
-    if (!ready || !coverUri || !point) return;
+    if (!ready || !coverUri || !point) {
+      // Knappen är tryckbar även när något fattas, för en avstängd knapp
+      // säger ingenting. Då måste det här säga det i stället.
+      Alert.alert("Något fattas", missing ?? "Fyll i allt först.");
+      return;
+    }
     setSaving(true);
     try {
       const coverUrl = await getBackend().uploadImage("activity-covers", coverUri);
@@ -130,7 +142,25 @@ export default function NewActivityScreen() {
   }
 
   return (
-    <Screen scroll edges={[]}>
+    <Screen
+      scroll
+      edges={[]}
+      footer={
+        <>
+          {missing && (
+            <>
+              <Txt variant="small" tone="faint" align="center">{missing}</Txt>
+              <Gap size="sm" />
+            </>
+          )}
+          <Button
+            label={saving ? "Lägger upp …" : "Lägg upp"}
+            onPress={create}
+            loading={saving}
+          />
+        </>
+      }
+    >
       <Gap size="lg" />
 
       {/* Bilden först, det är den folk ser i flödet. */}
@@ -323,31 +353,7 @@ export default function NewActivityScreen() {
         ))}
       </Row>
 
-      <Gap size="xl" />
 
-      <Button
-        label="Lägg upp"
-        onPress={create}
-        loading={saving}
-        disabled={!ready}
-      />
-
-      {!ready && (
-        <>
-          <Gap size="sm" />
-          <Txt variant="small" tone="faint" align="center">
-            {!coverUri
-              ? "En bild krävs."
-              : title.trim().length < 3
-                ? "Ge aktiviteten en titel."
-                : !locationName.trim() || !point
-                  ? "Fyll i var ni ska vara."
-                  : "Välj en tid som ligger framåt."}
-          </Txt>
-        </>
-      )}
-
-      <Gap size="xl" />
     </Screen>
   );
 }
