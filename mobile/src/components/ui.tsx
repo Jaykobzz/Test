@@ -22,6 +22,7 @@ import {
 import { Image } from "expo-image";
 import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
+import { Icon, type IconName } from "@/components/icons/Icon";
 import { Tappable } from "@/components/Tappable";
 import { useTheme } from "@/hooks/useTheme";
 import { font, radius, shadow, space } from "@/theme";
@@ -451,7 +452,8 @@ export function Chip({
   tone = "neutral",
 }: {
   label: string;
-  icon?: keyof typeof Ionicons.glyphMap;
+  /** Namn i FRIENDs eget ikonset, inte i något bibliotek. */
+  icon?: IconName;
   selected?: boolean;
   onPress?: () => void;
   tone?: "neutral" | "primary" | "accent" | "highlight";
@@ -481,7 +483,7 @@ export function Chip({
         paddingRight: space.md,
       }}
     >
-      {icon && <Ionicons name={icon} size={14} color={palette.fg} />}
+      {icon && <Icon name={icon} size={15} color={palette.fg} />}
       <Text style={[font.smallStrong as TextStyle, { color: palette.fg }]}>{label}</Text>
     </View>
   );

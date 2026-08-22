@@ -10,7 +10,8 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 
 import type { ActivityCard } from "@/api/types";
-import { interestLabel } from "@/api/interests";
+import { interestIcon, interestLabel } from "@/api/interests";
+import { Icon } from "@/components/icons/Icon";
 import { Avatar, Badge, Card, Credentials, Gap, Row, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance } from "@/lib/geo";
@@ -56,7 +57,16 @@ export function ActivityListItem({
             <Txt variant="heading" numberOfLines={2}>{activity.title}</Txt>
           </View>
           {activity.category && (
-            <Txt variant="small" tone="faint">{interestLabel(activity.category)}</Txt>
+            <Row gap="xs">
+              {interestIcon(activity.category) && (
+                <Icon
+                  name={interestIcon(activity.category)!}
+                  size={14}
+                  color={theme.color.textFaint}
+                />
+              )}
+              <Txt variant="small" tone="faint">{interestLabel(activity.category)}</Txt>
+            </Row>
           )}
         </Row>
 

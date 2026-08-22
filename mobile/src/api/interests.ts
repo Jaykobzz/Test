@@ -1,49 +1,47 @@
 /**
  * Intressekatalogen, speglad från supabase/migrations/*_seed_interests.sql.
  *
- * Ikonerna är linjeikoner ur ett enda set, inte emoji. Emoji ser olika ut på
- * varje plattform, går inte att färgsätta, bryter mot typografins rytm och
- * signalerar snabbhopkommen app. En chip med bra typografi och ett tunt
- * streckat glyf ser ut som något någon har ritat.
+ * Ikonnamnen pekar på FRIENDs eget set i components/icons, inte på ett
+ * bibliotek och absolut inte på emoji. Varje intresse har en egen ritad ikon.
  */
 
-import type { Ionicons } from "@expo/vector-icons";
+import type { IconName } from "@/components/icons/Icon";
 
 import type { Interest } from "./types";
 
-export type IconName = keyof typeof Ionicons.glyphMap;
+export type { IconName };
 
 export const INTERESTS: Interest[] = [
-  { slug: "fiske",      label: "Fiske",             icon: "fish-outline" },
-  { slug: "vandring",   label: "Vandring",          icon: "trail-sign-outline" },
-  { slug: "lopning",    label: "Löpning",           icon: "walk-outline" },
-  { slug: "cykling",    label: "Cykling",           icon: "bicycle-outline" },
-  { slug: "padel",      label: "Padel",             icon: "tennisball-outline" },
-  { slug: "fotboll",    label: "Fotboll",           icon: "football-outline" },
-  { slug: "golf",       label: "Golf",              icon: "golf-outline" },
-  { slug: "gym",        label: "Gym & träning",     icon: "barbell-outline" },
-  { slug: "bad",        label: "Bad & kallbad",     icon: "water-outline" },
-  { slug: "paddling",   label: "Paddling & kajak",  icon: "boat-outline" },
-  { slug: "skidor",     label: "Skidor & snö",      icon: "snow-outline" },
-  { slug: "svamp",      label: "Svamp & bär",       icon: "leaf-outline" },
-  { slug: "tradgard",   label: "Trädgård & odling", icon: "flower-outline" },
-  { slug: "matlagning", label: "Matlagning",        icon: "restaurant-outline" },
-  { slug: "fika",       label: "Fika",              icon: "cafe-outline" },
-  { slug: "middag",     label: "Middag & krog",     icon: "wine-outline" },
-  { slug: "bradspel",   label: "Brädspel",          icon: "dice-outline" },
-  { slug: "tvspel",     label: "TV-spel",           icon: "game-controller-outline" },
-  { slug: "musik",      label: "Musik & konsert",   icon: "musical-notes-outline" },
-  { slug: "film",       label: "Film & bio",        icon: "film-outline" },
-  { slug: "bocker",     label: "Böcker",            icon: "book-outline" },
-  { slug: "foto",       label: "Foto",              icon: "camera-outline" },
-  { slug: "konst",      label: "Konst & museum",    icon: "color-palette-outline" },
-  { slug: "bygga",      label: "Bygga & meka",      icon: "hammer-outline" },
-  { slug: "motor",      label: "Motor & bil",       icon: "car-sport-outline" },
-  { slug: "hundar",     label: "Hundpromenad",      icon: "paw-outline" },
-  { slug: "foraldrar",  label: "Föräldraliv",       icon: "people-outline" },
-  { slug: "sprak",      label: "Språkutbyte",       icon: "chatbubbles-outline" },
-  { slug: "teknik",     label: "Teknik & kod",      icon: "code-slash-outline" },
-  { slug: "loppis",     label: "Loppis & fynd",     icon: "pricetag-outline" },
+  { slug: "fiske",      label: "Fiske",             icon: "fiske" },
+  { slug: "vandring",   label: "Vandring",          icon: "vandring" },
+  { slug: "lopning",    label: "Löpning",           icon: "lopning" },
+  { slug: "cykling",    label: "Cykling",           icon: "cykling" },
+  { slug: "padel",      label: "Padel",             icon: "padel" },
+  { slug: "fotboll",    label: "Fotboll",           icon: "fotboll" },
+  { slug: "golf",       label: "Golf",              icon: "golf" },
+  { slug: "gym",        label: "Gym & träning",     icon: "gym" },
+  { slug: "bad",        label: "Bad & kallbad",     icon: "bad" },
+  { slug: "paddling",   label: "Paddling & kajak",  icon: "paddling" },
+  { slug: "skidor",     label: "Skidor & snö",      icon: "skidor" },
+  { slug: "svamp",      label: "Svamp & bär",       icon: "svamp" },
+  { slug: "tradgard",   label: "Trädgård & odling", icon: "tradgard" },
+  { slug: "matlagning", label: "Matlagning",        icon: "matlagning" },
+  { slug: "fika",       label: "Fika",              icon: "fika" },
+  { slug: "middag",     label: "Middag & krog",     icon: "middag" },
+  { slug: "bradspel",   label: "Brädspel",          icon: "bradspel" },
+  { slug: "tvspel",     label: "TV-spel",           icon: "tvspel" },
+  { slug: "musik",      label: "Musik & konsert",   icon: "musik" },
+  { slug: "film",       label: "Film & bio",        icon: "film" },
+  { slug: "bocker",     label: "Böcker",            icon: "bocker" },
+  { slug: "foto",       label: "Foto",              icon: "foto" },
+  { slug: "konst",      label: "Konst & museum",    icon: "konst" },
+  { slug: "bygga",      label: "Bygga & meka",      icon: "bygga" },
+  { slug: "motor",      label: "Motor & bil",       icon: "motor" },
+  { slug: "hundar",     label: "Hundpromenad",      icon: "hundar" },
+  { slug: "foraldrar",  label: "Föräldraliv",       icon: "foraldrar" },
+  { slug: "sprak",      label: "Språkutbyte",       icon: "sprak" },
+  { slug: "teknik",     label: "Teknik & kod",      icon: "teknik" },
+  { slug: "loppis",     label: "Loppis & fynd",     icon: "loppis" },
 ];
 
 const BY_SLUG = new Map(INTERESTS.map((i) => [i.slug, i]));
