@@ -9,9 +9,13 @@
   Beloppet är heltal kronor. Ören förekommer inte i den här sortens
   sammanhang, och ett heltal går inte att avrunda fel.
 
-  null betyder gratis, och det är ett val värden gör, inte något som blir
-  kvar av glömska: klienten frågar uttryckligen "kostar det något?". Därför
-  går det att skriva ut "Gratis" utan att ljuga.
+  null betyder att det inte kostar något, vilket är det normala. Klienten
+  säger då ingenting alls: att skriva ut "gratis" hade förutsatt att pris är
+  normen och noll undantaget, och då blir umgänget en produkt med rabatt.
+
+  Beloppet beskriver vad stället tar, inte vad värden tar. Inga pengar går
+  via appen och ingen håvar in något. Det är hela skillnaden mellan en
+  hängning och ett arrangemang, och den skillnaden ska synas i orden.
 */
 
 alter table activities
@@ -19,4 +23,4 @@ alter table activities
     check (price_sek is null or price_sek between 1 and 100000);
 
 comment on column activities.price_sek is
-  'Kostnad per person i hela kronor. null = gratis, valt av värden.';
+  'Vad stället tar per person i hela kronor. null = kostar inget.';

@@ -1,20 +1,21 @@
 /**
- * Kostnad per person.
+ * Kostar det något på plats?
  *
- * Snabbvalen finns för att de flesta priser i det här sammanhanget är runda
- * hundralappar, och för att ett tryck slår att skriva. "Annat" finns för att
- * bastun kostar 120 och inte 100.
+ * Avstängt från början och osynligt tills någon slår på det. Det är
+ * skillnaden mot en rad prisförslag: en sådan rad säger att prissättning är
+ * ett normalt steg när man ordnar något, och då börjar det kännas som ett
+ * event. Här är det en avvikelse man får påpeka om den finns.
  *
- * Gratis är ett eget val och inte ett tomt fält. Skillnaden spelar roll:
- * väljer man gratis kan appen skriva ut "Gratis" med säkerhet, och då slipper
- * någon dyka upp och bli överraskad vid grinden.
+ * Ordet är "kostar på plats" och inte "pris", eftersom värden inte tar
+ * betalt. Bastun gör det. Var pengarna hamnar är hela skillnaden mellan en
+ * hängning och ett arrangemang.
  */
 
 import { useState } from "react";
+import { Switch, View } from "react-native";
 
-import { Chip, Field, Gap, Row, Txt } from "@/components/ui";
-
-const QUICK = [50, 100, 150, 200] as const;
+import { Field, Gap, Row, Txt } from "@/components/ui";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Props {
   value: number | null;
@@ -22,50 +23,36 @@ interface Props {
 }
 
 export function PriceField({ value, onChange }: Props) {
-  const quick = value !== null && (QUICK as readonly number[]).includes(value);
-  const [custom, setCustom] = useState(!quick && value !== null);
+  const theme = useTheme();
+  const [on, setOn] = useState(value !== null);
 
-  function pick(amount: number | null) {
-    setCustom(false);
-    onChange(amount);
+  function toggle(next: boolean) {
+    setOn(next);
+    if (!next) onChange(null);
   }
 
   return (
     <>
-      <Txt variant="smallStrong" tone="muted">Kostar det något?</Txt>
-      <Gap size="xs" />
-      <Txt variant="small" tone="faint">
-        Per person. Ta med bastu, bana eller biljett här så slipper folk bli
-        överraskade på plats.
-      </Txt>
-      <Gap size="sm" />
-
-      <Row gap="sm" wrap>
-        <Chip
-          label="Gratis"
-          selected={value === null && !custom}
-          onPress={() => pick(null)}
-        />
-        {QUICK.map((amount) => (
-          <Chip
-            key={amount}
-            label={`${amount} kr`}
-            selected={!custom && value === amount}
-            onPress={() => pick(amount)}
-          />
-        ))}
-        <Chip
-          label="Annat"
-          selected={custom}
-          onPress={() => { setCustom(true); onChange(null); }}
+      <Row justify="space-between" gap="md">
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Txt variant="smallStrong" tone="muted">Kostar något på plats</Txt>
+          <Txt variant="small" tone="faint">
+            Bastu, bana, entré. Ni betalar var för sig, inget går via appen.
+          </Txt>
+        </View>
+        <Switch
+          value={on}
+          onValueChange={toggle}
+          trackColor={{ true: theme.color.primary, false: theme.color.surfaceAlt }}
+          thumbColor={theme.color.surface}
         />
       </Row>
 
-      {custom && (
+      {on && (
         <>
           <Gap size="sm" />
           <Field
-            label="Belopp i kronor"
+            label="Ungefär hur mycket per person?"
             value={value === null ? "" : String(value)}
             onChangeText={(text) => {
               const digits = text.replace(/\D/g, "").slice(0, 6);

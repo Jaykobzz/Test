@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Modal, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import type { ExperienceLevel } from "@/api/types";
+import { formatCost } from "@/lib/pris";
 import { Button, Card, Chip, Field, Gap, Row, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { radius, space } from "@/theme";
@@ -88,13 +89,13 @@ export function ApplySheet({
                 de andra som vill med.
               </Txt>
 
-              {priceSek !== null && priceSek > 0 && (
+              {formatCost(priceSek) && (
                 <>
                   <Gap size="md" />
-                  {/* Sista chansen att se kostnaden innan man tackar ja. */}
-                  <Row gap="sm">
-                    <Chip label={`Kostar ${priceSek} kr per person`} tone="accent" />
-                  </Row>
+                  {/* Sista gången kostnaden syns innan man tackar ja. */}
+                  <Txt variant="small" tone="muted">
+                    {formatCost(priceSek)}. Ni betalar var för sig på plats.
+                  </Txt>
                 </>
               )}
 
