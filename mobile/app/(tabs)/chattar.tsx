@@ -134,13 +134,15 @@ function ThreadRow({ thread, onPress }: { thread: ThreadSummary; onPress: () => 
         </View>
 
         <View style={{ flex: 1 }}>
-          <Row justify="space-between">
-            <View style={{ flex: 1 }}>
+          <Row justify="space-between" gap="sm">
+            <View style={{ flex: 1, minWidth: 0 }}>
               <Txt variant={unread ? "bodyStrong" : "body"} numberOfLines={1}>
                 {thread.title}
               </Txt>
             </View>
-            <Txt variant="micro" tone="faint">{formatRelative(thread.lastMessageAt)}</Txt>
+            <Txt variant="micro" tone="faint" style={{ flexShrink: 0 }}>
+              {formatRelative(thread.lastMessageAt)}
+            </Txt>
           </Row>
 
           <Gap size="xs" />

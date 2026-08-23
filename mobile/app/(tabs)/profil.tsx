@@ -70,7 +70,20 @@ export default function ProfileScreen() {
     }
   }
 
+  /** Vad som fattas, eller null när allt är klart. */
+  const missingInProfile =
+    draftName.trim().length < 2
+      ? "Skriv vad du vill kallas."
+      : draftInterests.length === 0
+        ? "Välj minst ett intresse."
+        : null;
+
   async function save() {
+    if (missingInProfile) {
+      // En avstängd knapp säger inte varför. Det här gör det.
+      Alert.alert("Något fattas", missingInProfile);
+      return;
+    }
     setSaving(true);
     try {
       await getBackend().updateMyProfile({
@@ -155,8 +168,8 @@ export default function ProfileScreen() {
 
         <Card onPress={() => router.push("/kompisar")}>
           <View style={{ padding: space.lg }}>
-            <Row justify="space-between">
-              <Row gap="md">
+            <Row justify="space-between" gap="sm">
+              <Row gap="md" style={{ flex: 1, minWidth: 0 }}>
                 <View
                   style={{
                     width: 42,
@@ -221,12 +234,7 @@ export default function ProfileScreen() {
               </Row>
 
               <Gap size="lg" />
-              <Button
-                label="Spara"
-                onPress={save}
-                loading={saving}
-                disabled={draftName.trim().length < 2 || draftInterests.length === 0}
-              />
+              <Button label="Spara" onPress={save} loading={saving} />
               <Gap size="sm" />
               <Button label="Avbryt" kind="ghost" onPress={() => setEditing(false)} />
             </View>

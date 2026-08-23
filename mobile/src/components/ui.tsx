@@ -25,7 +25,7 @@ import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-ar
 import { Icon, type IconName } from "@/components/icons/Icon";
 import { Tappable } from "@/components/Tappable";
 import { useTheme } from "@/hooks/useTheme";
-import { font, radius, shadowFor, space } from "@/theme";
+import { font, fontFamily, radius, shadowFor, space } from "@/theme";
 
 /* Text -------------------------------------------------------------------- */
 
@@ -393,7 +393,7 @@ export function Avatar({
       <Text
         style={{
           fontSize: size * 0.38,
-          fontWeight: "700",
+          fontFamily: fontFamily.bodyBold,
           color: theme.color.primary,
         }}
       >

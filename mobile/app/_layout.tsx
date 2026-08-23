@@ -23,7 +23,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider, useAuth } from "@/auth/AuthContext";
 import { Loading } from "@/components/ui";
-import { darkTheme, lightTheme } from "@/theme";
+import { darkTheme, fontFamily, lightTheme } from "@/theme";
 
 export default function RootLayout() {
   const scheme = useColorScheme();
@@ -92,7 +92,7 @@ function RootNavigator() {
         headerShadowVisible: false,
         headerStyle: { backgroundColor: theme.color.bg },
         headerTintColor: theme.color.text,
-        headerTitleStyle: { fontWeight: "700" },
+        headerTitleStyle: { fontFamily: fontFamily.displaySemi },
         contentStyle: { backgroundColor: theme.color.bg },
       }}
     >

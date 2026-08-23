@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
-import { font } from "@/theme";
+import { font, fontFamily } from "@/theme";
 
 export default function TabsLayout() {
   const theme = useTheme();
@@ -19,7 +19,10 @@ export default function TabsLayout() {
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: theme.color.border,
         },
-        tabBarLabelStyle: { fontSize: font.micro.fontSize, fontWeight: "600" },
+        tabBarLabelStyle: {
+          fontSize: font.micro.fontSize,
+          fontFamily: fontFamily.bodySemi,
+        },
       }}
     >
       <Tabs.Screen

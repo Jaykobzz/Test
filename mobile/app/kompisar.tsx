@@ -128,8 +128,8 @@ export default function FriendsScreen() {
               {friends.map((person) => (
                 <Card key={person.id} onPress={() => router.push(`/person/${person.id}`)}>
                   <View style={{ padding: space.lg }}>
-                    <Row justify="space-between">
-                      <Row gap="md">
+                    <Row justify="space-between" gap="sm">
+                      <Row gap="md" style={{ flex: 1, minWidth: 0 }}>
                         <Avatar uri={person.avatarUrl} name={person.displayName} size={48} />
                         <View>
                           <Txt variant="bodyStrong">{person.displayName}</Txt>

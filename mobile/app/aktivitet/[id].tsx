@@ -182,7 +182,7 @@ export default function ActivityScreen() {
             accessibilityRole="link"
             accessibilityLabel={`Öppna ${activity.locationName} i kartor`}
           >
-            <Row justify="space-between">
+            <Row justify="space-between" gap="sm">
               <InfoRow
                 icon="location-outline"
                 text={activity.locationName
@@ -190,7 +190,7 @@ export default function ActivityScreen() {
                     ? ` · ${formatDistance(activity.distanceM)}`
                     : "")}
               />
-              <Row gap="xs">
+              <Row gap="xs" style={{ flexShrink: 0 }}>
                 <Txt variant="small" tone="primary">Karta</Txt>
                 <Ionicons name="open-outline" size={14} color={theme.color.primary} />
               </Row>
@@ -264,6 +264,16 @@ export default function ActivityScreen() {
               <Txt variant="small" tone="muted">
                 Accepterar du någon hamnar ni direkt i en chatt tillsammans.
               </Txt>
+              {full && (
+                <>
+                  <Gap size="sm" />
+                  {/* Utan den här raden ser knapparna nedanför bara ut att
+                      vara trasiga. */}
+                  <Txt variant="small" tone="danger">
+                    Alla platser är tagna. Hoppar någon av kan du acceptera fler.
+                  </Txt>
+                </>
+              )}
               <Gap size="md" />
 
               <View style={{ gap: space.md }}>
@@ -322,9 +332,9 @@ function InfoRow({
 }) {
   const theme = useTheme();
   return (
-    <Row gap="sm">
+    <Row gap="sm" style={{ flex: 1, minWidth: 0 }}>
       <Ionicons name={icon} size={17} color={theme.color.textMuted} />
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, minWidth: 0 }}>
         <Txt variant="body" tone="muted">{text}</Txt>
       </View>
     </Row>

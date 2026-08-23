@@ -63,6 +63,33 @@ export default function PersonScreen() {
     }
   }
 
+  function confirmRemoveFriend() {
+    if (!person?.friendRequestId) return;
+    Alert.alert(
+      `Ta bort ${person.displayName} som kompis?`,
+      "Ni kan fortfarande haka på varandras aktiviteter. Personen får ingen "
+      + "avisering om det här.",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Ta bort",
+          style: "destructive",
+          onPress: async () => {
+            setWorking(true);
+            try {
+              await getBackend().removeFriend(person.friendRequestId!);
+              await load();
+            } catch (error) {
+              Alert.alert("Gick inte", describe(error));
+            } finally {
+              setWorking(false);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   async function respondFriend(accept: boolean) {
     if (!person?.friendRequestId) return;
     setWorking(true);
@@ -220,6 +247,7 @@ export default function PersonScreen() {
               working={working}
               onRequest={requestFriend}
               onRespond={respondFriend}
+              onRemove={confirmRemoveFriend}
             />
 
             <Gap size="sm" />
@@ -253,11 +281,13 @@ function FriendAction({
   working,
   onRequest,
   onRespond,
+  onRemove,
 }: {
   person: PublicProfile;
   working: boolean;
   onRequest: () => void;
   onRespond: (accept: boolean) => void;
+  onRemove: () => void;
 }) {
   const theme = useTheme();
 
@@ -278,6 +308,18 @@ function FriendAction({
         <Txt variant="small" tone="muted" align="center">
           {person.displayName} ser aktiviteter du lägger upp bara för kompisar.
         </Txt>
+        <Gap size="sm" />
+        {/*
+          Utan den här fanns bara en väg ut ur en kompisrelation, och det var
+          att blockera. Att sluta vara kompis ska inte kräva det hårdaste
+          verktyget appen har.
+        */}
+        <Button
+          label="Ta bort som kompis"
+          kind="ghost"
+          onPress={onRemove}
+          disabled={working}
+        />
       </View>
     );
   }
