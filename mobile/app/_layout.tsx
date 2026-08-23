@@ -82,6 +82,13 @@ function RootNavigator() {
   return (
     <Stack
       screenOptions={{
+        /*
+          Utan detta tar iOS namnet på skärmen man kom ifrån som etikett på
+          bakåtknappen. Kommer man från flikarna heter den rutten "(tabs)",
+          och då står det "Tabs" i appen. "minimal" visar bara pilen, vilket
+          dessutom är det Apple själva gör i sina egna appar.
+        */
+        headerBackButtonDisplayMode: "minimal",
         headerShadowVisible: false,
         headerStyle: { backgroundColor: theme.color.bg },
         headerTintColor: theme.color.text,

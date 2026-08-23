@@ -275,50 +275,75 @@ export default function NewActivityScreen() {
       <Txt variant="smallStrong" tone="muted">När?</Txt>
       <Gap size="sm" />
 
-      <View
-        style={{
-          backgroundColor: theme.color.surface,
-          borderRadius: radius.field,
-          borderWidth: 1,
-          borderColor: theme.color.border,
-          padding: space.md,
-        }}
-      >
-        <Txt variant="bodyStrong">
-          {formatActivityWhen(startsAt.toISOString(), endsAt.toISOString())}
-        </Txt>
-        <Gap size="sm" />
+      {/*
+        iOS och Android vill ha olika saker här.
+
+        Tidigare fanns två knappar som fällde ut en väljare under rutan. På
+        iOS ritas väljaren inline, så tiden hamnade löst under fältet i
+        stället för i det. Med display "compact" blir varje väljare ett eget
+        litet fält som öppnar sin egen popover, vilket är det iOS självt gör.
+
+        Android har ingen compact-variant utan öppnar alltid en egen dialog,
+        så där behövs knapparna.
+      */}
+      {Platform.OS === "ios" ? (
         <Row gap="sm">
-          <Button
-            label="Ändra dag"
-            kind="secondary"
-            icon="calendar"
-            onPress={() => setPicker("date")}
-            fullWidth={false}
+          <DateTimePicker
+            value={startsAt}
+            mode="date"
+            display="compact"
+            minimumDate={new Date()}
+            accentColor={theme.color.primary}
+            themeVariant={theme.dark ? "dark" : "light"}
+            onChange={(_, selected) => selected && setStartsAt(selected)}
           />
-          <Button
-            label="Ändra tid"
-            kind="secondary"
-            icon="time"
-            onPress={() => setPicker("time")}
-            fullWidth={false}
+          <DateTimePicker
+            value={startsAt}
+            mode="time"
+            display="compact"
+            accentColor={theme.color.primary}
+            themeVariant={theme.dark ? "dark" : "light"}
+            onChange={(_, selected) => selected && setStartsAt(selected)}
           />
         </Row>
-      </View>
-
-      {picker && (
-        <DateTimePicker
-          value={startsAt}
-          mode={picker}
-          minimumDate={picker === "date" ? new Date() : undefined}
-          onChange={(event, selected) => {
-            // Android stänger väljaren själv; iOS visar den inline.
-            if (Platform.OS === "android") setPicker(null);
-            if (event.type === "dismissed" || !selected) return;
-            setStartsAt(selected);
-          }}
-        />
+      ) : (
+        <>
+          <Row gap="sm">
+            <Button
+              label="Välj dag"
+              kind="secondary"
+              icon="calendar"
+              onPress={() => setPicker("date")}
+              fullWidth={false}
+            />
+            <Button
+              label="Välj tid"
+              kind="secondary"
+              icon="time"
+              onPress={() => setPicker("time")}
+              fullWidth={false}
+            />
+          </Row>
+          {picker && (
+            <DateTimePicker
+              value={startsAt}
+              mode={picker}
+              minimumDate={picker === "date" ? new Date() : undefined}
+              onChange={(event, selected) => {
+                setPicker(null);
+                if (event.type === "dismissed" || !selected) return;
+                setStartsAt(selected);
+              }}
+            />
+          )}
+        </>
       )}
+
+      <Gap size="sm" />
+      {/* Sammanfattningen i klartext, så man ser hela spannet på en gång. */}
+      <Txt variant="small" tone="muted">
+        {formatActivityWhen(startsAt.toISOString(), endsAt.toISOString())}
+      </Txt>
 
       <Gap size="md" />
       <Txt variant="smallStrong" tone="muted">Hur länge?</Txt>
