@@ -120,6 +120,53 @@ samtidigt.
 
 ---
 
+## Hittat i genomgången av appen
+
+Buggarna nedan är redan lagade. Det som står här är sådant som saknas.
+
+### 12. Det går inte att ändra en aktivitet
+
+Backenden har `createActivity` och `cancelActivity`, men ingen väg däremellan.
+En felstavad titel eller fel tid går bara att lösa genom att ställa in och
+skapa på nytt, och då förlorar man de sökande och chatten.
+
+Det här är den största enskilda luckan. En värd som måste flytta fram en
+timme ska inte behöva sprida ut sitt sällskap för att göra det.
+
+Behöver `update_activity()` med samma synlighetskontroll som resten, plus en
+systemhälsning i tråden när tid eller plats ändras, så att de som redan tackat
+ja får veta.
+
+### 13. Ingen väg ut ur en chatt
+
+Man kan hoppa av en aktivitet, och då lämnar man dess tråd. Men en
+direktchatt går inte att lämna, bara att blockera personen. Samma problem som
+kompisrelationen hade: det hårdaste verktyget är det enda.
+
+### 14. Tabbaren använder Ionicons
+
+Resten av appen har ett eget ikonset som ritats för ändamålet, men de fyra
+ikonerna man ser hela tiden kommer från ett bibliotek. Det är den mest synliga
+ytan i appen och den enda som inte följer huset.
+
+Behöver fyra ikoner till i `design/icons/icons.json`: kompass, kalender,
+samtal och person.
+
+### 15. `listInterests()` anropas aldrig
+
+Klienten använder sin egen hårdkodade lista i `src/api/interests.ts`, eftersom
+den bär ikonerna. Tabellen `interests` i databasen och funktionen som läser den
+är därmed död vikt, och de två listorna kan glida isär utan att något märker
+det. Antingen tas den bort eller så blir den källan, men inte som nu.
+
+### 16. Olästmarkeringen är inte i realtid
+
+Pricken i tabbaren laddas om när flikarna får fokus. Står appen öppen dyker
+inget upp förrän man byter skärm. `subscribeToThread()` finns redan och bör
+driva den när Supabase är uppe.
+
+---
+
 ## Väntar på beslut
 
 ### 7. Kategorier i två nivåer

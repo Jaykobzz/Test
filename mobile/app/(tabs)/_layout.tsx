@@ -3,10 +3,12 @@ import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
+import { useUnread } from "@/hooks/useUnread";
 import { font, fontFamily } from "@/theme";
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const unread = useUnread();
 
   return (
     <Tabs
@@ -43,6 +45,14 @@ export default function TabsLayout() {
         name="chattar"
         options={{
           title: "Chattar",
+          // Siffran är det enda i appen som ber om uppmärksamhet av sig
+          // självt, så den finns bara när den betyder något.
+          tabBarBadge: unread > 0 ? (unread > 99 ? "99+" : unread) : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: theme.color.accent,
+            fontFamily: fontFamily.bodyBold,
+            fontSize: 11,
+          },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles" size={size} color={color} />
           ),
