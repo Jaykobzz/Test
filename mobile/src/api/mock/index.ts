@@ -432,6 +432,41 @@ export class MockBackend implements Backend {
     await persist();
   }
 
+  async deleteAccount(): Promise<void> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+
+    // Samma ordning som delete_my_account(): ställ in innan du försvinner,
+    // så att den som tackat ja ser "inställd" och inte ett hål.
+    for (const activity of db.activities) {
+      if (activity.hostId === me
+        && (activity.status === "open" || activity.status === "full")
+        && Date.parse(activity.endsAt) > Date.now()) {
+        activity.status = "cancelled";
+      }
+    }
+
+    // Meddelanden blir kvar utan avsändare, precis som i databasen, så att
+    // ingen annans chatthistorik får hål i sig.
+    for (const message of db.messages) {
+      if (message.senderId === me) message.senderId = null;
+    }
+
+    db.activities = db.activities.filter((a) => a.hostId !== me);
+    db.participants = db.participants.filter((p) => p.userId !== me);
+    db.threadMembers = db.threadMembers.filter((m) => m.userId !== me);
+    db.friendships = db.friendships.filter(
+      (f) => f.requesterId !== me && f.addresseeId !== me,
+    );
+    db.profiles = db.profiles.filter((p) => p.id !== me);
+    for (const [pnr, id] of Object.entries(db.identities)) {
+      if (id === me) delete db.identities[pnr];
+    }
+
+    db.currentUserId = null;
+    await persist();
+  }
+
   /* Profil ---------------------------------------------------------------- */
 
   async getMyProfile(): Promise<MyProfile | null> {

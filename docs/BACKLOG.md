@@ -5,7 +5,40 @@ Beslut som redan är fattade står här tillsammans med sin motivering. Poängen
 gång till, och att inget av det vi kommit fram till ska bero på att någon
 råkar minnas rätt.
 
-Ordningen inom varje avsnitt är ungefär den vi bör ta dem i.
+---
+
+## Vägen till lansering
+
+Det här avsnittet finns för att skilja det som *hindrar* en lansering från
+det som bara gör appen bättre. Utan den skillnaden dras man mot det roligaste
+kvarvarande arbetet, och det är sällan det som står i vägen.
+
+### Måste finnas innan någon utomstående kan använda appen
+
+| | Vad | Vem kan göra det |
+|---|---|---|
+| 1 | **Delad databas.** Idag ligger allt lokalt i varje telefon, så två personer kan inte se varandra. Ingenting annat spelar roll förrän det är löst. Migrationerna och `SupabaseBackend` är färdiga; det som saknas är ett projekt. Gratisplanen tillåter två aktiva och båda är upptagna. | Jakob väljer vilket projekt som pausas |
+| 2 | **Något som stoppar slit-och-släng-konton.** BankID är beslutat att vänta. SMS-verifiering kostar cirka 30 öre per registrering och kräver ett konto hos en leverantör. Identiteten ligger redan bakom ett gränssnitt, så själva inkopplingen är en dags arbete. | Jakob skaffar konto, sen kod |
+| 3 | **Integritetspolicy och villkor på en publik adress.** Både App Store och GDPR kräver det, och appen samlar position, bilder och personuppgifter. Utan en URL avvisas appen i granskningen. | Utkast kan skrivas, Jakob publicerar |
+| 4 | ~~**Radera sitt konto inifrån appen.**~~ Klart. Apple kräver det av alla appar med konton. | Klart |
+| 5 | **Någon som faktiskt läser anmälningar.** Tabellen finns och knappen finns, men ingen tittar. För en app där folk träffas fysiskt är det inte en formalitet. Behöver inte vara ett verktyg, men det behöver vara någons uppgift. | Jakob |
+| 6 | **Ett sätt att installera appen.** Expo Go duger för vänner, TestFlight för alla andra. Kräver EAS-bygge och Apple Developer Program, 99 dollar om året. | Jakob skaffar konto, sen kod |
+
+### Behövs för att appen ska hålla i verkligheten
+
+Inte hinder för granskningen, men de gör skada varje dag de saknas.
+
+- **Ändra en aktivitet** (punkt 12). Idag löses fel tid genom att ställa in
+  och göra om, och då försvinner de sökande och chatten.
+- **Städa passerade aktiviteter automatiskt** (punkt 6). En spontan inbjudan
+  som ligger kvar timmar efter att den varit får folk att sluta lita på
+  flödet.
+
+### Kan vänta till efter första området
+
+Push, kartnål, positionsdelning, egna tabbikoner, realtid på olästmarkeringen,
+kategorier i två nivåer. Allt sådant gör appen bättre men avgör ingenting
+innan det finns folk som använder den.
 
 ---
 

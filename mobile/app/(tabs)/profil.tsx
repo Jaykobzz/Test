@@ -107,6 +107,43 @@ export default function ProfileScreen() {
     ]);
   }
 
+  function confirmDelete() {
+    // Två steg med flit. Det här går inte att ångra, och en enda knapptryckning
+    // ska inte kunna radera allt någon byggt upp.
+    Alert.alert(
+      "Radera ditt konto?",
+      "Din profil, dina aktiviteter och dina kompisrelationer tas bort. "
+      + "Aktiviteter du är värd för ställs in så att de som tackat ja får veta. "
+      + "Det går inte att ångra.",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Fortsätt",
+          style: "destructive",
+          onPress: () => Alert.alert(
+            "Säker?",
+            "Kontot raderas direkt och går inte att få tillbaka.",
+            [
+              { text: "Nej", style: "cancel" },
+              {
+                text: "Radera",
+                style: "destructive",
+                onPress: async () => {
+                  try {
+                    await getBackend().deleteAccount();
+                    await refresh();
+                  } catch (error) {
+                    Alert.alert("Gick inte att radera", describe(error));
+                  }
+                },
+              },
+            ],
+          ),
+        },
+      ],
+    );
+  }
+
   function confirmReset() {
     Alert.alert(
       "Börja om?",
@@ -275,6 +312,13 @@ export default function ProfileScreen() {
         <Divider />
 
         <Button label="Logga ut" kind="ghost" onPress={confirmSignOut} />
+        <Gap size="sm" />
+        {/*
+          Apple kräver att den som kan skapa ett konto också kan radera det
+          inifrån appen. GDPR kräver samma sak av andra skäl. Den ligger sist
+          och lågmält, men den ligger här.
+        */}
+        <Button label="Radera mitt konto" kind="danger" onPress={confirmDelete} />
 
         {USING_MOCK && (
           <>

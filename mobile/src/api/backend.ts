@@ -37,6 +37,11 @@ export interface Backend {
   bankIdCancel(orderRef: string): Promise<void>;
   restoreSession(): Promise<boolean>;
   signOut(): Promise<void>;
+  /**
+   * Raderar kontot på riktigt. Kommer inte tillbaka: efter det här finns
+   * ingen session och inget att logga in till.
+   */
+  deleteAccount(): Promise<void>;
 
   /* Profil ---------------------------------------------------------------- */
   getMyProfile(): Promise<MyProfile | null>;

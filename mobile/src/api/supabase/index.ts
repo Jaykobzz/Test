@@ -211,6 +211,12 @@ export class SupabaseBackend implements Backend {
     return data.session !== null;
   }
 
+  async deleteAccount(): Promise<void> {
+    const { error } = await supabase().rpc("delete_my_account");
+    fail(error);
+    await supabase().auth.signOut();
+  }
+
   async signOut(): Promise<void> {
     await supabase().auth.signOut();
   }

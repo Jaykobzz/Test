@@ -214,6 +214,21 @@ async function shouldThrow(label, fn) {
     check("kompislistan går att läsa", Array.isArray(friends));
   }
 
+  console.log("\nRadera konto");
+  const foreDelete = (await api.discover({ radiusM: 25000 })).length;
+  const minaFore = (await api.myActivities()).hosting.length;
+  check("jag ar vard for nagot att stalla in", minaFore > 0);
+  await api.deleteAccount();
+  const efter = await api.getMyProfile();
+  check("profilen ar borta", efter === null);
+
+  // Logga in med samma nummer igen: ska ge en HELT ny person.
+  const s2 = await api.bankIdStart("199001011234");
+  await new Promise((r) => setTimeout(r, 3200));
+  const c2 = await api.bankIdCollect(s2.orderRef);
+  check("samma nummer ger en ny profil efter radering",
+        c2.needsOnboarding === true);
+
   console.log("\nUtloggning");
   await api.signOut();
   const gone = await api.getMyProfile();
