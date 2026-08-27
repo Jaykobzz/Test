@@ -12,6 +12,7 @@ import { FlatList, RefreshControl, View } from "react-native";
 import Animated, { FadeIn, FadeInDown, LinearTransition } from "react-native-reanimated";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityCard } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
@@ -59,7 +60,7 @@ export default function DiscoverScreen() {
           setPlace({
             lat: profile.homeLat,
             lng: profile.homeLng,
-            label: profile.homeAreaLabel ?? "Ditt område",
+            label: profile.homeAreaLabel ?? t.feed.yourArea,
           });
         }
       }
@@ -105,7 +106,7 @@ export default function DiscoverScreen() {
         <Row justify="space-between" gap="md">
           {/* Knappen till höger behåller sin bredd, platsraden får krympa. */}
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Txt variant="title">Upptäck</Txt>
+            <Txt variant="title">{t.feed.title}</Txt>
             {place && (
               <Row gap="xs">
                 <Ionicons name="location" size={13} color={theme.color.textFaint} />
@@ -118,7 +119,7 @@ export default function DiscoverScreen() {
 
           <Tappable
             onPress={() => setChoosing(true)}
-            accessibilityLabel="Skapa aktivitet"
+            accessibilityLabel="SKAPA"
             scale={0.94}
             style={{
               backgroundColor: theme.color.primary,
@@ -226,14 +227,14 @@ export default function DiscoverScreen() {
           ListEmptyComponent={
             <EmptyState
               icon="compass-outline"
-              title="Tomt här just nu"
+              title={t.feed.emptyTitle}
               body={
                 filter.length
-                  ? "Inga aktiviteter matchar filtret. Prova att ta bort något."
-                  : "Ingen har lagt upp något i närheten än. Bli den första, det brukar räcka med en."
+                  ? t.feed.emptyFiltered
+                  : t.feed.emptyBody
               }
               action={{
-                label: filter.length ? "Rensa filter" : "Skapa aktivitet",
+                label: filter.length ? t.feed.clearFilter : t.feed.create,
                 onPress: () => (filter.length ? setFilter([]) : setChoosing(true)),
               }}
             />

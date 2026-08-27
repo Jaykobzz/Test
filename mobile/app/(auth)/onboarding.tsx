@@ -14,6 +14,7 @@ import { Alert, Pressable, View } from "react-native";
 import { getBackend } from "@/api";
 import { INTERESTS, type IconName } from "@/api/interests";
 import { useAuth } from "@/auth/AuthContext";
+import { t } from "@/i18n";
 import { Button, Chip, Divider, Field, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { pickImage } from "@/lib/image";
@@ -73,11 +74,11 @@ export default function OnboardingScreen() {
   /** Vad som fattas, eller null när allt är klart. En rad, inte en lista. */
   const missing =
     avatarUri === null
-      ? "Välj en bild på dig först."
+      ? t.onboarding.needPhoto
       : displayName.trim().length < 2
-        ? "Skriv vad du vill kallas."
+        ? t.onboarding.needName
         : interests.length < MIN_INTERESTS
-          ? `Välj ${MIN_INTERESTS - interests.length} intressen till.`
+          ? t.onboarding.needInterests(MIN_INTERESTS - interests.length)
           : null;
 
   const canSave = missing === null;
@@ -87,7 +88,7 @@ export default function OnboardingScreen() {
       const uri = await pickImage("avatars");
       if (uri) setAvatarUri(uri);
     } catch (error) {
-      Alert.alert("Kunde inte välja bild", describe(error));
+      Alert.alert(t.onboarding.photoFailed, describe(error));
     }
   }
 
@@ -105,7 +106,7 @@ export default function OnboardingScreen() {
       // ovanför den är nästan lika illa: den syns inte när man tittar på
       // knappen man just tryckt på. Därför en ruta man måste stänga.
       setTriedToSave(true);
-      Alert.alert("Något fattas", missing ?? "Fyll i allt tre steg först.");
+      Alert.alert(t.common.missing, missing ?? t.onboarding.needAll);
       return;
     }
     setSaving(true);
@@ -123,7 +124,7 @@ export default function OnboardingScreen() {
       await refresh();
       router.replace("/(tabs)");
     } catch (error) {
-      Alert.alert("Kunde inte spara", describe(error));
+      Alert.alert(t.onboarding.saveFailed, describe(error));
     } finally {
       setSaving(false);
     }
@@ -147,7 +148,7 @@ export default function OnboardingScreen() {
             </>
           )}
           <Button
-            label={saving ? "Sparar …" : "Kom igång"}
+            label={saving ? t.onboarding.saving : t.onboarding.start}
             onPress={save}
             loading={saving}
           />
@@ -155,23 +156,23 @@ export default function OnboardingScreen() {
       }
     >
       <Gap size="xl" />
-      <Txt variant="display">Välkommen!</Txt>
+      <Txt variant="display">{t.onboarding.welcome}</Txt>
       <Gap size="xs" />
       <Txt variant="body" tone="muted">
-        Tre snabba saker, sen är du igång.
+        {t.onboarding.intro}
       </Txt>
 
       <Gap size="xl" />
 
       {/* 1. Bilden */}
-      <StepTitle n={1} label="En bild på dig" done={avatarUri !== null} />
+      <StepTitle n={1} label={t.onboarding.photo} done={avatarUri !== null} />
       <Gap size="xs" />
       <Txt variant="small" tone="muted">
-        Alla här visar sitt ansikte. Det är därför det känns tryggt att tacka ja.
+        {t.onboarding.photoWhy}
       </Txt>
       <Gap size="md" />
 
-      <Pressable onPress={choosePhoto} accessibilityRole="button" accessibilityLabel="Välj profilbild">
+      <Pressable onPress={choosePhoto} accessibilityRole="button" accessibilityLabel={t.onboarding.choosePhoto}>
         <View style={{ alignItems: "center" }}>
           {avatarUri ? (
             <View>
@@ -206,7 +207,7 @@ export default function OnboardingScreen() {
               }}
             >
               <Ionicons name="camera" size={30} color={theme.color.primary} />
-              <Txt variant="micro" tone="primary">VÄLJ BILD</Txt>
+              <Txt variant="micro" tone="primary">{t.onboarding.pickPhoto}</Txt>
             </View>
           )}
         </View>
@@ -216,22 +217,22 @@ export default function OnboardingScreen() {
       <Divider />
 
       {/* 2. Vem du är */}
-      <StepTitle n={2} label="Vem är du?" done={displayName.trim().length >= 2} />
+      <StepTitle n={2} label={t.onboarding.who} done={displayName.trim().length >= 2} />
       <Gap size="md" />
 
       <Field
-        label="Vad ska folk kalla dig?"
+        label={t.onboarding.nameLabel}
         value={displayName}
         onChangeText={setDisplayName}
-        placeholder="Förnamn räcker"
+        placeholder={t.onboarding.namePlaceholder}
         maxLength={40}
       />
       <Gap size="md" />
       <Field
-        label="Kort om dig"
+        label={t.onboarding.bioLabel}
         value={bio}
         onChangeText={setBio}
-        placeholder="Vad gör du helst en ledig lördag?"
+        placeholder={t.onboarding.bioPlaceholder}
         multiline
         maxLength={500}
         hint={`${bio.length}/500`}
@@ -250,10 +251,10 @@ export default function OnboardingScreen() {
           <Ionicons name="location" size={17} color={theme.color.accent} />
           <View style={{ flex: 1 }}>
             <Txt variant="smallStrong">
-              {locating ? "Letar upp ditt område …" : home?.label ?? "Område okänt"}
+              {locating ? t.onboarding.locating : home?.label ?? t.onboarding.areaUnknown}
             </Txt>
             <Txt variant="small" tone="faint">
-              Vi sparar bara ungefär var du bor, aldrig din exakta adress.
+              {t.onboarding.areaPrivacy}
             </Txt>
           </View>
         </Row>
@@ -265,12 +266,12 @@ export default function OnboardingScreen() {
       {/* 3. Intressen */}
       <StepTitle
         n={3}
-        label="Vad gillar du?"
+        label={t.onboarding.interests}
         done={interests.length >= MIN_INTERESTS}
       />
       <Gap size="xs" />
       <Txt variant="small" tone="muted">
-        Välj minst {MIN_INTERESTS}. De styr vad du får se i flödet.
+        {t.onboarding.interestsHelp(MIN_INTERESTS)}
       </Txt>
       <Gap size="md" />
 
@@ -324,5 +325,5 @@ function StepTitle({ n, label, done }: { n: number; label: string; done: boolean
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

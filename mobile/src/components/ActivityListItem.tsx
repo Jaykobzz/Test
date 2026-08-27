@@ -14,6 +14,7 @@ import { interestIcon, interestLabel } from "@/api/interests";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar, Badge, Card, Credentials, Gap, Row, Txt } from "@/components/ui";
 import { Cover } from "@/components/Cover";
+import { t } from "@/i18n";
 import { useTheme } from "@/hooks/useTheme";
 import { formatDistance } from "@/lib/geo";
 import { formatActivityWhen } from "@/lib/time";
@@ -39,11 +40,11 @@ export function ActivityListItem({
         />
 
         <Row gap="xs" wrap style={{ position: "absolute", top: space.md, left: space.md }}>
-          {activity.kind === "now" && <Badge label="Spontant" icon="flash" tone="accent" />}
-          {activity.visibility === "friends" && <Badge label="Bara kompisar" icon="heart" tone="accent" />}
-          {activity.myStatus === "pending" && <Badge label="Ansökt" tone="dark" />}
-          {activity.myStatus === "accepted" && <Badge label="Du är med" tone="primary" />}
-          {activity.isMine && <Badge label="Din aktivitet" tone="dark" />}
+          {activity.kind === "now" && <Badge label={t.card.spontaneous} icon="flash" tone="accent" />}
+          {activity.visibility === "friends" && <Badge label={t.card.friendsOnly} icon="heart" tone="accent" />}
+          {activity.myStatus === "pending" && <Badge label={t.card.applied} tone="dark" />}
+          {activity.myStatus === "accepted" && <Badge label={t.card.youreIn} tone="primary" />}
+          {activity.isMine && <Badge label={t.card.yours} tone="dark" />}
         </Row>
 
         {activity.distanceM !== null && (
@@ -132,8 +133,8 @@ function SpotsLabel({ activity }: { activity: ActivityCard }) {
       >
         <Txt variant="micro" tone="muted">
           {activity.acceptedCount === 0
-            ? "Öppet för alla"
-            : `${activity.acceptedCount} med`}
+            ? t.card.openToAll
+            : t.card.joined(activity.acceptedCount)}
         </Txt>
       </View>
     );
@@ -152,7 +153,7 @@ function SpotsLabel({ activity }: { activity: ActivityCard }) {
       }}
     >
       <Txt variant="micro" tone={full ? "faint" : "primary"}>
-        {full ? "Fullt" : left === 1 ? "1 plats kvar" : `${left} platser kvar`}
+        {full ? t.card.full : t.card.spotsLeft(left)}
       </Txt>
     </View>
   );

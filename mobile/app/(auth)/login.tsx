@@ -11,6 +11,7 @@ import { useState } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { USING_MOCK } from "@/api";
+import { t } from "@/i18n";
 import { useAuth, waitingMessage } from "@/auth/AuthContext";
 import { Logo } from "@/components/Logo";
 import { Button, Field, Gap, Row, Screen, Txt } from "@/components/ui";
@@ -37,7 +38,7 @@ export default function LoginScreen() {
 
           <Gap size="lg" />
           <Txt variant="body" tone="muted" align="center" style={{ maxWidth: 300 }}>
-            Hitta folk i närheten som vill göra samma sak som du.
+            {t.login.tagline}
           </Txt>
         </View>
 
@@ -53,8 +54,8 @@ export default function LoginScreen() {
         ) : (
           <>
             <Field
-              label="Personnummer"
-              placeholder="ÅÅÅÅMMDD-XXXX"
+              label={t.login.personalNumber}
+              placeholder={t.login.personalNumberHint}
               value={personalNumber}
               onChangeText={setPersonalNumber}
               keyboardType="number-pad"
@@ -64,14 +65,14 @@ export default function LoginScreen() {
               onSubmitEditing={() => valid && signIn(personalNumber)}
               error={signInState.phase === "failed" ? signInState.message : undefined}
               hint={USING_MOCK
-                ? "Testläge: valfritt tolvsiffrigt nummer fungerar."
+                ? t.login.testMode
                 : undefined}
             />
 
             <Gap size="lg" />
 
             <Button
-              label="Logga in med BankID"
+              label={t.login.signIn}
               icon="shield-checkmark"
               onPress={() => signIn(personalNumber)}
               disabled={!valid}
@@ -88,7 +89,7 @@ export default function LoginScreen() {
           andra låsikon tillförde ingenting utom problemet.
         */}
         <Txt variant="small" tone="faint" align="center">
-          Alla här är verifierade med BankID. Ditt personnummer lagras aldrig.
+          {t.login.assurance}
         </Txt>
       </KeyboardAvoidingView>
     </Screen>
@@ -111,10 +112,10 @@ function WaitingCard({ message, onCancel }: { message: string; onCancel: () => v
       <Ionicons name="shield-checkmark" size={38} color={theme.color.primary} />
       <Txt variant="heading" align="center">{message}</Txt>
       <Txt variant="small" tone="muted" align="center">
-        Håll appen öppen tills det är klart.
+        {t.login.keepOpen}
       </Txt>
       <Gap size="sm" />
-      <Button label="Avbryt" kind="ghost" onPress={onCancel} />
+      <Button label={t.common.cancel} kind="ghost" onPress={onCancel} />
     </View>
   );
 }

@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Modal, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import type { ExperienceLevel } from "@/api/types";
+import { t } from "@/i18n";
 import { formatCost } from "@/lib/pris";
 import { Button, Card, Chip, Field, Gap, Row, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
@@ -24,9 +25,9 @@ import { radius, space } from "@/theme";
 const MIN_LENGTH = 5;
 
 const LEVELS: { value: ExperienceLevel; label: string }[] = [
-  { value: "first_time", label: "Första gången" },
-  { value: "some", label: "Gjort det förr" },
-  { value: "often", label: "Gör det ofta" },
+  { value: "first_time", label: t.apply.firstTime },
+  { value: "some", label: t.apply.some },
+  { value: "often", label: t.apply.often },
 ];
 
 interface Props {
@@ -53,7 +54,7 @@ export function ApplySheet({
 
   const tooShort = message.trim().length < MIN_LENGTH;
   // Felet visas först när någon försökt skicka, inte medan de skriver.
-  const error = touched && tooShort ? "Skriv någon rad, det behöver inte vara långt." : undefined;
+  const error = touched && tooShort ? t.apply.tooShort : undefined;
 
   function submit() {
     setTouched(true);
@@ -82,11 +83,10 @@ export function ApplySheet({
             }}
           >
             <ScrollView keyboardShouldPersistTaps="handled">
-              <Txt variant="title">Haka på {activityTitle}</Txt>
+              <Txt variant="title">{t.apply.title(activityTitle)}</Txt>
               <Gap size="xs" />
               <Txt variant="body" tone="muted">
-                Skriv en rad till värden. Det är den som gör att du syns bland
-                de andra som vill med.
+                {t.apply.why}
               </Txt>
 
               {formatCost(priceSek) && (
@@ -94,7 +94,7 @@ export function ApplySheet({
                   <Gap size="md" />
                   {/* Sista gången kostnaden syns innan man tackar ja. */}
                   <Txt variant="small" tone="muted">
-                    {formatCost(priceSek)}. Ni betalar var för sig på plats.
+                    {formatCost(priceSek)}. {t.apply.payOnSite}
                   </Txt>
                 </>
               )}
@@ -102,8 +102,8 @@ export function ApplySheet({
               <Gap size="lg" />
 
               <Field
-                label="Din rad"
-                placeholder="Varför vill du haka på?"
+                label={t.apply.yourLine}
+                placeholder={t.apply.yourLinePlaceholder}
                 value={message}
                 onChangeText={setMessage}
                 multiline
@@ -113,10 +113,10 @@ export function ApplySheet({
 
               <Gap size="lg" />
 
-              <Txt variant="smallStrong" tone="muted">Hur van är du?</Txt>
+              <Txt variant="smallStrong" tone="muted">{t.apply.experience}</Txt>
               <Gap size="xs" />
               <Txt variant="small" tone="faint">
-                Frivilligt. Hjälper värden planera, och att vara ny är aldrig ett minus.
+                {t.apply.experienceHelp}
               </Txt>
               <Gap size="sm" />
               <Row gap="sm" wrap>
@@ -136,13 +136,13 @@ export function ApplySheet({
               <Gap size="xl" />
 
               <Button
-                label="Skicka"
+                label={t.apply.send}
                 icon="paper-plane"
                 onPress={submit}
                 disabled={working}
               />
               <Gap size="sm" />
-              <Button label="Avbryt" kind="ghost" onPress={close} disabled={working} />
+              <Button label={t.common.cancel} kind="ghost" onPress={close} disabled={working} />
             </ScrollView>
           </View>
         </KeyboardAvoidingView>

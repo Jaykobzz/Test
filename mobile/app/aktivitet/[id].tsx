@@ -17,6 +17,7 @@ import { useFocusEffect } from "expo-router";
 import { getBackend } from "@/api";
 import { ApplySheet } from "@/components/ApplySheet";
 import { Cover } from "@/components/Cover";
+import { t } from "@/i18n";
 import { formatCost } from "@/lib/pris";
 import { interestLabel } from "@/api/interests";
 import type { ActivityDetail, Applicant, ExperienceLevel } from "@/api/types";
@@ -62,7 +63,7 @@ export default function ActivityScreen() {
         activity?.threadId ? (
           <IconButton
             icon="chatbubbles"
-            label="Öppna chatten"
+            label={t.activity.openChat}
             tone="primary"
             onPress={() => router.push(`/chatt/${activity.threadId}`)}
           />
@@ -83,7 +84,7 @@ export default function ActivityScreen() {
       setApplying(false);
       await load();
     } catch (error) {
-      Alert.alert("Kunde inte haka på", describe(error));
+      Alert.alert(t.apply.failed, describe(error));
     } finally {
       setWorking(false);
     }
@@ -91,10 +92,10 @@ export default function ActivityScreen() {
 
   async function withdraw() {
     if (!activity?.myParticipantId) return;
-    Alert.alert("Hoppa av?", "Du tas bort från aktiviteten och dess chatt.", [
-      { text: "Avbryt", style: "cancel" },
+    Alert.alert(t.activity.leaveTitle, t.activity.leaveBody, [
+      { text: t.common.cancel, style: "cancel" },
       {
-        text: "Hoppa av",
+        text: t.activity.leave,
         style: "destructive",
         onPress: async () => {
           setWorking(true);
@@ -125,14 +126,14 @@ export default function ActivityScreen() {
 
   function cancelActivity() {
     if (!activity) return;
-    Alert.alert("Ställa in?", "Alla som är med får ett meddelande i chatten.", [
-      { text: "Avbryt", style: "cancel" },
+    Alert.alert(t.activity.cancelTitle, t.activity.cancelBody, [
+      { text: t.common.cancel, style: "cancel" },
       {
-        text: "Ställ in",
+        text: t.activity.cancelConfirm,
         style: "destructive",
         onPress: async () => {
           try {
-            await getBackend().cancelActivity(activity.id, "Värden ställde in.");
+            await getBackend().cancelActivity(activity.id, t.activity.hostCancelled);
             await load();
           } catch (error) {
             Alert.alert("Gick inte", describe(error));
@@ -163,10 +164,10 @@ export default function ActivityScreen() {
         <View style={{ padding: space.lg }}>
           <Row gap="xs" wrap>
             {activity.visibility === "friends" && (
-              <Badge label="Bara kompisar" icon="heart" tone="accent" />
+              <Badge label={t.card.friendsOnly} icon="heart" tone="accent" />
             )}
-            {activity.status === "cancelled" && <Badge label="Inställd" tone="dark" />}
-            {past && activity.status !== "cancelled" && <Badge label="Har varit" tone="dark" />}
+            {activity.status === "cancelled" && <Badge label={t.activity.cancelledBadge} tone="dark" />}
+            {past && activity.status !== "cancelled" && <Badge label={t.activity.pastBadge} tone="dark" />}
             {activity.category && <Badge label={interestLabel(activity.category)} tone="dark" />}
           </Row>
 
@@ -191,7 +192,7 @@ export default function ActivityScreen() {
                     : "")}
               />
               <Row gap="xs" style={{ flexShrink: 0 }}>
-                <Txt variant="small" tone="primary">Karta</Txt>
+                <Txt variant="small" tone="primary">{t.activity.map}</Txt>
                 <Ionicons name="open-outline" size={14} color={theme.color.primary} />
               </Row>
             </Row>
@@ -200,8 +201,8 @@ export default function ActivityScreen() {
           <InfoRow
             icon="people-outline"
             text={activity.capacity === null
-              ? `${activity.acceptedCount} med · ingen gräns`
-              : `${activity.acceptedCount} av ${activity.capacity} platser tagna`}
+              ? t.activity.noLimit(activity.acceptedCount)
+              : t.activity.spotsTaken(activity.acceptedCount, activity.capacity)}
           />
           {/* Bara när det faktiskt kostar. Tystnad betyder att det inte gör
               det, vilket är det normala och därför inte behöver sägas. */}
@@ -258,11 +259,11 @@ export default function ActivityScreen() {
               <Gap size="lg" />
               <Divider />
               <Txt variant="heading">
-                Vill haka på ({activity.applicants.length})
+                {t.activity.applicants(activity.applicants.length)}
               </Txt>
               <Gap size="xs" />
               <Txt variant="small" tone="muted">
-                Accepterar du någon hamnar ni direkt i en chatt tillsammans.
+                {t.activity.acceptCreatesChat}
               </Txt>
               {full && (
                 <>
@@ -270,7 +271,7 @@ export default function ActivityScreen() {
                   {/* Utan den här raden ser knapparna nedanför bara ut att
                       vara trasiga. */}
                   <Txt variant="small" tone="danger">
-                    Alla platser är tagna. Hoppar någon av kan du acceptera fler.
+                    {t.activity.allTaken}
                   </Txt>
                 </>
               )}
@@ -373,9 +374,9 @@ function PersonRow({
 
 /** Nivån i klartext. Beskriver aktiviteten, aldrig personen. */
 const EXPERIENCE_LABEL: Record<ExperienceLevel, string> = {
-  first_time: "Första gången",
-  some: "Gjort det förr",
-  often: "Gör det ofta",
+  first_time: t.apply.firstTime,
+  some: t.apply.some,
+  often: t.apply.often,
 };
 
 function ApplicantCard({
@@ -435,14 +436,14 @@ function ApplicantCard({
         <Row gap="sm">
           <View style={{ flex: 1 }}>
             <Button
-              label="Acceptera"
+              label={t.activity.accept}
               icon="checkmark"
               onPress={() => onDecide(true)}
               disabled={disabled}
             />
           </View>
           <Button
-            label="Nej tack"
+            label={t.activity.decline}
             kind="secondary"
             onPress={() => onDecide(false)}
             disabled={disabled}
@@ -485,9 +486,9 @@ function ActionArea({
     return (
       <View style={{ gap: space.sm }}>
         {activity.threadId && (
-          <Button label="Öppna chatten" icon="chatbubbles" kind="secondary" onPress={onOpenChat} />
+          <Button label={t.activity.openChat} icon="chatbubbles" kind="secondary" onPress={onOpenChat} />
         )}
-        <Button label="Gör om det här" icon="repeat" onPress={onRepeat} />
+        <Button label={t.activity.repeat} icon="repeat" onPress={onRepeat} />
       </View>
     );
   }
@@ -496,10 +497,10 @@ function ActionArea({
     return (
       <View style={{ gap: space.sm }}>
         {activity.threadId && (
-          <Button label="Öppna chatten" icon="chatbubbles" onPress={onOpenChat} />
+          <Button label={t.activity.openChat} icon="chatbubbles" onPress={onOpenChat} />
         )}
-        <Button label="Ändra aktiviteten" icon="create" kind="secondary" onPress={onEdit} />
-        <Button label="Ställ in aktiviteten" kind="danger" onPress={onCancel} />
+        <Button label={t.activity.edit} icon="create" kind="secondary" onPress={onEdit} />
+        <Button label={t.activity.cancel} kind="danger" onPress={onCancel} />
       </View>
     );
   }
@@ -508,7 +509,7 @@ function ActionArea({
     case "accepted":
       return (
         <View style={{ gap: space.sm }}>
-          <Button label="Öppna chatten" icon="chatbubbles" onPress={onOpenChat} />
+          <Button label={t.activity.openChat} icon="chatbubbles" onPress={onOpenChat} />
           <Button label="Hoppa av" kind="ghost" onPress={onWithdraw} />
         </View>
       );
@@ -519,7 +520,7 @@ function ActionArea({
           <Txt variant="small" tone="muted" align="center">
             Du har ansökt. Värden hör av sig.
           </Txt>
-          <Button label="Ta tillbaka ansökan" kind="ghost" onPress={onWithdraw} />
+          <Button label={t.activity.withdraw} kind="ghost" onPress={onWithdraw} />
         </View>
       );
 
@@ -533,7 +534,7 @@ function ActionArea({
     default:
       return (
         <Button
-          label={full ? "Fullt" : "Jag vill haka på"}
+          label={full ? t.card.full : t.activity.apply}
           icon="hand-right"
           onPress={onApply}
           loading={working}
@@ -544,5 +545,5 @@ function ActionArea({
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

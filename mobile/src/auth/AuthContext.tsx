@@ -18,6 +18,7 @@ import {
 } from "react";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { BankIdCollect, MyProfile } from "@/api/types";
 
 /** Hur ofta vi frågar servern om BankID-signeringen är klar. */
@@ -118,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSignInState({ phase: "waiting", hintCode: result.hintCode, qrData: result.qrData });
       }
 
-      setSignInState({ phase: "failed", message: "Det tog för lång tid. Försök igen." });
+      setSignInState({ phase: "failed", message: t.login.timedOut });
     } catch (error) {
       setSignInState({ phase: "failed", message: describeError(error) });
     }
@@ -156,23 +157,23 @@ export function useAuth(): AuthValue {
 function hintToMessage(hintCode?: string): string {
   switch (hintCode) {
     case "expiredTransaction":
-      return "BankID hann gå ut. Försök igen.";
+      return t.login.expired;
     case "userCancel":
     case "cancelled":
-      return "Du avbröt inloggningen.";
+      return t.login.userCancel;
     case "certificateErr":
-      return "Ditt BankID gick inte att använda. Kontakta din bank.";
+      return t.login.certificateErr;
     case "startFailed":
-      return "BankID kunde inte startas. Kontrollera att appen är installerad.";
+      return t.login.startFailed;
     case "invalidParameters":
-      return "Något blev fel med inloggningen. Försök igen.";
+      return t.login.invalidParameters;
     default:
-      return "Inloggningen misslyckades. Försök igen.";
+      return t.login.failed;
   }
 }
 
 function describeError(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }
 
 /** Väntetext under signering, så att skärmen inte bara står och snurrar. */
@@ -180,10 +181,10 @@ export function waitingMessage(hintCode?: string): string {
   switch (hintCode) {
     case "outstandingTransaction":
     case "noClient":
-      return "Starta BankID-appen för att skriva under.";
+      return t.login.openBankId;
     case "userSign":
-      return "Skriv under i BankID-appen.";
+      return t.login.signInApp;
     default:
-      return "Väntar på BankID …";
+      return t.login.waiting;
   }
 }
