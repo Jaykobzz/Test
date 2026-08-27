@@ -104,6 +104,10 @@ function RootNavigator() {
         options={{ title: "Spontant nu", presentation: "modal" }}
       />
       <Stack.Screen name="aktivitet/[id]" options={{ title: "" }} />
+      <Stack.Screen
+        name="aktivitet/andra/[id]"
+        options={{ title: "Ändra", presentation: "modal" }}
+      />
       <Stack.Screen name="chatt/[id]" options={{ title: "" }} />
       <Stack.Screen name="person/[id]" options={{ title: "" }} />
       <Stack.Screen

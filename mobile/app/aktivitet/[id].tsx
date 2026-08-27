@@ -298,6 +298,7 @@ export default function ActivityScreen() {
             onApply={() => setApplying(true)}
             onWithdraw={withdraw}
             onCancel={cancelActivity}
+            onEdit={() => router.push(`/aktivitet/andra/${activity.id}`)}
             onOpenChat={() =>
               activity.threadId && router.push(`/chatt/${activity.threadId}`)
             }
@@ -460,6 +461,7 @@ function ActionArea({
   onApply,
   onWithdraw,
   onCancel,
+  onEdit,
   onOpenChat,
   onRepeat,
 }: {
@@ -468,6 +470,7 @@ function ActionArea({
   onApply: () => void;
   onWithdraw: () => void;
   onCancel: () => void;
+  onEdit: () => void;
   onOpenChat: () => void;
   onRepeat: () => void;
 }) {
@@ -495,6 +498,7 @@ function ActionArea({
         {activity.threadId && (
           <Button label="Öppna chatten" icon="chatbubbles" onPress={onOpenChat} />
         )}
+        <Button label="Ändra aktiviteten" icon="create" kind="secondary" onPress={onEdit} />
         <Button label="Ställ in aktiviteten" kind="danger" onPress={onCancel} />
       </View>
     );

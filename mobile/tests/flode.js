@@ -214,6 +214,45 @@ async function shouldThrow(label, fn) {
     check("kompislistan går att läsa", Array.isArray(friends));
   }
 
+  console.log("\nAndra en aktivitet");
+  // Ta den aktivitet som faktiskt har folk i sig, inte bara den forsta i
+  // listan: senare steg i testet har skapat aktiviteter utan deltagare.
+  const allaMina = (await api.myActivities()).hosting;
+  const detaljer = await Promise.all(allaMina.map((a) => api.getActivity(a.id)));
+  const mitt = detaljer.find((a) => a.accepted.length > 0) ?? detaljer[0];
+  check("hittade en aktivitet med accepterade deltagare", mitt.accepted.length > 0,
+        `mest ${Math.max(...detaljer.map((d) => d.accepted.length))}`);
+  const trad = mitt.threadId;
+  const foreAntal = trad ? (await api.listMessages(trad)).length : 0;
+
+  await api.updateActivity(mitt.id, { title: "Fiska i Drevviken, nytt namn" });
+  const bytt = await api.getActivity(mitt.id);
+  check("titeln andrades", bytt.title === "Fiska i Drevviken, nytt namn");
+  check("deltagarna finns kvar efter andringen", bytt.accepted.length === mitt.accepted.length);
+  if (trad) {
+    const nu = await api.listMessages(trad);
+    check("en titelandring pingar ingen", nu.length === foreAntal, `${nu.length} vs ${foreAntal}`);
+  }
+
+  const nyTid = new Date(Date.now() + 50 * 3600000).toISOString();
+  await api.updateActivity(mitt.id, {
+    startsAt: nyTid,
+    endsAt: new Date(Date.parse(nyTid) + 7200000).toISOString(),
+    locationName: "Nya bryggan",
+  });
+  if (trad) {
+    const nu = await api.listMessages(trad);
+    const sist = nu[nu.length - 1];
+    check("tid och plats meddelas i traden", sist && sist.kind === "system",
+          sist ? sist.kind : "inget meddelande");
+    check("hälsningen namner bade tid och plats",
+          Boolean(sist && sist.body.includes("Ny tid") && sist.body.includes("Ny plats")),
+          sist ? sist.body : "");
+  }
+
+  await shouldThrow("kapaciteten kan inte sankas under de accepterade",
+    () => api.updateActivity(mitt.id, { capacity: mitt.accepted.length - 1 }));
+
   console.log("\nRadera konto");
   const foreDelete = (await api.discover({ radiusM: 25000 })).length;
   const minaFore = (await api.myActivities()).hosting.length;

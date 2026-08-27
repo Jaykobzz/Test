@@ -18,6 +18,7 @@ import type {
   BankIdCollect,
   BankIdStart,
   ExperienceLevel,
+  UpdateActivityInput,
   FriendRequest,
   CreateActivityInput,
   DiscoverParams,
@@ -465,11 +466,37 @@ export class SupabaseBackend implements Backend {
     return this.getActivity(data!.id);
   }
 
+  async updateActivity(
+    activityId: Uuid,
+    patch: UpdateActivityInput,
+  ): Promise<ActivityCard> {
+    // null i ett argument betyder "rör inte". Se update_activity().
+    const { error } = await supabase().rpc("update_activity", {
+      p_activity_id: activityId,
+      p_title: patch.title ?? null,
+      p_description: patch.description ?? null,
+      p_category: patch.category ?? null,
+      p_cover_url: patch.coverUrl ?? null,
+      p_location_name: patch.locationName ?? null,
+      p_lat: patch.lat ?? null,
+      p_lng: patch.lng ?? null,
+      p_starts_at: patch.startsAt ?? null,
+      p_ends_at: patch.endsAt ?? null,
+      p_capacity: patch.capacity ?? null,
+      p_visibility: patch.visibility ?? null,
+      p_price_sek: patch.priceSek ?? null,
+    });
+    fail(error);
+    return this.getActivity(activityId);
+  }
+
   async cancelActivity(activityId: Uuid, reason: string): Promise<void> {
-    const { error } = await supabase()
-      .from("activities")
-      .update({ status: "cancelled", cancelled_reason: reason })
-      .eq("id", activityId);
+    // Gick tidigare som en rå tabelluppdatering, vilket betydde att de som
+    // tackat ja aldrig fick veta. Funktionen skriver i tråden.
+    const { error } = await supabase().rpc("cancel_activity", {
+      p_activity_id: activityId,
+      p_reason: reason,
+    });
     fail(error);
   }
 

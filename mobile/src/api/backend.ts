@@ -8,6 +8,7 @@
 
 import type {
   ExperienceLevel,
+  UpdateActivityInput,
   ActivityCard,
   ActivityDetail,
   Applicant,
@@ -53,6 +54,8 @@ export interface Backend {
   discover(params: DiscoverParams): Promise<ActivityCard[]>;
   getActivity(activityId: Uuid): Promise<ActivityDetail>;
   createActivity(input: CreateActivityInput): Promise<ActivityCard>;
+  /** Bara värden, bara innan den varit. Deltagarna får veta i chatten. */
+  updateActivity(activityId: Uuid, patch: UpdateActivityInput): Promise<ActivityCard>;
   cancelActivity(activityId: Uuid, reason: string): Promise<void>;
   myActivities(): Promise<{ hosting: ActivityCard[]; joined: ActivityCard[] }>;
 

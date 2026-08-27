@@ -28,8 +28,6 @@ kvarvarande arbetet, och det är sällan det som står i vägen.
 
 Inte hinder för granskningen, men de gör skada varje dag de saknas.
 
-- **Ändra en aktivitet** (punkt 12). Idag löses fel tid genom att ställa in
-  och göra om, och då försvinner de sökande och chatten.
 - **Städa passerade aktiviteter automatiskt** (punkt 6). En spontan inbjudan
   som ligger kvar timmar efter att den varit får folk att sluta lita på
   flödet.
@@ -157,7 +155,7 @@ samtidigt.
 
 Buggarna nedan är redan lagade. Det som står här är sådant som saknas.
 
-### 12. Det går inte att ändra en aktivitet
+### 12. ~~Det går inte att ändra en aktivitet~~ Klart
 
 Backenden har `createActivity` och `cancelActivity`, men ingen väg däremellan.
 En felstavad titel eller fel tid går bara att lösa genom att ställa in och

@@ -142,6 +142,29 @@ export interface CreateActivityInput {
   minAge?: number | null;
 }
 
+/**
+ * Fält som utelämnas lämnas orörda.
+ *
+ * Det gör att en skärm kan skicka bara det som ändrats. Priset är att det
+ * inte går att tömma ett fält den här vägen, vilket är ett medvetet byte:
+ * att av misstag radera någons beskrivning är värre än att inte kunna
+ * nolla den.
+ */
+export interface UpdateActivityInput {
+  title?: string;
+  description?: string;
+  category?: string;
+  coverUrl?: string;
+  locationName?: string;
+  lat?: number;
+  lng?: number;
+  startsAt?: IsoDate;
+  endsAt?: IsoDate;
+  capacity?: number | null;
+  visibility?: ActivityVisibility;
+  priceSek?: number | null;
+}
+
 export interface ListItem {
   id: string;
   text: string;

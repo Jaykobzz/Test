@@ -16,6 +16,7 @@ import type {
   ActivityDetail,
   Applicant,
   ExperienceLevel,
+  UpdateActivityInput,
   BankIdCollect,
   BankIdStart,
   FriendRequest,
@@ -204,6 +205,21 @@ function toActivityCard(
     myStatus: mine?.status ?? null,
     isMine: activity.hostId === me,
   };
+}
+
+/**
+ * Tid i klartext för en systemhälsning, samma form som update_activity()
+ * skriver på servern: "3 mars 14:00".
+ */
+function formatWhenForNotice(iso: string): string {
+  const d = new Date(iso);
+  const manad = [
+    "januari", "februari", "mars", "april", "maj", "juni",
+    "juli", "augusti", "september", "oktober", "november", "december",
+  ][d.getMonth()]!;
+  const tim = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${d.getDate()} ${manad} ${tim}:${min}`;
 }
 
 function toApplicant(db: MockDb, participant: MockParticipant): Applicant {
@@ -622,6 +638,64 @@ export class MockBackend implements Backend {
     db.activities.push(activity);
     await persist();
     return toActivityCard(db, activity);
+  }
+
+  async updateActivity(
+    activityId: Uuid,
+    patch: UpdateActivityInput,
+  ): Promise<ActivityCard> {
+    const db = await loadDb();
+    const me = meOrThrow(db);
+    const a = activityOrThrow(db, activityId);
+
+    if (a.hostId !== me) throw new Error("Bara värden kan ändra aktiviteten");
+    if (a.status !== "open" && a.status !== "full") {
+      throw new Error("Aktiviteten går inte att ändra längre");
+    }
+    if (Date.parse(a.endsAt) < Date.now()) {
+      throw new Error("Aktiviteten har redan varit");
+    }
+
+    // Att kasta ut någon som fått ett ja är inte en ändring, det är ett
+    // löftesbrott. Samma spärr som i update_activity().
+    const accepted = acceptedCount(db, activityId);
+    if (patch.capacity !== undefined && patch.capacity !== null
+      && patch.capacity < accepted) {
+      throw new Error(
+        `Redan ${accepted} personer med, går inte att sänka till ${patch.capacity}`);
+    }
+
+    const before = { startsAt: a.startsAt, endsAt: a.endsAt, locationName: a.locationName };
+
+    if (patch.title !== undefined) a.title = patch.title;
+    if (patch.description !== undefined) a.description = patch.description;
+    if (patch.category !== undefined) a.category = patch.category;
+    if (patch.coverUrl !== undefined) a.coverUrl = patch.coverUrl;
+    if (patch.locationName !== undefined) a.locationName = patch.locationName;
+    if (patch.lat !== undefined) a.lat = patch.lat;
+    if (patch.lng !== undefined) a.lng = patch.lng;
+    if (patch.startsAt !== undefined) a.startsAt = patch.startsAt;
+    if (patch.endsAt !== undefined) a.endsAt = patch.endsAt;
+    if (patch.capacity !== undefined) a.capacity = patch.capacity;
+    if (patch.visibility !== undefined) a.visibility = patch.visibility;
+    if (patch.priceSek !== undefined) a.priceSek = patch.priceSek;
+
+    // Bara det någon behöver planera om för. En rättad stavning ska inte
+    // pinga sex personer.
+    const notices: string[] = [];
+    if (a.startsAt !== before.startsAt || a.endsAt !== before.endsAt) {
+      notices.push(`Ny tid: ${formatWhenForNotice(a.startsAt)}`);
+    }
+    if (a.locationName !== before.locationName) {
+      notices.push(`Ny plats: ${a.locationName}`);
+    }
+    if (notices.length) {
+      const thread = db.threads.find((t) => t.activityId === activityId);
+      if (thread) pushSystemMessage(db, thread.id, `${notices.join(". ")}.`);
+    }
+
+    await persist();
+    return toActivityCard(db, a);
   }
 
   async cancelActivity(activityId: Uuid, reason: string): Promise<void> {
