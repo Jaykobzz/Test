@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Hanken+Grotesk:wght@400;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #B3541E; } a:hover { color: #8E4218; }
+    .scr { width: 390px; height: 844px; background: #F7F5EF; overflow: hidden;
+           font-family: "Hanken Grotesk", system-ui, sans-serif; color: #14201B; }
+    .disp { font-family: "Unbounded", system-ui, sans-serif; font-weight: 600; }
+    .pad { padding: 0 20px; }
+    .lbl { font-size: 13px; line-height: 18px; font-weight: 600; color: #56635C; }
+    .chip { border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+            background: #EEEAE0; color: #56635C; display: inline-flex; align-items: center; gap: 6px; }
+    .chip.on { background: #15604B; color: #FFFFFF; }
+    .field { background: #FFFFFF; border: 1px solid #DFD9CB; border-radius: 14px;
+             padding: 12px; font-size: 15px; color: #83908A; }
+  </style>
+</helmet>
+
+<div class="scr">
+
+  <!-- Modaltopp -->
+  <div class="pad" style="padding-top:22px; padding-bottom:6px; display:flex; align-items:center; justify-content:space-between">
+    <span style="font-size:15px; color:#56635C">Avbryt</span>
+    <span class="disp" style="font-size:18px">Spontant nu</span>
+    <span style="width:44px"></span>
+  </div>
+
+  <div class="pad">
+    <div style="font-size:15px; line-height:22px; color:#56635C; padding:8px 0 18px">
+      Går ut till folk i närheten som gillar samma sak. Den försvinner av sig
+      själv när den har varit.
+    </div>
+
+    <div class="lbl">Vad?</div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; padding-top:8px">
+      <span class="chip on">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8Z"/><path d="M15 9h2.5a2.5 2.5 0 0 1 0 5H15"/></svg>
+        Ta en fika
+      </span>
+      <span class="chip">Promenad</span>
+      <span class="chip">Löprunda</span>
+      <span class="chip">Cykla en sväng</span>
+      <span class="chip">Gå på gymmet</span>
+      <span class="chip">Käka lunch</span>
+    </div>
+
+    <div style="height:18px"></div>
+    <div class="lbl">När?</div>
+    <div style="display:flex; gap:8px; padding-top:8px">
+      <span class="chip">Nu</span>
+      <span class="chip on">Om 30 min</span>
+      <span class="chip">Om 1 h</span>
+      <span class="chip">Om 2 h</span>
+    </div>
+
+    <div style="height:18px"></div>
+    <div class="lbl">Hur länge?</div>
+    <div style="display:flex; gap:8px; padding-top:8px">
+      <span class="chip">1 h</span>
+      <span class="chip on">2 h</span>
+      <span class="chip">3 h</span>
+    </div>
+
+    <div style="height:18px"></div>
+    <div style="height:1px; background:#DFD9CB"></div>
+    <div style="height:18px"></div>
+
+    <div class="lbl">Var?</div>
+    <div class="field" style="margin-top:8px; color:#14201B; display:flex; align-items:center; gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B3541E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      Skarpnäcks torg
+    </div>
+
+    <div style="height:18px"></div>
+    <div class="lbl">Hur många?</div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; padding-top:8px">
+      <span class="chip">1</span>
+      <span class="chip">2</span>
+      <span class="chip on">3</span>
+      <span class="chip">4</span>
+      <span class="chip">6</span>
+      <span class="chip">Spelar ingen roll</span>
+    </div>
+
+    <div style="height:18px"></div>
+    <div class="lbl">Vem får se?</div>
+    <div style="display:flex; gap:8px; padding-top:8px">
+      <span class="chip on">Alla i närheten</span>
+      <span class="chip">Bara kompisar</span>
+    </div>
+
+    <div style="height:26px"></div>
+    <div style="background:#15604B; color:#fff; border-radius:999px; padding:15px;
+                text-align:center; font-size:15px; font-weight:700">Lägg upp</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

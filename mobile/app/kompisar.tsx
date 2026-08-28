@@ -1,0 +1,188 @@
+/**
+ * kompisar, de permanenta kompisarna.
+ *
+ * Skillnaden mot en vanlig aktivitetskompis: kompisar ser aktiviteter du lägger
+ * upp med synlighet "bara mina kompisar", och ni kan alltid chatta.
+ */
+
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Alert, Pressable, RefreshControl, ScrollView, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+
+import { getBackend } from "@/api";
+import { t } from "@/i18n";
+import type { FriendRequest, PublicProfile } from "@/api/types";
+import {
+  Avatar, Button, Card, Credentials, EmptyState, Gap, Loading, Row, Screen, Txt,
+} from "@/components/ui";
+import { useTheme } from "@/hooks/useTheme";
+import { space } from "@/theme";
+
+export default function FriendsScreen() {
+  const router = useRouter();
+  const theme = useTheme();
+
+  const [friends, setFriends] = useState<PublicProfile[]>([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const [friends, pending] = await Promise.all([
+        getBackend().listFriends(),
+        getBackend().listFriendRequests(),
+      ]);
+      setFriends(friends);
+      setRequests(pending);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  if (loading) return <Screen><Loading /></Screen>;
+
+  async function respond(friendshipId: string, accept: boolean) {
+    try {
+      await getBackend().respondFriend(friendshipId, accept);
+      await load();
+    } catch (error) {
+      Alert.alert("Gick inte", describe(error));
+    }
+  }
+
+  const incoming = requests.filter((r) => r.incoming);
+  const outgoing = requests.filter((r) => !r.incoming);
+
+  return (
+    <Screen padded={false} edges={[]}>
+      <ScrollView
+        contentContainerStyle={{ padding: space.lg, paddingBottom: space.xxxl, gap: space.md }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => { setRefreshing(true); void load(); }}
+          />
+        }
+      >
+        {incoming.length > 0 && (
+          <>
+            <Txt variant="heading">Vill bli kompis med dig</Txt>
+            {incoming.map((request) => (
+              <Card key={request.friendshipId}>
+                <View style={{ padding: space.lg, gap: space.md }}>
+                  <Pressable onPress={() => router.push(`/person/${request.profile.id}`)}>
+                    <Row gap="md">
+                      <Avatar
+                        uri={request.profile.avatarUrl}
+                        name={request.profile.displayName}
+                        size={48}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <Txt variant="bodyStrong">{request.profile.displayName}</Txt>
+                        <Credentials
+                          verified={request.profile.bankIdVerified}
+                          activityCount={request.profile.activitiesJoined}
+                          size="micro"
+                        />
+                      </View>
+                    </Row>
+                  </Pressable>
+                  <Row gap="sm">
+                    <View style={{ flex: 1 }}>
+                      <Button
+                        label={t.friends.accept}
+                        icon="heart"
+                        onPress={() => respond(request.friendshipId, true)}
+                      />
+                    </View>
+                    <Button
+                      label="Nej tack"
+                      kind="secondary"
+                      onPress={() => respond(request.friendshipId, false)}
+                      fullWidth={false}
+                    />
+                  </Row>
+                </View>
+              </Card>
+            ))}
+            <Gap size="md" />
+          </>
+        )}
+
+        {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 ? (
+          <EmptyState
+            icon="heart-outline"
+            title={t.friends.emptyTitle}
+            body={t.friends.emptyBody}
+            action={{ label: t.friends.findSomething, onPress: () => router.push("/(tabs)") }}
+          />
+        ) : (
+          friends.length > 0 && (
+            <>
+              <Txt variant="heading">{t.nav.friends} ({friends.length})</Txt>
+              {friends.map((person) => (
+                <Card key={person.id} onPress={() => router.push(`/person/${person.id}`)}>
+                  <View style={{ padding: space.lg }}>
+                    <Row justify="space-between" gap="sm">
+                      <Row gap="md" style={{ flex: 1, minWidth: 0 }}>
+                        <Avatar uri={person.avatarUrl} name={person.displayName} size={48} />
+                        <View>
+                          <Txt variant="bodyStrong">{person.displayName}</Txt>
+                          <Row gap="sm">
+                            <Credentials
+                            verified={person.bankIdVerified}
+                            activityCount={person.activitiesJoined}
+                            size="micro"
+                          />
+                            {person.homeAreaLabel && (
+                              <Txt variant="small" tone="faint">· {person.homeAreaLabel}</Txt>
+                            )}
+                          </Row>
+                        </View>
+                      </Row>
+                      <Ionicons name="chevron-forward" size={18} color={theme.color.textFaint} />
+                    </Row>
+                  </View>
+                </Card>
+              ))}
+            </>
+          )
+        )}
+
+        {outgoing.length > 0 && (
+          <>
+            <Gap size="md" />
+            <Txt variant="heading">{t.friends.waiting}</Txt>
+            {outgoing.map((request) => (
+              <Card key={request.friendshipId}>
+                <View style={{ padding: space.lg }}>
+                  <Row gap="md">
+                    <Avatar
+                      uri={request.profile.avatarUrl}
+                      name={request.profile.displayName}
+                      size={40}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Txt variant="bodyStrong">{request.profile.displayName}</Txt>
+                      <Txt variant="small" tone="faint">{t.friends.youAsked}</Txt>
+                    </View>
+                  </Row>
+                </View>
+              </Card>
+            ))}
+          </>
+        )}
+      </ScrollView>
+    </Screen>
+  );
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : t.common.somethingWrong;
+}

@@ -1,0 +1,253 @@
+/**
+ * Upptäck, flödet med aktiviteter i närheten.
+ *
+ * Sorterat på när det händer, inte på hur nära det är: det är lättare att ta
+ * sig lite längre bort än att flytta på en tid man redan har bokat.
+ */
+
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { FlatList, RefreshControl, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, LinearTransition } from "react-native-reanimated";
+
+import { getBackend } from "@/api";
+import { t } from "@/i18n";
+import { INTERESTS, type IconName } from "@/api/interests";
+import type { ActivityCard } from "@/api/types";
+import { useAuth } from "@/auth/AuthContext";
+import { ActivityListItem } from "@/components/ActivityListItem";
+import { CreateChooser } from "@/components/CreateChooser";
+import { ActivityCardSkeleton } from "@/components/Skeleton";
+import { Tappable } from "@/components/Tappable";
+import { Chip, EmptyState, Gap, Row, Screen, Txt } from "@/components/ui";
+import { useTheme } from "@/hooks/useTheme";
+import { getCurrentPlace } from "@/lib/location";
+import { spring, useMotion } from "@/lib/motion";
+import { radius, space } from "@/theme";
+
+/** Radier man kan välja mellan, i meter. */
+const RADII = [
+  { label: "2 km", value: 2_000 },
+  { label: "5 km", value: 5_000 },
+  { label: "15 km", value: 15_000 },
+  { label: "50 km", value: 50_000 },
+];
+
+export default function DiscoverScreen() {
+  const theme = useTheme();
+  const router = useRouter();
+  const { profile } = useAuth();
+  const motion = useMotion();
+
+  const [place, setPlace] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [choosing, setChoosing] = useState(false);
+  const [radiusM, setRadiusM] = useState(15_000);
+  const [filter, setFilter] = useState<string[]>([]);
+  const [activities, setActivities] = useState<ActivityCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Positionen hämtas en gång; profilens hemområde används som reserv.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const current = await getCurrentPlace();
+        if (active) setPlace({ lat: current.lat, lng: current.lng, label: current.label });
+      } catch {
+        if (active && profile?.homeLat && profile.homeLng) {
+          setPlace({
+            lat: profile.homeLat,
+            lng: profile.homeLng,
+            label: profile.homeAreaLabel ?? t.feed.yourArea,
+          });
+        }
+      }
+    })();
+    return () => { active = false; };
+  }, [profile]);
+
+  const load = useCallback(async () => {
+    if (!place) return;
+    try {
+      const result = await getBackend().discover({
+        lat: place.lat,
+        lng: place.lng,
+        radiusM,
+        interests: filter.length ? filter : undefined,
+      });
+      setActivities(result);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [place, radiusM, filter]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  // Flödet ska vara aktuellt när man kommer tillbaka från en aktivitet.
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  function toggleFilter(slug: string) {
+    setFilter((current) =>
+      current.includes(slug) ? current.filter((s) => s !== slug) : [...current, slug],
+    );
+  }
+
+  // Bara intressen som faktiskt förekommer i flödet är värda att filtrera på.
+  const availableFilters = INTERESTS.filter(
+    (i) => filter.includes(i.slug) || activities.some((a) => a.category === i.slug),
+  );
+
+  return (
+    <Screen padded={false}>
+      <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm }}>
+        <Row justify="space-between" gap="md">
+          {/* Knappen till höger behåller sin bredd, platsraden får krympa. */}
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Txt variant="title">{t.feed.title}</Txt>
+            {place && (
+              <Row gap="xs">
+                <Ionicons name="location" size={13} color={theme.color.textFaint} />
+                <Txt variant="small" tone="faint" numberOfLines={1} style={{ flex: 1 }}>
+                  {place.label} · {RADII.find((r) => r.value === radiusM)?.label}
+                </Txt>
+              </Row>
+            )}
+          </View>
+
+          <Tappable
+            onPress={() => setChoosing(true)}
+            accessibilityLabel="SKAPA"
+            scale={0.94}
+            style={{
+              backgroundColor: theme.color.primary,
+              borderRadius: radius.pill,
+              paddingVertical: 10,
+              paddingHorizontal: space.lg,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              flexShrink: 0,
+            }}
+          >
+            <Ionicons name="add" size={17} color={theme.color.onPrimary} />
+            <Txt variant="smallStrong" tone="onPrimary">Skapa</Txt>
+          </Tappable>
+        </Row>
+      </View>
+
+      <Gap size="md" />
+
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: space.lg, gap: space.sm }}
+        data={RADII}
+        keyExtractor={(item) => String(item.value)}
+        renderItem={({ item }) => (
+          <Chip
+            label={item.label}
+            selected={radiusM === item.value}
+            onPress={() => setRadiusM(item.value)}
+          />
+        )}
+      />
+
+      {availableFilters.length > 0 && (
+        <>
+          <Gap size="sm" />
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: space.lg, gap: space.sm }}
+            data={availableFilters}
+            keyExtractor={(item) => item.slug}
+            renderItem={({ item }) => (
+              <Chip
+                label={item.label}
+                icon={item.icon as IconName}
+                selected={filter.includes(item.slug)}
+                onPress={() => toggleFilter(item.slug)}
+              />
+            )}
+          />
+        </>
+      )}
+
+      <Gap size="md" />
+
+      {loading ? (
+        <View style={{ paddingHorizontal: space.lg, gap: space.md }}>
+          {[0, 1, 2].map((i) => (
+            <Animated.View key={i} entering={FadeIn.delay(i * 60)}>
+              <ActivityCardSkeleton />
+            </Animated.View>
+          ))}
+        </View>
+      ) : (
+        <Animated.FlatList
+          itemLayoutAnimation={motion.reduced ? undefined : LinearTransition.springify()
+            .mass(spring.layout.mass)
+            .stiffness(spring.layout.stiffness)
+            .damping(spring.layout.damping)}
+          data={activities}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{
+            paddingHorizontal: space.lg,
+            paddingBottom: space.xxxl,
+            gap: space.md,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => { setRefreshing(true); void load(); }}
+              tintColor={theme.color.primary}
+            />
+          }
+          renderItem={({ item, index }) => (
+            <Animated.View
+              entering={
+                motion.reduced
+                  ? FadeIn
+                  : FadeInDown.delay(motion.stagger(index))
+                      .springify()
+                      .mass(spring.enter.mass)
+                      .stiffness(spring.enter.stiffness)
+                      .damping(spring.enter.damping)
+              }
+            >
+              <ActivityListItem
+                activity={item}
+                onPress={() => router.push(`/aktivitet/${item.id}`)}
+              />
+            </Animated.View>
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              icon="compass-outline"
+              title={t.feed.emptyTitle}
+              body={
+                filter.length
+                  ? t.feed.emptyFiltered
+                  : t.feed.emptyBody
+              }
+              action={{
+                label: filter.length ? t.feed.clearFilter : t.feed.create,
+                onPress: () => (filter.length ? setFilter([]) : setChoosing(true)),
+              }}
+            />
+          }
+        />
+      )}
+
+      <CreateChooser
+        visible={choosing}
+        onClose={() => setChoosing(false)}
+        onPlanned={() => { setChoosing(false); router.push("/aktivitet/ny"); }}
+        onSpontaneous={() => { setChoosing(false); router.push("/aktivitet/spontan"); }}
+      />
+    </Screen>
+  );
+}

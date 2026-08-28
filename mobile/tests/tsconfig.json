@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "outDir": "../.flode",
+    "rootDir": "../src",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "../src/api/mock/*.ts",
+    "../src/api/types.ts",
+    "../src/api/backend.ts",
+    "../src/api/interests.ts",
+    "../src/lib/geo.ts",
+    "../src/i18n/*.ts"
+  ]
+}
