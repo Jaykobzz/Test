@@ -23,6 +23,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider, useAuth } from "@/auth/AuthContext";
 import { Loading } from "@/components/ui";
+import { t } from "@/i18n";
 import { darkTheme, fontFamily, lightTheme } from "@/theme";
 
 export default function RootLayout() {
@@ -77,7 +78,7 @@ function RootNavigator() {
     }
   }, [loading, profile, segments, router]);
 
-  if (loading) return <Loading label="Laddar Haka på …" />;
+  if (loading) return <Loading label={t.common.loading} />;
 
   return (
     <Stack
@@ -98,23 +99,23 @@ function RootNavigator() {
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="aktivitet/ny" options={{ title: "Planera något", presentation: "modal" }} />
+      <Stack.Screen name="aktivitet/ny" options={{ title: t.nav.planSomething, presentation: "modal" }} />
       <Stack.Screen
         name="aktivitet/spontan"
-        options={{ title: "Spontant nu", presentation: "modal" }}
+        options={{ title: t.nav.spontaneousNow, presentation: "modal" }}
       />
       <Stack.Screen name="aktivitet/[id]" options={{ title: "" }} />
       <Stack.Screen
         name="aktivitet/andra/[id]"
-        options={{ title: "Ändra", presentation: "modal" }}
+        options={{ title: t.nav.edit, presentation: "modal" }}
       />
       <Stack.Screen name="chatt/[id]" options={{ title: "" }} />
       <Stack.Screen name="person/[id]" options={{ title: "" }} />
       <Stack.Screen
         name="igen/[activityId]"
-        options={{ title: "Göra om det?", presentation: "modal" }}
+        options={{ title: t.nav.doItAgain, presentation: "modal" }}
       />
-      <Stack.Screen name="kompisar" options={{ title: "Kompisar" }} />
+      <Stack.Screen name="kompisar" options={{ title: t.nav.friends }} />
     </Stack>
   );
 }

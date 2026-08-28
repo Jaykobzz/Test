@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { RematchPrompt } from "@/api/types";
 import { Avatar, Button, Card, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
@@ -124,7 +125,7 @@ export default function RematchScreen() {
         </View>
         <View style={{ flex: 1 }}>
           <Button
-            label="Ja gärna"
+            label={t.again.yes}
             icon="repeat"
             onPress={() => answer(true)}
             disabled={saving}
@@ -152,5 +153,5 @@ export default function RematchScreen() {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

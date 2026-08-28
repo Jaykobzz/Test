@@ -14,6 +14,7 @@ import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import { getBackend } from "@/api";
 import type { ThreadSummary } from "@/api/types";
 import { EmptyState, Gap, Loading, Row, Screen, Txt } from "@/components/ui";
+import { t } from "@/i18n";
 import { useTheme } from "@/hooks/useTheme";
 import { formatRelative } from "@/lib/time";
 import { radius, space } from "@/theme";
@@ -64,9 +65,9 @@ export default function ChatsScreen() {
           <View style={{ paddingHorizontal: space.lg }}>
             <EmptyState
               icon="chatbubbles-outline"
-              title="Inga chattar än"
-              body="När någon accepterar din ansökan, eller du accepterar någon annans, hamnar ni i en chatt här."
-              action={{ label: "Hitta något att göra", onPress: () => router.push("/(tabs)") }}
+              title={t.chats.emptyTitle}
+              body={t.chats.emptyBody}
+              action={{ label: t.chats.findSomething, onPress: () => router.push("/(tabs)") }}
             />
           </View>
         }
@@ -154,7 +155,7 @@ function ThreadRow({ thread, onPress }: { thread: ThreadSummary; onPress: () => 
                 tone={unread ? "default" : "faint"}
                 numberOfLines={1}
               >
-                {thread.lastMessage ?? "Säg hej!"}
+                {thread.lastMessage ?? t.chats.sayHi}
               </Txt>
             </View>
 

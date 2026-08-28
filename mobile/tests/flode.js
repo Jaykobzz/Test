@@ -22,6 +22,11 @@ const stubs = {
     __esModule: true,
     Image: { resolveAssetSource: (m) => ({ uri: (m && m.uri) || "stub" }) },
   },
+  // Nativmodul. Testet kor pa svenska, sa att textkontroller ar forutsagbara.
+  "expo-localization": {
+    __esModule: true,
+    getLocales: () => [{ languageCode: "sv", languageTag: "sv-SE" }],
+  },
   "@react-native-async-storage/async-storage": {
     __esModule: true,
     default: {

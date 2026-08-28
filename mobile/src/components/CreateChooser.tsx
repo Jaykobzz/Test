@@ -10,6 +10,7 @@
 import { Modal, View } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
+import { t } from "@/i18n";
 import { Tappable } from "@/components/Tappable";
 import { Gap, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
@@ -29,7 +30,7 @@ export function CreateChooser({ visible, onClose, onPlanned, onSpontaneous }: Pr
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <Tappable
         onPress={onClose}
-        accessibilityLabel="Stäng"
+        accessibilityLabel={t.chooser.close}
         scale={1}
         style={{ flex: 1, justifyContent: "flex-end", backgroundColor: theme.color.overlay }}
       >
@@ -43,20 +44,20 @@ export function CreateChooser({ visible, onClose, onPlanned, onSpontaneous }: Pr
             gap: space.md,
           }}
         >
-          <Txt variant="title">Vad vill du lägga upp?</Txt>
+          <Txt variant="title">{t.chooser.title}</Txt>
 
           <Option
             icon="fika"
-            title="Spontant nu"
-            body="Något du vill göra inom några timmar. Går ut till folk i närheten direkt."
+            title={t.chooser.spontaneous}
+            body={t.chooser.spontaneousBody}
             onPress={onSpontaneous}
             highlight
           />
 
           <Option
             icon="vandring"
-            title="Planera något"
-            body="En aktivitet längre fram, med bild och beskrivning."
+            title={t.chooser.planned}
+            body={t.chooser.plannedBody}
             onPress={onPlanned}
           />
         </View>

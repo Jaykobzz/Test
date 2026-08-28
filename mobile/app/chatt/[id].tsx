@@ -3,7 +3,7 @@
  *
  * Fyra sorters meddelanden: text, bild, plats och lista. De tre sista finns
  * för att det är dem man faktiskt behöver inför något man ska göra ihop:
- * "här är bryggan", "här är vad vi ska ta med".
+ * t.chat.placeExample, t.chat.listExample.
  */
 
 import { Ionicons } from "@expo/vector-icons";
@@ -22,6 +22,7 @@ import {
 } from "react-native";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { Message, ThreadSummary } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { Avatar, Gap, IconButton, Loading, Row, Screen, Txt } from "@/components/ui";
@@ -59,7 +60,7 @@ export default function ChatScreen() {
       setThread(threads.find((t) => t.id === id) ?? null);
       await getBackend().markThreadRead(id);
     } catch (error) {
-      Alert.alert("Kunde inte öppna chatten", describe(error));
+      Alert.alert(t.chat.openFailed, describe(error));
     } finally {
       setLoading(false);
     }
@@ -161,7 +162,7 @@ export default function ChatScreen() {
     if (Platform.OS !== "ios") {
       Alert.alert(
         "Ny lista",
-        "Skriv punkterna i textfältet, en per rad, och tryck på listknappen igen.",
+        t.chat.listHelp,
       );
     }
   }
@@ -262,7 +263,7 @@ export default function ChatScreen() {
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder="Skriv något …"
+            placeholder={t.chat.placeholder}
             placeholderTextColor={theme.color.textFaint}
             multiline
             style={[
@@ -486,5 +487,5 @@ function MessageBubble({
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Switch, View } from "react-native";
 
 import { Field, Gap, Row, Txt } from "@/components/ui";
+import { t } from "@/i18n";
 import { useTheme } from "@/hooks/useTheme";
 
 interface Props {
@@ -35,9 +36,9 @@ export function PriceField({ value, onChange }: Props) {
     <>
       <Row justify="space-between" gap="md">
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Txt variant="smallStrong" tone="muted">Kostar något på plats</Txt>
+          <Txt variant="smallStrong" tone="muted">{t.price.label}</Txt>
           <Txt variant="small" tone="faint">
-            Bastu, bana, entré. Ni betalar var för sig, inget går via appen.
+            {t.price.help}
           </Txt>
         </View>
         <Switch
@@ -52,7 +53,7 @@ export function PriceField({ value, onChange }: Props) {
         <>
           <Gap size="sm" />
           <Field
-            label="Ungefär hur mycket per person?"
+            label={t.price.amount}
             value={value === null ? "" : String(value)}
             onChangeText={(text) => {
               const digits = text.replace(/\D/g, "").slice(0, 6);

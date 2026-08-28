@@ -2,6 +2,8 @@
 
 const EARTH_RADIUS_M = 6_371_000;
 
+import { locale, t } from "@/i18n";
+
 export interface LatLng {
   lat: number;
   lng: number;
@@ -28,10 +30,14 @@ export function distanceMeters(a: LatLng, b: LatLng): number {
  */
 export function formatDistance(meters: number | null): string {
   if (meters === null) return "";
-  if (meters < 100) return "här intill";
-  if (meters < 1000) return `${Math.round(meters / 100) * 100} m`;
-  if (meters < 10_000) return `${(meters / 1000).toFixed(1).replace(".", ",")} km`;
-  return `${Math.round(meters / 1000)} km`;
+  if (meters < 100) return t.distance.rightHere;
+  if (meters < 1000) return t.distance.metres(Math.round(meters / 100) * 100);
+  if (meters < 10_000) {
+    const km = (meters / 1000).toFixed(1);
+    // Decimalkomma på svenska, punkt på engelska.
+    return t.distance.kilometres(locale === "sv" ? km.replace(".", ",") : km);
+  }
+  return t.distance.kilometres(String(Math.round(meters / 1000)));
 }
 
 /**

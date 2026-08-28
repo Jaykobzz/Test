@@ -14,6 +14,7 @@ import { Alert, Pressable, ScrollView, View } from "react-native";
 
 import { USING_MOCK, getBackend, resetMockData } from "@/api";
 import { INTERESTS, type IconName } from "@/api/interests";
+import { t } from "@/i18n";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import {
@@ -73,15 +74,15 @@ export default function ProfileScreen() {
   /** Vad som fattas, eller null när allt är klart. */
   const missingInProfile =
     draftName.trim().length < 2
-      ? "Skriv vad du vill kallas."
+      ? t.onboarding.needName
       : draftInterests.length === 0
-        ? "Välj minst ett intresse."
+        ? t.profile.needInterest
         : null;
 
   async function save() {
     if (missingInProfile) {
       // En avstängd knapp säger inte varför. Det här gör det.
-      Alert.alert("Något fattas", missingInProfile);
+      Alert.alert(t.common.missing, missingInProfile);
       return;
     }
     setSaving(true);
@@ -101,9 +102,9 @@ export default function ProfileScreen() {
   }
 
   function confirmSignOut() {
-    Alert.alert("Logga ut?", "Du loggar in igen med BankID.", [
-      { text: "Avbryt", style: "cancel" },
-      { text: "Logga ut", style: "destructive", onPress: () => void signOut() },
+    Alert.alert(t.profile.signOutTitle, t.profile.signOutBody, [
+      { text: t.common.cancel, style: "cancel" },
+      { text: t.profile.signOut, style: "destructive", onPress: () => void signOut() },
     ]);
   }
 
@@ -111,29 +112,27 @@ export default function ProfileScreen() {
     // Två steg med flit. Det här går inte att ångra, och en enda knapptryckning
     // ska inte kunna radera allt någon byggt upp.
     Alert.alert(
-      "Radera ditt konto?",
-      "Din profil, dina aktiviteter och dina kompisrelationer tas bort. "
-      + "Aktiviteter du är värd för ställs in så att de som tackat ja får veta. "
-      + "Det går inte att ångra.",
+      t.profile.deleteTitle,
+      t.profile.deleteBody,
       [
-        { text: "Avbryt", style: "cancel" },
+        { text: t.common.cancel, style: "cancel" },
         {
-          text: "Fortsätt",
+          text: t.profile.deleteContinue,
           style: "destructive",
           onPress: () => Alert.alert(
-            "Säker?",
-            "Kontot raderas direkt och går inte att få tillbaka.",
+            t.profile.deleteSureTitle,
+            t.profile.deleteSureBody,
             [
-              { text: "Nej", style: "cancel" },
+              { text: t.profile.deleteNo, style: "cancel" },
               {
-                text: "Radera",
+                text: t.profile.deleteConfirm,
                 style: "destructive",
                 onPress: async () => {
                   try {
                     await getBackend().deleteAccount();
                     await refresh();
                   } catch (error) {
-                    Alert.alert("Gick inte att radera", describe(error));
+                    Alert.alert(t.profile.deleteFailed, describe(error));
                   }
                 },
               },
@@ -146,12 +145,12 @@ export default function ProfileScreen() {
 
   function confirmReset() {
     Alert.alert(
-      "Börja om?",
-      "Allt du gjort i testläget försvinner och exempeldatan återställs.",
+      t.profile.resetTitle,
+      t.profile.resetBody,
       [
-        { text: "Avbryt", style: "cancel" },
+        { text: t.common.cancel, style: "cancel" },
         {
-          text: "Börja om",
+          text: t.profile.resetConfirm,
           style: "destructive",
           onPress: async () => { await resetMockData(); await signOut(); },
         },
@@ -223,7 +222,7 @@ export default function ProfileScreen() {
                   <Txt variant="bodyStrong">Kompisar</Txt>
                   <Txt variant="small" tone="muted">
                     {friends.length === 0
-                      ? "Inga än"
+                      ? t.profile.none
                       : friends.length === 1 ? "1 person" : `${friends.length} personer`}
                     {pendingFriends > 0 && ` · ${pendingFriends} väntar på svar`}
                   </Txt>
@@ -311,14 +310,14 @@ export default function ProfileScreen() {
         <Gap size="xl" />
         <Divider />
 
-        <Button label="Logga ut" kind="ghost" onPress={confirmSignOut} />
+        <Button label={t.profile.signOut} kind="ghost" onPress={confirmSignOut} />
         <Gap size="sm" />
         {/*
           Apple kräver att den som kan skapa ett konto också kan radera det
           inifrån appen. GDPR kräver samma sak av andra skäl. Den ligger sist
           och lågmält, men den ligger här.
         */}
-        <Button label="Radera mitt konto" kind="danger" onPress={confirmDelete} />
+        <Button label={t.profile.deleteAccount} kind="danger" onPress={confirmDelete} />
 
         {USING_MOCK && (
           <>
@@ -340,7 +339,7 @@ export default function ProfileScreen() {
                 </View>
               </Row>
               <Gap size="sm" />
-              <Button label="Börja om från början" kind="danger" onPress={confirmReset} />
+              <Button label={t.profile.reset} kind="danger" onPress={confirmReset} />
             </View>
           </>
         )}
@@ -350,5 +349,5 @@ export default function ProfileScreen() {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

@@ -24,6 +24,7 @@ import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-ar
 
 import { Icon, type IconName } from "@/components/icons/Icon";
 import { Tappable } from "@/components/Tappable";
+import { t } from "@/i18n";
 import { useTheme } from "@/hooks/useTheme";
 import { font, fontFamily, radius, shadowFor, space } from "@/theme";
 
@@ -443,10 +444,8 @@ export function Credentials({
     parts.push(
       <Txt key="a" variant={variant} tone="muted">
         {activityCount === 0
-          ? "Inga aktiviteter än"
-          : activityCount === 1
-            ? "1 aktivitet"
-            : `${activityCount} aktiviteter`}
+          ? t.credentials.noActivities
+          : t.credentials.activities(activityCount)}
       </Txt>,
     );
   }
@@ -454,7 +453,7 @@ export function Credentials({
   if (memberSince) {
     parts.push(
       <Txt key="m" variant={variant} tone="faint">
-        Med sedan {formatMonthYear(memberSince)}
+        {t.credentials.memberSince(formatMonthYear(memberSince))}
       </Txt>,
     );
   }

@@ -18,6 +18,7 @@ import { Alert, Platform, View } from "react-native";
 
 import { getBackend } from "@/api";
 import type { ActivityDetail, ActivityVisibility } from "@/api/types";
+import { t } from "@/i18n";
 import { PriceField } from "@/components/PriceField";
 import {
   Button, Chip, Divider, Field, Gap, Loading, Row, Screen, Txt,
@@ -60,7 +61,7 @@ export default function EditActivityScreen() {
         setVisibility(a.visibility);
         setPriceSek(a.priceSek);
       } catch (error) {
-        Alert.alert("Kunde inte hämta aktiviteten", describe(error));
+        Alert.alert(t.plan.loadFailed, describe(error));
         router.back();
       }
     })();
@@ -74,18 +75,18 @@ export default function EditActivityScreen() {
 
   const missing =
     title.trim().length < 3
-      ? "Titeln behöver minst tre tecken."
+      ? t.plan.tooShortTitle
       : !locationName.trim()
-        ? "Fyll i var ni ska vara."
+        ? t.plan.needPlace
         : startsAt.getTime() <= Date.now()
-          ? "Välj en tid som ligger framåt."
+          ? t.plan.needFutureTime
           : capacity !== null && capacity < accepted
-            ? `Redan ${accepted} med, går inte att sänka under det.`
+            ? t.plan.cannotLower(accepted)
             : null;
 
   async function save() {
     if (missing || !original) {
-      Alert.alert("Går inte att spara", missing ?? "Något fattas.");
+      Alert.alert(t.common.missing, missing ?? t.plan.needAll);
       return;
     }
     setSaving(true);
@@ -102,7 +103,7 @@ export default function EditActivityScreen() {
       });
       router.back();
     } catch (error) {
-      Alert.alert("Kunde inte spara", describe(error));
+      Alert.alert(t.profile.saveFailed, describe(error));
     } finally {
       setSaving(false);
     }
@@ -123,7 +124,7 @@ export default function EditActivityScreen() {
             </>
           )}
           <Button
-            label={saving ? "Sparar …" : "Spara ändringar"}
+            label={saving ? t.plan.saving : t.plan.saveChanges}
             onPress={save}
             loading={saving}
           />
@@ -147,24 +148,24 @@ export default function EditActivityScreen() {
           >
             <Txt variant="smallStrong" tone="primary">
               {accepted === 1
-                ? "Personen som är med får veta i chatten"
-                : `De ${accepted} som är med får veta i chatten`}
+                ? t.plan.willTellOne
+                : t.plan.willTellMany(accepted)}
             </Txt>
             <Txt variant="small" tone="muted">
               {timeChanged && placeChanged
-                ? "Både tiden och platsen har ändrats."
-                : timeChanged ? "Tiden har ändrats." : "Platsen har ändrats."}
+                ? t.plan.bothChanged
+                : timeChanged ? t.plan.timeChanged : t.plan.placeChanged}
             </Txt>
           </View>
           <Gap size="lg" />
         </>
       )}
 
-      <Field label="Vad ska ni göra?" value={title} onChangeText={setTitle} maxLength={80} />
+      <Field label={t.plan.titleLabel} value={title} onChangeText={setTitle} maxLength={80} />
 
       <Gap size="md" />
       <Field
-        label="Beskrivning"
+        label={t.plan.descriptionLabel}
         value={description}
         onChangeText={setDescription}
         multiline
@@ -174,7 +175,7 @@ export default function EditActivityScreen() {
       <Gap size="lg" />
       <Divider />
 
-      <Txt variant="smallStrong" tone="muted">När?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.when}</Txt>
       <Gap size="sm" />
       {Platform.OS === "ios" ? (
         <Row gap="sm">
@@ -199,9 +200,9 @@ export default function EditActivityScreen() {
       ) : (
         <>
           <Row gap="sm">
-            <Button label="Välj dag" kind="secondary" icon="calendar"
+            <Button label={t.plan.pickDay} kind="secondary" icon="calendar"
               onPress={() => setPicker("date")} fullWidth={false} />
-            <Button label="Välj tid" kind="secondary" icon="time"
+            <Button label={t.plan.pickTime} kind="secondary" icon="time"
               onPress={() => setPicker("time")} fullWidth={false} />
           </Row>
           {picker && (
@@ -225,11 +226,11 @@ export default function EditActivityScreen() {
       </Txt>
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Hur länge?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howLong}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {[1, 2, 3, 4, 6, 8].map((h) => (
-          <Chip key={h} label={`${h} tim`} selected={hours === h}
+          <Chip key={h} label={t.create.hours(h)} selected={hours === h}
             onPress={() => setHours(h)} />
         ))}
       </Row>
@@ -237,13 +238,13 @@ export default function EditActivityScreen() {
       <Gap size="lg" />
       <Divider />
 
-      <Field label="Var?" value={locationName} onChangeText={setLocationName} maxLength={80} />
+      <Field label={t.create.where} value={locationName} onChangeText={setLocationName} maxLength={80} />
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Hur många kan haka på?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howMany}</Txt>
       {accepted > 0 && (
         <Txt variant="small" tone="faint">
-          {accepted === 1 ? "1 person är redan med." : `${accepted} personer är redan med.`}
+          {t.plan.alreadyJoined(accepted)}
         </Txt>
       )}
       <Gap size="sm" />
@@ -252,7 +253,7 @@ export default function EditActivityScreen() {
           <Chip key={c} label={String(c)} selected={capacity === c}
             onPress={() => setCapacity(c)} />
         ))}
-        <Chip label="Ingen gräns" selected={capacity === null}
+        <Chip label={t.plan.noLimit} selected={capacity === null}
           onPress={() => setCapacity(null)} />
       </Row>
 
@@ -260,12 +261,12 @@ export default function EditActivityScreen() {
       <PriceField value={priceSek} onChange={setPriceSek} />
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Vem får se?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.whoSees}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
-        <Chip label="Alla i närheten" selected={visibility === "public"}
+        <Chip label={t.create.everyone} selected={visibility === "public"}
           onPress={() => setVisibility("public")} />
-        <Chip label="Bara kompisar" selected={visibility === "friends"}
+        <Chip label={t.create.friendsOnly} selected={visibility === "friends"}
           onPress={() => setVisibility("friends")} />
       </Row>
 
@@ -275,5 +276,5 @@ export default function EditActivityScreen() {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

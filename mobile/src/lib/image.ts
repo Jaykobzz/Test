@@ -4,6 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { ImageBucket } from "@/api/types";
 
 export interface PickOptions {
@@ -35,7 +36,7 @@ const PRESETS: Record<ImageBucket, PickOptions> = {
 export async function pickImage(bucket: ImageBucket): Promise<string | null> {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!permission.granted) {
-    throw new Error("Haka på behöver tillgång till dina bilder för att du ska kunna välja en.");
+    throw new Error(t.permission.photos);
   }
 
   const preset = PRESETS[bucket];
@@ -54,7 +55,7 @@ export async function pickImage(bucket: ImageBucket): Promise<string | null> {
 export async function captureImage(bucket: ImageBucket): Promise<string | null> {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
   if (!permission.granted) {
-    throw new Error("Haka på behöver tillgång till kameran för att du ska kunna ta en bild.");
+    throw new Error(t.permission.camera);
   }
 
   const preset = PRESETS[bucket];

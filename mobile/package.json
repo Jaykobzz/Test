@@ -45,8 +45,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "flode": "tsc -p tests/tsconfig.json && node tests/flode.js",
-    "uppdatera": "git pull && npm install && expo start -c"
+    "flode": "tsc -p tests/tsconfig.json && node tests/flode.js && node tests/sprak.js",
+    "uppdatera": "git pull && npm install && expo start -c",
+    "sprak": "tsc -p tests/tsconfig.json && node tests/sprak.js"
   },
   "private": true
 }

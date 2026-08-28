@@ -5,6 +5,8 @@ import * as Location from "expo-location";
 import { coarsen, type LatLng } from "./geo";
 import { DEFAULT_LOCATION } from "@/api/mock/seed";
 
+import { t } from "@/i18n";
+
 export interface PlaceGuess extends LatLng {
   label: string;
   /** Falskt när användaren nekat och vi föll tillbaka på en förvald punkt. */
@@ -43,11 +45,11 @@ export async function describePlace(point: LatLng): Promise<string> {
       latitude: point.lat,
       longitude: point.lng,
     });
-    if (!place) return "Okänt område";
-    return place.district ?? place.subregion ?? place.city ?? place.region ?? "Okänt område";
+    if (!place) return t.place.unknownArea;
+    return place.district ?? place.subregion ?? place.city ?? place.region ?? t.place.unknownArea;
   } catch {
     // Omvänd geokodning kräver nät och kan tystna. Positionen duger ändå.
-    return "Okänt område";
+    return t.place.unknownArea;
   }
 }
 

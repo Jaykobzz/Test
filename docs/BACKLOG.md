@@ -19,6 +19,7 @@ kvarvarande arbetet, och det är sällan det som står i vägen.
 |---|---|---|
 | 1 | **Delad databas.** Idag ligger allt lokalt i varje telefon, så två personer kan inte se varandra. Ingenting annat spelar roll förrän det är löst. Migrationerna och `SupabaseBackend` är färdiga; det som saknas är ett projekt. Gratisplanen tillåter två aktiva och båda är upptagna. | Jakob väljer vilket projekt som pausas |
 | 2 | **Något som stoppar slit-och-släng-konton.** BankID är beslutat att vänta. SMS-verifiering kostar cirka 30 öre per registrering och kräver ett konto hos en leverantör. Identiteten ligger redan bakom ett gränssnitt, så själva inkopplingen är en dags arbete. | Jakob skaffar konto, sen kod |
+| 2b | ~~**Engelska i appen.**~~ Klart. Hela gränssnittet finns på båda språken, och `npm run flode` kontrollerar att ingen svensk text läckt in i den engelska ordboken. | Klart |
 | 3 | **Integritetspolicy och villkor på en publik adress.** Både App Store och GDPR kräver det, och appen samlar position, bilder och personuppgifter. Utan en URL avvisas appen i granskningen. | Utkast kan skrivas, Jakob publicerar |
 | 4 | ~~**Radera sitt konto inifrån appen.**~~ Klart. Apple kräver det av alla appar med konton. | Klart |
 | 5 | **Någon som faktiskt läser anmälningar.** Tabellen finns och knappen finns, men ingen tittar. För en app där folk träffas fysiskt är det inte en formalitet. Behöver inte vara ett verktyg, men det behöver vara någons uppgift. | Jakob |

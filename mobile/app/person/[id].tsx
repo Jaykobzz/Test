@@ -14,6 +14,7 @@ import { Alert, ScrollView, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import { INTERESTS, type IconName } from "@/api/interests";
 import type { PublicProfile } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
@@ -38,7 +39,7 @@ export default function PersonScreen() {
     try {
       setPerson(await getBackend().getProfile(id));
     } catch (error) {
-      Alert.alert("Kunde inte hämta profilen", describe(error));
+      Alert.alert(t.person.loadFailed, describe(error));
     } finally {
       setLoading(false);
     }
@@ -67,12 +68,11 @@ export default function PersonScreen() {
     if (!person?.friendRequestId) return;
     Alert.alert(
       `Ta bort ${person.displayName} som kompis?`,
-      "Ni kan fortfarande haka på varandras aktiviteter. Personen får ingen "
-      + "avisering om det här.",
+      t.person.removeFriendBody,
       [
         { text: "Avbryt", style: "cancel" },
         {
-          text: "Ta bort",
+          text: t.person.remove,
           style: "destructive",
           onPress: async () => {
             setWorking(true);
@@ -110,7 +110,7 @@ export default function PersonScreen() {
       const threadId = await getBackend().ensureDirectThread(person.id);
       router.push(`/chatt/${threadId}`);
     } catch (error) {
-      Alert.alert("Kan inte öppna chatt än", describe(error));
+      Alert.alert(t.person.chatNotYet, describe(error));
     } finally {
       setWorking(false);
     }
@@ -120,7 +120,7 @@ export default function PersonScreen() {
     if (!person) return;
     Alert.alert(
       `Blockera ${person.displayName}?`,
-      "Ni ser inte längre varandras aktiviteter och kan inte kontakta varandra.",
+      t.person.blockBody,
       [
         { text: "Avbryt", style: "cancel" },
         {
@@ -145,7 +145,7 @@ export default function PersonScreen() {
       { text: "Avbryt", style: "cancel" },
       { text: "Obehagligt beteende", onPress: () => submitReport("obehagligt_beteende") },
       { text: "Falsk profil", onPress: () => submitReport("falsk_profil") },
-      { text: "Något annat", onPress: () => submitReport("annat") },
+      { text: t.person.reportOther, onPress: () => submitReport("annat") },
     ]);
   }
 
@@ -153,7 +153,7 @@ export default function PersonScreen() {
     if (!person) return;
     try {
       await getBackend().reportUser(person.id, reason);
-      Alert.alert("Tack", "Vi tittar på det. Du kan även blockera personen.");
+      Alert.alert("Tack", t.person.reportThanks);
     } catch (error) {
       Alert.alert("Gick inte", describe(error));
     }
@@ -200,8 +200,8 @@ export default function PersonScreen() {
         <Gap size="xl" />
 
         <Row gap="sm" justify="space-around">
-          <Stat value={person.activitiesHosted} label="värd för" />
-          <Stat value={person.activitiesJoined} label="varit med på" />
+          <Stat value={person.activitiesHosted} label={t.person.hosted} />
+          <Stat value={person.activitiesJoined} label={t.person.joined} />
           <Stat value={person.friendCount} label="kompisar" />
         </Row>
 
@@ -251,14 +251,14 @@ export default function PersonScreen() {
             />
 
             <Gap size="sm" />
-            <Button label="Skicka meddelande" icon="chatbubble" kind="secondary" onPress={openChat} />
+            <Button label={t.person.message} icon="chatbubble" kind="secondary" onPress={openChat} />
 
             <Gap size="xl" />
             <Divider />
 
             <Row gap="sm" justify="center">
-              <Button label="Anmäl" kind="ghost" onPress={report} fullWidth={false} />
-              <Button label="Blockera" kind="ghost" onPress={confirmBlock} fullWidth={false} />
+              <Button label={t.person.report} kind="ghost" onPress={report} fullWidth={false} />
+              <Button label={t.person.block} kind="ghost" onPress={confirmBlock} fullWidth={false} />
             </Row>
           </>
         )}
@@ -302,7 +302,7 @@ function FriendAction({
       >
         <Row gap="sm" justify="center">
           <Ionicons name="heart" size={17} color={theme.color.accent} />
-          <Txt variant="bodyStrong">Ni är kompisar</Txt>
+          <Txt variant="bodyStrong">{t.person.areFriends}</Txt>
         </Row>
         <Gap size="xs" />
         <Txt variant="small" tone="muted" align="center">
@@ -315,7 +315,7 @@ function FriendAction({
           verktyget appen har.
         */}
         <Button
-          label="Ta bort som kompis"
+          label={t.person.removeFriend}
           kind="ghost"
           onPress={onRemove}
           disabled={working}
@@ -332,7 +332,7 @@ function FriendAction({
         </Txt>
         <Row gap="sm">
           <View style={{ flex: 1 }}>
-            <Button label="Ja gärna" icon="heart" onPress={() => onRespond(true)} disabled={working} />
+            <Button label={t.person.accept} icon="heart" onPress={() => onRespond(true)} disabled={working} />
           </View>
           <Button
             label="Nej tack"
@@ -365,5 +365,5 @@ function FriendAction({
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

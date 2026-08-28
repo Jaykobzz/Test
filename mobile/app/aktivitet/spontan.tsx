@@ -18,6 +18,7 @@ import { Alert, View } from "react-native";
 import { getBackend } from "@/api";
 import { INTERESTS } from "@/api/interests";
 import type { ActivityVisibility } from "@/api/types";
+import { t } from "@/i18n";
 import { PriceField } from "@/components/PriceField";
 import { Button, Chip, Divider, Field, Gap, Row, Screen, Txt } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
@@ -27,16 +28,16 @@ import { radius, space } from "@/theme";
 
 /** Hur långt fram en spontan aktivitet får ligga. Samma gräns som databasen. */
 const WITHIN = [
-  { label: "Nu", minutes: 10 },
-  { label: "Om 30 min", minutes: 30 },
-  { label: "Om 1 h", minutes: 60 },
-  { label: "Om 2 h", minutes: 120 },
+  { label: t.create.now, minutes: 10 },
+  { label: t.create.inMinutes(30), minutes: 30 },
+  { label: t.create.inHours(1), minutes: 60 },
+  { label: t.create.inHours(2), minutes: 120 },
 ] as const;
 
 const LENGTHS = [
-  { label: "1 h", hours: 1 },
-  { label: "2 h", hours: 2 },
-  { label: "3 h", hours: 3 },
+  { label: t.create.hours(1), hours: 1 },
+  { label: t.create.hours(2), hours: 2 },
+  { label: t.create.hours(3), hours: 3 },
 ] as const;
 
 const CAPACITIES = [1, 2, 3, 4, 6] as const;
@@ -48,16 +49,16 @@ const CAPACITIES = [1, 2, 3, 4, 6] as const;
  * något, det är att inte gå ut ensam, och då ska förslagen låta som det.
  */
 const SUGGESTIONS: { title: string; category: string }[] = [
-  { title: "Ta en fika", category: "fika" },
-  { title: "Promenad", category: "vandring" },
-  { title: "Löprunda", category: "lopning" },
-  { title: "Cykla en sväng", category: "cykling" },
-  { title: "Gå på gymmet", category: "gym" },
-  { title: "Käka lunch", category: "middag" },
-  { title: "Spela något", category: "bradspel" },
-  { title: "Kasta boll", category: "fotboll" },
-  { title: "Gå till badet", category: "bad" },
-  { title: "Fota en runda", category: "foto" },
+  { title: t.suggestions.fika, category: "fika" },
+  { title: t.suggestions.walk, category: "vandring" },
+  { title: t.suggestions.run, category: "lopning" },
+  { title: t.suggestions.bike, category: "cykling" },
+  { title: t.suggestions.gym, category: "gym" },
+  { title: t.suggestions.lunch, category: "middag" },
+  { title: t.suggestions.game, category: "bradspel" },
+  { title: t.suggestions.ball, category: "fotboll" },
+  { title: t.suggestions.swim, category: "bad" },
+  { title: t.suggestions.photo, category: "foto" },
 ];
 
 export default function SpontaneousScreen() {
@@ -92,9 +93,9 @@ export default function SpontaneousScreen() {
 
   const missing =
     title.trim().length < 3
-      ? "Skriv vad du vill göra."
+      ? t.create.needTitle
       : !point
-        ? "Väntar på din position."
+        ? t.create.waitingForLocation
         : null;
 
   async function create() {
@@ -107,7 +108,7 @@ export default function SpontaneousScreen() {
         title: title.trim(),
         category: category ?? undefined,
         coverUrl: null,
-        locationName: locationName.trim() || "I närheten",
+        locationName: locationName.trim() || t.create.nearby,
         lat: point.lat,
         lng: point.lng,
         startsAt: startsAt.toISOString(),
@@ -119,7 +120,7 @@ export default function SpontaneousScreen() {
       });
       router.replace(`/aktivitet/${created.id}`);
     } catch (error) {
-      Alert.alert("Gick inte att lägga upp", describe(error));
+      Alert.alert(t.create.failed, describe(error));
     } finally {
       setSaving(false);
     }
@@ -137,7 +138,7 @@ export default function SpontaneousScreen() {
             </>
           )}
           <Button
-            label={saving ? "Lägger upp …" : "Lägg upp"}
+            label={saving ? t.create.posting : t.create.post}
             onPress={create}
             loading={saving}
           />
@@ -146,13 +147,12 @@ export default function SpontaneousScreen() {
     >
       <Gap size="lg" />
       <Txt variant="body" tone="muted">
-        Går ut till folk i närheten som gillar samma sak. Den försvinner av sig
-        själv när den har varit.
+        {t.create.spontaneousIntro}
       </Txt>
 
       <Gap size="lg" />
 
-      <Txt variant="smallStrong" tone="muted">Vad?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.what}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {SUGGESTIONS.map((s) => (
@@ -168,17 +168,17 @@ export default function SpontaneousScreen() {
 
       <Gap size="md" />
       <Field
-        label="Eller skriv något eget"
+        label={t.create.whatOwn}
         value={title}
         onChangeText={setTitle}
-        placeholder="Vad är du sugen på?"
+        placeholder={t.create.whatPlaceholder}
         maxLength={80}
       />
 
       <Gap size="lg" />
       <Divider />
 
-      <Txt variant="smallStrong" tone="muted">När?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.when}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {WITHIN.map((w) => (
@@ -192,7 +192,7 @@ export default function SpontaneousScreen() {
       </Row>
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Hur länge?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howLong}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {LENGTHS.map((l) => (
@@ -209,15 +209,15 @@ export default function SpontaneousScreen() {
       <Divider />
 
       <Field
-        label="Var?"
+        label={t.create.where}
         value={locationName}
         onChangeText={setLocationName}
-        placeholder="Letar upp var du är …"
+        placeholder={t.create.whereLocating}
         maxLength={80}
       />
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Hur många?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howMany}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {CAPACITIES.map((c) => (
@@ -229,7 +229,7 @@ export default function SpontaneousScreen() {
           />
         ))}
         <Chip
-          label="Spelar ingen roll"
+          label={t.create.noLimit}
           selected={capacity === null}
           onPress={() => setCapacity(null)}
         />
@@ -239,16 +239,16 @@ export default function SpontaneousScreen() {
       <PriceField value={priceSek} onChange={setPriceSek} />
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Vem får se?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.whoSees}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         <Chip
-          label="Alla i närheten"
+          label={t.create.everyone}
           selected={visibility === "public"}
           onPress={() => setVisibility("public")}
         />
         <Chip
-          label="Bara kompisar"
+          label={t.create.friendsOnly}
           selected={visibility === "friends"}
           onPress={() => setVisibility("friends")}
         />
@@ -259,5 +259,5 @@ export default function SpontaneousScreen() {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

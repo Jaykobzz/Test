@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
+import { t } from "@/i18n";
 import { useUnread } from "@/hooks/useUnread";
 import { font, fontFamily } from "@/theme";
 
@@ -30,21 +31,21 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Upptäck",
+          title: t.nav.discover,
           tabBarIcon: ({ color, size }) => <Ionicons name="compass" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="aktiviteter"
         options={{
-          title: "Mina",
+          title: t.nav.mine,
           tabBarIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="chattar"
         options={{
-          title: "Chattar",
+          title: t.nav.chats,
           // Siffran är det enda i appen som ber om uppmärksamhet av sig
           // självt, så den finns bara när den betyder något.
           tabBarBadge: unread > 0 ? (unread > 99 ? "99+" : unread) : undefined,
@@ -61,7 +62,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profil"
         options={{
-          title: "Profil",
+          title: t.nav.profile,
           tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
         }}
       />

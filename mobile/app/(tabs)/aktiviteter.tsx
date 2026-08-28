@@ -12,6 +12,7 @@ import { useCallback, useState } from "react";
 import { Alert, RefreshControl, ScrollView, View } from "react-native";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { ActivityCard, Rematch, RematchPrompt } from "@/api/types";
 import { ActivityListItem } from "@/components/ActivityListItem";
 import {
@@ -109,14 +110,14 @@ export default function MyActivitiesScreen() {
         {upcoming.length === 0 && past.length === 0 && (
           <EmptyState
             icon="calendar-outline"
-            title={tab === "hosting" ? "Du är inte värd för något än" : "Du har inte hakat på något än"}
+            title={tab === "hosting" ? t.mine.noHosting : t.mine.noJoined}
             body={
               tab === "hosting"
-                ? "Lägg upp något du ändå ska göra. Fiska, springa, spela, folk hakar på."
-                : "Kika i Upptäck och ansök om något som ser kul ut."
+                ? t.mine.noHostingBody
+                : t.mine.noJoinedBody
             }
             action={{
-              label: tab === "hosting" ? "Skapa aktivitet" : "Till Upptäck",
+              label: tab === "hosting" ? "Skapa aktivitet" : t.mine.toDiscover,
               onPress: () =>
                 router.push(tab === "hosting" ? "/aktivitet/ny" : "/(tabs)"),
             }}
@@ -125,7 +126,7 @@ export default function MyActivitiesScreen() {
 
         {upcoming.length > 0 && (
           <>
-            <Txt variant="heading">Framåt</Txt>
+            <Txt variant="heading">{t.mine.ahead}</Txt>
             {upcoming.map((activity) => (
               <ActivityListItem
                 key={activity.id}
@@ -270,7 +271,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
           <View style={{ flex: 1 }}>
             <Row gap="xs">
               <Ionicons name="repeat" size={15} color={theme.color.accent} />
-              <Txt variant="micro" tone="muted">NI VILL BÅDA</Txt>
+              <Txt variant="micro" tone="muted">{t.mine.bothWant}</Txt>
             </Row>
             <Gap size="xs" />
             <Txt variant="heading">
@@ -283,7 +284,7 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
         <Row gap="sm">
           <View style={{ flex: 1 }}>
             <Button
-              label="Boka in nästa"
+              label={t.mine.bookNext}
               icon="chatbubble"
               onPress={openChat}
               loading={working}
@@ -307,5 +308,5 @@ function MatchCard({ match, onDone }: { match: Rematch; onDone: () => void }) {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

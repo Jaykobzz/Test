@@ -22,6 +22,7 @@
     "../src/api/types.ts",
     "../src/api/backend.ts",
     "../src/api/interests.ts",
-    "../src/lib/geo.ts"
+    "../src/lib/geo.ts",
+    "../src/i18n/*.ts"
   ]
 }

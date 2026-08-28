@@ -11,8 +11,10 @@
  * och den skillnaden ska synas i orden.
  */
 
-/** "Kostar 120 kr på plats", eller null när det inte kostar något. */
+/** "Kostar 120 kr på plats" eller "Costs 120 kr on site", annars null. */
+import { t } from "@/i18n";
+
 export function formatCost(priceSek: number | null): string | null {
   if (priceSek === null || priceSek === 0) return null;
-  return `Kostar ${priceSek} kr på plats`;
+  return t.activity.costsOnSite(priceSek);
 }

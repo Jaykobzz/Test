@@ -13,6 +13,7 @@ import { Alert, Platform, Pressable, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import { PriceField } from "@/components/PriceField";
 import { INTERESTS, type IconName } from "@/api/interests";
 import type { ActivityVisibility } from "@/api/types";
@@ -32,7 +33,7 @@ const CAPACITIES = [
   { label: "4", value: 4 },
   { label: "6", value: 6 },
   { label: "10", value: 10 },
-  { label: "Ingen gräns", value: null },
+  { label: t.plan.noLimit, value: null },
 ];
 
 export default function NewActivityScreen() {
@@ -82,13 +83,13 @@ export default function NewActivityScreen() {
   /** Vad som fattas, eller null när allt är klart. */
   const missing =
     coverUri === null
-      ? "En bild krävs."
+      ? t.plan.needCover
       : title.trim().length < 3
-        ? "Ge aktiviteten en titel."
+        ? t.plan.needTitle
         : !locationName.trim() || !point
-          ? "Fyll i var ni ska vara."
+          ? t.plan.needPlace
           : startsAt.getTime() <= Date.now()
-            ? "Välj en tid som ligger framåt."
+            ? t.plan.needFutureTime
             : null;
 
   const ready = missing === null;
@@ -98,7 +99,7 @@ export default function NewActivityScreen() {
       const uri = await pickImage("activity-covers");
       if (uri) setCoverUri(uri);
     } catch (error) {
-      Alert.alert("Kunde inte välja bild", describe(error));
+      Alert.alert(t.plan.coverFailed, describe(error));
     }
   }
 
@@ -108,7 +109,7 @@ export default function NewActivityScreen() {
       setPoint({ lat: place.lat, lng: place.lng });
       setLocationName(await describePlace(place));
     } catch (error) {
-      Alert.alert("Kunde inte hämta platsen", describe(error));
+      Alert.alert(t.plan.locationFailed, describe(error));
     }
   }
 
@@ -116,7 +117,7 @@ export default function NewActivityScreen() {
     if (!ready || !coverUri || !point) {
       // Knappen är tryckbar även när något fattas, för en avstängd knapp
       // säger ingenting. Då måste det här säga det i stället.
-      Alert.alert("Något fattas", missing ?? "Fyll i allt först.");
+      Alert.alert(t.common.missing, missing ?? t.plan.needAll);
       return;
     }
     setSaving(true);
@@ -138,7 +139,7 @@ export default function NewActivityScreen() {
       });
       router.replace(`/aktivitet/${activity.id}`);
     } catch (error) {
-      Alert.alert("Kunde inte skapa aktiviteten", describe(error));
+      Alert.alert(t.plan.createFailed, describe(error));
     } finally {
       setSaving(false);
     }
@@ -157,7 +158,7 @@ export default function NewActivityScreen() {
             </>
           )}
           <Button
-            label={saving ? "Lägger upp …" : "Lägg upp"}
+            label={saving ? t.create.posting : t.create.post}
             onPress={create}
             loading={saving}
           />
@@ -167,7 +168,7 @@ export default function NewActivityScreen() {
       <Gap size="lg" />
 
       {/* Bilden först, det är den folk ser i flödet. */}
-      <Pressable onPress={chooseCover} accessibilityLabel="Välj omslagsbild">
+      <Pressable onPress={chooseCover} accessibilityLabel={t.plan.chooseCover}>
         {coverUri ? (
           <View>
             <Image
@@ -208,8 +209,8 @@ export default function NewActivityScreen() {
             }}
           >
             <Ionicons name="image" size={30} color={theme.color.primary} />
-            <Txt variant="smallStrong" tone="primary">Välj en bild</Txt>
-            <Txt variant="small" tone="muted">Krav, det är den som får folk att haka på</Txt>
+            <Txt variant="smallStrong" tone="primary">{t.plan.pickCover}</Txt>
+            <Txt variant="small" tone="muted">{t.plan.coverRequired}</Txt>
           </View>
         )}
       </Pressable>
@@ -217,7 +218,7 @@ export default function NewActivityScreen() {
       <Gap size="xl" />
 
       <Field
-        label="Vad ska ni göra?"
+        label={t.plan.titleLabel}
         value={title}
         onChangeText={setTitle}
         placeholder="Fiska i Drevviken"
@@ -227,10 +228,10 @@ export default function NewActivityScreen() {
       <Gap size="md" />
 
       <Field
-        label="Berätta lite mer"
+        label={t.plan.descriptionLabel}
         value={description}
         onChangeText={setDescription}
-        placeholder="Vad ska man ta med? Behöver man kunna något?"
+        placeholder={t.plan.descriptionPlaceholder}
         multiline
         maxLength={2000}
       />
@@ -255,14 +256,14 @@ export default function NewActivityScreen() {
       <Divider />
 
       <Field
-        label="Var?"
+        label={t.create.where}
         value={locationName}
         onChangeText={setLocationName}
-        placeholder="Drevviken, Skarpnäck"
+        placeholder={t.plan.placePlaceholder}
       />
       <Gap size="sm" />
       <Button
-        label={point ? "Använd min position igen" : "Använd min position"}
+        label={point ? t.plan.useMyLocationAgain : t.plan.useMyLocation}
         icon="location"
         kind="ghost"
         onPress={useCurrentLocation}
@@ -272,7 +273,7 @@ export default function NewActivityScreen() {
       <Gap size="lg" />
       <Divider />
 
-      <Txt variant="smallStrong" tone="muted">När?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.when}</Txt>
       <Gap size="sm" />
 
       {/*
@@ -310,14 +311,14 @@ export default function NewActivityScreen() {
         <>
           <Row gap="sm">
             <Button
-              label="Välj dag"
+              label={t.plan.pickDay}
               kind="secondary"
               icon="calendar"
               onPress={() => setPicker("date")}
               fullWidth={false}
             />
             <Button
-              label="Välj tid"
+              label={t.plan.pickTime}
               kind="secondary"
               icon="time"
               onPress={() => setPicker("time")}
@@ -346,7 +347,7 @@ export default function NewActivityScreen() {
       </Txt>
 
       <Gap size="md" />
-      <Txt variant="smallStrong" tone="muted">Hur länge?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howLong}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {[1, 2, 3, 4, 6, 8].map((hours) => (
@@ -362,7 +363,7 @@ export default function NewActivityScreen() {
       <Gap size="lg" />
       <Divider />
 
-      <Txt variant="smallStrong" tone="muted">Vem får se den?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.plan.whoSees}</Txt>
       <Gap size="sm" />
       <VisibilityChoice value={visibility} onChange={setVisibility} />
 
@@ -372,7 +373,7 @@ export default function NewActivityScreen() {
 
       <Gap size="lg" />
 
-      <Txt variant="smallStrong" tone="muted">Hur många kan haka på?</Txt>
+      <Txt variant="smallStrong" tone="muted">{t.create.howMany}</Txt>
       <Gap size="sm" />
       <Row gap="sm" wrap>
         {CAPACITIES.map((option) => (
@@ -408,14 +409,14 @@ function VisibilityChoice({
     {
       key: "public",
       icon: "globe",
-      title: "Alla i närheten",
-      body: "Syns i flödet för alla som är i området.",
+      title: t.create.everyone,
+      body: t.plan.publicHelp,
     },
     {
       key: "friends",
       icon: "heart",
       title: "Bara mina kompisar",
-      body: "Ingen annan ser den. Bra för sånt du bara delar med folk du känner.",
+      body: t.plan.friendsHelp,
     },
   ];
 
@@ -460,5 +461,5 @@ function VisibilityChoice({
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }

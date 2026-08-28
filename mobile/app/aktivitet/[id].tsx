@@ -47,7 +47,7 @@ export default function ActivityScreen() {
     try {
       setActivity(await getBackend().getActivity(id));
     } catch (error) {
-      Alert.alert("Kunde inte hämta aktiviteten", describe(error));
+      Alert.alert(t.activity.couldNotLoad, describe(error));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -223,7 +223,7 @@ export default function ActivityScreen() {
           <Gap size="lg" />
           <Divider />
 
-          <Txt variant="heading">Värd</Txt>
+          <Txt variant="heading">{t.activity.host}</Txt>
           <Gap size="md" />
           <PersonRow
             id={activity.hostId}
@@ -479,7 +479,7 @@ function ActionArea({
   const full = activity.spotsLeft === 0;
 
   if (activity.status === "cancelled") {
-    return <Txt variant="small" tone="faint" align="center">Aktiviteten är inställd.</Txt>;
+    return <Txt variant="small" tone="faint" align="center">{t.cancelledNotice.text}</Txt>;
   }
 
   if (past) {

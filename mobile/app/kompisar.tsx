@@ -12,6 +12,7 @@ import { Alert, Pressable, RefreshControl, ScrollView, View } from "react-native
 import { useFocusEffect } from "expo-router";
 
 import { getBackend } from "@/api";
+import { t } from "@/i18n";
 import type { FriendRequest, PublicProfile } from "@/api/types";
 import {
   Avatar, Button, Card, Credentials, EmptyState, Gap, Loading, Row, Screen, Txt,
@@ -95,7 +96,7 @@ export default function FriendsScreen() {
                   <Row gap="sm">
                     <View style={{ flex: 1 }}>
                       <Button
-                        label="Ja gärna"
+                        label={t.friends.accept}
                         icon="heart"
                         onPress={() => respond(request.friendshipId, true)}
                       />
@@ -117,14 +118,14 @@ export default function FriendsScreen() {
         {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 ? (
           <EmptyState
             icon="heart-outline"
-            title="Inga kompisar än"
-            body="När du varit med om något kul med någon kan du fråga om ni ska bli kompisar. Då ser ni varandras privata aktiviteter."
-            action={{ label: "Hitta något att göra", onPress: () => router.push("/(tabs)") }}
+            title={t.friends.emptyTitle}
+            body={t.friends.emptyBody}
+            action={{ label: t.friends.findSomething, onPress: () => router.push("/(tabs)") }}
           />
         ) : (
           friends.length > 0 && (
             <>
-              <Txt variant="heading">Dina kompisar ({friends.length})</Txt>
+              <Txt variant="heading">{t.nav.friends} ({friends.length})</Txt>
               {friends.map((person) => (
                 <Card key={person.id} onPress={() => router.push(`/person/${person.id}`)}>
                   <View style={{ padding: space.lg }}>
@@ -157,7 +158,7 @@ export default function FriendsScreen() {
         {outgoing.length > 0 && (
           <>
             <Gap size="md" />
-            <Txt variant="heading">Väntar på svar</Txt>
+            <Txt variant="heading">{t.friends.waiting}</Txt>
             {outgoing.map((request) => (
               <Card key={request.friendshipId}>
                 <View style={{ padding: space.lg }}>
@@ -169,7 +170,7 @@ export default function FriendsScreen() {
                     />
                     <View style={{ flex: 1 }}>
                       <Txt variant="bodyStrong">{request.profile.displayName}</Txt>
-                      <Txt variant="small" tone="faint">Du har frågat</Txt>
+                      <Txt variant="small" tone="faint">{t.friends.youAsked}</Txt>
                     </View>
                   </Row>
                 </View>
@@ -183,5 +184,5 @@ export default function FriendsScreen() {
 }
 
 function describe(error: unknown): string {
-  return error instanceof Error ? error.message : "Något gick fel.";
+  return error instanceof Error ? error.message : t.common.somethingWrong;
 }
